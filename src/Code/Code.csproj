@@ -1,0 +1,219 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{26C977EB-925F-470D-8AAC-2DD36347F701}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Code</RootNamespace>
+    <AssemblyName>Code</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Api2\Controllers\AppSettingsController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api2\Controllers\Base\ApiController.cs" />
+    <Compile Include="Api2\Controllers\Base\ApiServiceExtension.cs" />
+    <Compile Include="Api2\Controllers\Cache\ApiController.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApiController.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api2\Controllers\Cache\CachesController.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CachesController.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api2\Controllers\Contollers.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\AppDbContext.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AppDbContext.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Core\DesignTimeDbContextFactory.cs" />
+    <Compile Include="Data\Services\Base\BaseService.cs" />
+    <Compile Include="Data\Services\Base\RemoveUnique.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RemoveUnique.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Services\DataServiceExtension.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataServiceExtension.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\Base\BaseEntityDto.cs" />
+    <Compile Include="Dtos\Base\BulkEntityDto.cs" />
+    <Compile Include="Dtos\Base\IBaseEntityDto.cs" />
+    <Compile Include="Dtos\Caches\AppSettingCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\Caches\BaseEntityCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\Caches\BaseNameEntityCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\Caches\Base\BaseCache.cs" />
+    <Compile Include="Dtos\Caches\_Cache.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\_Dto.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Address.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\AppSetting.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\BaseEntity.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\BaseNameEntity.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Base\BaseEntity.cs" />
+    <Compile Include="Entities\Base\IBaseEntity.cs" />
+    <Compile Include="Entities\Base\RemoveNavigation.cs" />
+    <Compile Include="Entities\Base\RemoveNavigation1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RemoveNavigation.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\BulkEntity.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\CurriculumType.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\File.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Gender.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\MediaType.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\_Entities.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Model.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Model.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EntityDeploy Include="Model.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Model.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.Config" />
+    <None Include="copyApi.bat" />
+    <None Include="copyApi2.bat" />
+    <None Include="copyBlazor.bat" />
+    <None Include="copyBlazor1.bat" />
+    <None Include="copyBlazorPage.bat" />
+    <None Include="copyData.bat" />
+    <None Include="copyDataServices.bat" />
+    <None Include="copyDtos.bat" />
+    <None Include="copyEntities.bat" />
+    <None Include="copyit - Copy.bat" />
+    <None Include="copyit.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Api2\Controllers\Cache\ApiController.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ApiController.cs</LastGenOutput>
+    </Content>
+    <Content Include="Api2\Controllers\Cache\CachesController.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CachesController.cs</LastGenOutput>
+    </Content>
+    <Content Include="Api2\Controllers\Contollers.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Contollers.cs</LastGenOutput>
+    </Content>
+    <Content Include="copyit-xlist.txt" />
+    <Content Include="Data\AppDbContext.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AppDbContext.cs</LastGenOutput>
+    </Content>
+    <Content Include="Data\Services\Base\RemoveUnique.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RemoveUnique.cs</LastGenOutput>
+    </Content>
+    <Content Include="Data\Services\DataServiceExtension.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DataServiceExtension.cs</LastGenOutput>
+    </Content>
+    <Content Include="Dtos\Caches\_Cache.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>_Cache.cs</LastGenOutput>
+    </Content>
+    <Content Include="Dtos\_Dto.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>_Dto.cs</LastGenOutput>
+    </Content>
+    <Content Include="Entities\Base\RemoveNavigation.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RemoveNavigation1.cs</LastGenOutput>
+    </Content>
+    <Content Include="Entities\_Entities.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>_Entities.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

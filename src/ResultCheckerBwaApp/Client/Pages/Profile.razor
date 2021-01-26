@@ -1,0 +1,77 @@
+﻿@page "/profile"
+@*@layout LoginLayout*@
+@inject NavigationManager navigationManager
+@inject AuthenticationStateProvider authStateProvider
+
+<h1 class="h2 font-weight-normal login-title">
+</h1>
+
+<AuthorizeView>
+    <Authorized>
+        <EditForm class="form-signin" OnValidSubmit="OnSubmit" Model="userInfo" Context="edit">
+            <DataAnnotationsValidator />
+            <h4 class="font-weight-normal text-center">Profile</h4>
+
+            <label for="inputUsername" class="sr-only">User Name</label>
+            <InputText id="inputUsername" class="form-control" @bind-Value="userInfo.UserName" autofocus placeholder="Username" />
+            <ValidationMessage For="@(() => userInfo.UserName)" />
+
+            @foreach (var claim in userInfo.Claims)
+            {
+                <div>@(claim.Key) | @(claim.Value)</div>
+            }
+
+            @*<label for="inputPassword" class="sr-only">Password</label>
+                <InputText type="password" id="inputPassword" class="form-control" placeholder="Password" @bind-Value="userInfo.Password" />
+                <ValidationMessage For="@(() => userInfo.Password)" />
+
+                <div class="form-check m-3">
+                    <InputCheckbox id="inputRememberMe" class="form-check-input" @bind-Value="@userInfo.RememberMe" />
+                    <label class="form-check-label" for="inputRememberMe">Remember Me</label>
+                </div>*@
+
+            <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+
+            <label class="text-danger">@error</label>
+
+            @*<NavLink href="aspnetidentity/register">
+                    <h6 class="font-weight-normal text-center">Create account</h6>
+                </NavLink>*@
+        </EditForm>
+    </Authorized>
+    <NotAuthorized>
+    </NotAuthorized>
+</AuthorizeView>
+
+
+@code{
+
+    UserInfo userInfo { get; set; }
+    string error { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userInfo = new()
+        {
+            UserName = user.Identity.Name,
+            Claims = user.Claims.Select(s => new KeyValuePair<string, string>(s.Type, s.Value)).ToList()
+        };
+
+    }
+
+    async Task OnSubmit()
+    {
+        error = null;
+        try
+        {
+
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+}

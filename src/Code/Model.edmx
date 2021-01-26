@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl" Namespace="Model.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2005">
+        <EntityContainer Name="ModelTargetContainer" >
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="Model" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+        <EntityContainer Name="ModelContainer" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="BulkEntities" EntityType="Model.BulkEntity" />
+          <EntitySet Name="BaseEntities" EntityType="Model.BaseEntity" />
+          </EntityContainer>
+        <EntityType Name="BulkEntity">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <EntityType Name="BaseNameEntity" BaseType="Model.BaseEntity">
+          <Property Name="Name" Nullable="false" MaxLength="100" Type="String" />
+        </EntityType>
+        <EntityType Name="BaseEntity">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+        </EntityType>
+        <ComplexType Name="File" >
+          <Property Type="String" Name="Uri" Nullable="true" />
+          <Property Type="String" Name="Extension" Nullable="true" />
+          <Property Type="String" Name="Content" Nullable="false" />
+        </ComplexType>
+        <EnumType Name="Gender">
+          <Member Name="Male" />
+          <Member Name="Female" />
+        </EnumType>
+        <ComplexType Name="Address" >
+          <Property Type="String" Name="Line1" Nullable="false" />
+          <Property Type="String" Name="Line2" Nullable="false" />
+          <Property Type="String" Name="PostCode" Nullable="false" />
+          <Property Type="String" Name="State" Nullable="false" />
+          <Property Type="String" Name="Country" Nullable="false" />
+        </ComplexType>
+        <EnumType Name="MediaType">
+          <Member Name="Text" Value="0" />
+          <Member Name="Image" Value="1" />
+          <Member Name="Video" Value="2" />
+          <Member Name="Audio" Value="3" />
+          <Member Name="Application" Value="4" />
+          <Member Name="Pdf" Value="5" />
+          <Member Name="Csv" Value="6" />
+          <Member Name="Zoom" Value="7" />
+        </EnumType>
+        <EnumType Name="CurriculumType">
+          <Member Name="Learn" />
+          <Member Name="Test" />
+        </EnumType>
+        <EntityType Name="AppSetting" BaseType="Model.BaseEntity" >
+          <Property Name="Key" Type="String" Nullable="false" MaxLength="100" />
+          <Property Name="Value" Type="String" MaxLength="100" />
+        </EntityType>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs" Space="C-S">
+        <Alias Key="Model" Value="Model" />
+        <Alias Key="Target" Value="Model.Store" />
+        <EntityContainerMapping CdmEntityContainer="ModelContainer" StorageEntityContainer="ModelTargetContainer">
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="8d1c865064164a32a21ac0271227ced2" Name="Diagram1" ZoomLevel="86">
+        <EntityTypeShape EntityType="Model.BulkEntity" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="Model.BaseNameEntity" Width="1.5" PointX="11.75" PointY="2.75" />
+        <EntityTypeShape EntityType="Model.BaseEntity" Width="1.5" PointX="8.375" PointY="0.75" />
+        <InheritanceConnector EntityType="Model.BaseNameEntity" />
+        <EntityTypeShape EntityType="Model.AppSetting" Width="1.5" PointX="6.125" PointY="2.75" />
+        <InheritanceConnector EntityType="Model.AppSetting" />
+        </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -1,0 +1,21 @@
+@inject NavigationManager navigationManager
+@inject IdentityAuthenticationStateProvider authStateProvider
+
+<AuthorizeView>
+    <Authorized>
+        <a href="aspnetidentity/profile">Hello, @context.User.Identity.Name!</a>
+        <button class="nav-link btn btn-link" @onclick="BeginSignOut">Log out</button>
+    </Authorized>
+    <NotAuthorized>
+        <a href="aspnetidentity/register">Register</a>
+        <a href="aspnetidentity/login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    private async Task BeginSignOut(MouseEventArgs args)
+    {
+        await authStateProvider.Logout();
+        navigationManager.NavigateTo("/aspnetidentity/login");
+    }
+}

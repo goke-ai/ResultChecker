@@ -1,0 +1,64 @@
+﻿@page "/playgame"
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using ResultCheckerBwaApp.Shared
+@attribute [Authorize(Roles ="Gamers,Users")]
+@inject HttpClient Http
+
+<h1>Game</h1>
+
+<p>This is Game of Rock, Paper and Scissor, it demonstrates Role authorization from the server.</p>
+
+@if (games == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Player1</th>
+                <th>Player2</th>
+                <th>Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var game in games)
+            {
+                <tr>
+                    <td>@game.Date.ToString()</td>
+                    <td>@game.Player1</td>
+                    <td>@game.Player2</td>
+                    <td>@game.Score</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+
+    private Game[] games;
+    string error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            games = await Http.GetFromJsonAsync<Game[]>("Games");
+        }
+        catch (AccessTokenNotAvailableException exception)
+        {
+            exception.Redirect();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            Console.WriteLine(error);            
+        }
+    }
+
+}

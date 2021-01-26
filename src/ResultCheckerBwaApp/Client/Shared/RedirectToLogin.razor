@@ -1,0 +1,24 @@
+@inject IIdentitySetting IdentitySetting
+
+@switch (identity)
+{
+    case "AspnetIdentity":
+        <AspnetIdentityRedirectToLogin />
+        break;
+    case "IdentityServer":
+        <IdentityServerRedirectToLogin />
+        break;
+    default:
+        break;
+}
+
+
+@code{
+    string identity = "";
+
+    protected override void OnInitialized()
+    {
+        identity = IdentitySetting.Value;
+    }
+
+}
