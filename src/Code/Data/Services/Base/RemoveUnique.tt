@@ -28,7 +28,7 @@ if (container == null)
 //------------------------------------------------------------------------------
 
 <#
-var useNamespace = "Ark.Iskools.Data.Services";
+var useNamespace = "Ark.ResultCheckers.Data.Services";
 var usinglist = new string[]{
 					"Microsoft.EntityFrameworkCore",
 					codeStringGenerator.GetRootNamespace() + ".Entities",
@@ -63,7 +63,7 @@ using System.Linq;
 #>
 
 using System;
-using Ark.Iskools.Dtos;
+using Ark.ResultCheckers.Dtos;
 
 <#
     //foreach (var entitySet in container.BaseEntitySets.OfType<EntitySet>().OrderBy(o => o.Name))

@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ark.Iskools.Entities
+namespace Ark.ResultCheckers.Entities
 {
     
     using System;

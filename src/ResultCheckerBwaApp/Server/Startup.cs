@@ -16,6 +16,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Ark.ResultCheckers.Data;
 
 namespace ResultCheckerBwaApp.Server
 {
@@ -35,6 +36,10 @@ namespace ResultCheckerBwaApp.Server
         {
             var identity = Configuration["Identity"];
             IsAspnetIdentity = identity == "AspnetIdentity";
+
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(

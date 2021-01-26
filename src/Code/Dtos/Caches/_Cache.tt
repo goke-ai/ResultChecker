@@ -10,7 +10,7 @@ var typeMapper = new TypeMapper(code, ef, textTransform.Errors);
 var	fileManager = EntityFrameworkTemplateFileManager.Create(this);
 var itemCollection = new EdmMetadataLoader(textTransform.Host, textTransform.Errors).CreateEdmItemCollection(inputFile);
 var codeStringGenerator = new CodeStringGenerator(code, typeMapper, ef);
-var moreNamespace = ""; // "Ark.Iskools.Dtos.Caches";
+var moreNamespace = ""; // "Ark.ResultCheckers.Dtos.Caches";
 var usinglist = new string[]{
 					"Microsoft.EntityFrameworkCore",
 					codeStringGenerator.GetRootNamespace() + ".Entities",
@@ -1385,7 +1385,7 @@ public class CodeStringGenerator
                 (Environment.NewLine + "using System.ComponentModel.DataAnnotations;"),
                 (Environment.NewLine + "using System.ComponentModel.DataAnnotations.Schema;"),
                 (Environment.NewLine + "using System.Linq.Expressions;"),
-                //(Environment.NewLine + "using Ark.Iskools.Entities;"),
+                //(Environment.NewLine + "using Ark.ResultCheckers.Entities;"),
                 (Environment.NewLine + "using " + ns + ".Entities;"),
                 inHeader ? "" : Environment.NewLine)
             : "";

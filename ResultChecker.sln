@@ -9,7 +9,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResultCheckerBwaApp.Client"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ResultCheckerBwaApp.Shared", "src\ResultCheckerBwaApp\Shared\ResultCheckerBwaApp.Shared.csproj", "{8C9EB448-FB60-4A99-8E20-B16071305D4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Code", "src\Code\Code.csproj", "{26C977EB-925F-470D-8AAC-2DD36347F701}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ark.ResultCheckers.Entities", "src\Ark.ResultCheckers.Entities\Ark.ResultCheckers.Entities.csproj", "{3DB8758A-C206-4DD3-8FE7-D61AF2CED2FB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ark.ResultCheckers.Dtos", "src\Ark.ResultCheckers.Dtos\Ark.ResultCheckers.Dtos.csproj", "{F2298C7C-1E30-4F6A-82A9-04300EAB9C44}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ark.ResultCheckers.Data", "src\Ark.ResultCheckers.Data\Ark.ResultCheckers.Data.csproj", "{2ACC1AA9-682C-4C98-B56B-A380E0251641}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Lib", "Lib", "{22E9F06F-88F0-43BB-8E9D-3DE1BDB94C51}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Coding", "Coding", "{10B34352-4207-4A58-B9B1-AAC971EE1DF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,13 +37,26 @@ Global
 		{8C9EB448-FB60-4A99-8E20-B16071305D4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C9EB448-FB60-4A99-8E20-B16071305D4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C9EB448-FB60-4A99-8E20-B16071305D4A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{26C977EB-925F-470D-8AAC-2DD36347F701}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{26C977EB-925F-470D-8AAC-2DD36347F701}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{26C977EB-925F-470D-8AAC-2DD36347F701}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{26C977EB-925F-470D-8AAC-2DD36347F701}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DB8758A-C206-4DD3-8FE7-D61AF2CED2FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DB8758A-C206-4DD3-8FE7-D61AF2CED2FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DB8758A-C206-4DD3-8FE7-D61AF2CED2FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DB8758A-C206-4DD3-8FE7-D61AF2CED2FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2298C7C-1E30-4F6A-82A9-04300EAB9C44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2298C7C-1E30-4F6A-82A9-04300EAB9C44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2298C7C-1E30-4F6A-82A9-04300EAB9C44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2298C7C-1E30-4F6A-82A9-04300EAB9C44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2ACC1AA9-682C-4C98-B56B-A380E0251641}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2ACC1AA9-682C-4C98-B56B-A380E0251641}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2ACC1AA9-682C-4C98-B56B-A380E0251641}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2ACC1AA9-682C-4C98-B56B-A380E0251641}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3DB8758A-C206-4DD3-8FE7-D61AF2CED2FB} = {22E9F06F-88F0-43BB-8E9D-3DE1BDB94C51}
+		{F2298C7C-1E30-4F6A-82A9-04300EAB9C44} = {22E9F06F-88F0-43BB-8E9D-3DE1BDB94C51}
+		{2ACC1AA9-682C-4C98-B56B-A380E0251641} = {22E9F06F-88F0-43BB-8E9D-3DE1BDB94C51}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1993BBEE-6106-4654-AACC-112E14A27EBF}

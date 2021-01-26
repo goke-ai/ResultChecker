@@ -28,7 +28,7 @@ if (container == null)
 //------------------------------------------------------------------------------
 
 <#
-var useNamespace = "Ark.Iskools.Api2.Controllers";
+var useNamespace = "Ark.ResultCheckers.Api2.Controllers";
 var usinglist = new string[]{
 					"Microsoft.AspNetCore.Hosting",
 					"Microsoft.AspNetCore.Http",
@@ -40,7 +40,7 @@ var usinglist = new string[]{
 					"System.IO",
 					"System.Linq",
 					"System.Threading.Tasks",
-					"Ark.Iskools.Dtos.Caches",
+					"Ark.ResultCheckers.Dtos.Caches",
 				};
 
 var codeNamespace = code.VsNamespaceSuggestion();

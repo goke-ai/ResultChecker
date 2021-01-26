@@ -54,7 +54,7 @@ namespace ResultCheckerBwaApp.Server
                     // var testUserPw = config["SeedUserPW"];
                     SeedData.InitializeAsync(scope.ServiceProvider, config).Wait();
 
-                    // Ark.Coeus.Data.Seeding.Start(serviceProvider.GetRequiredService<AppDbContext>(), serviceProvider.GetRequiredService<ILogger<Ark.Coeus.Data.Seeding>>());
+                    Ark.ResultCheckers.Data.SeedData.Initialize(scope.ServiceProvider, config);
 
                     logger.LogInformation(message);
                 }

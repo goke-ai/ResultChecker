@@ -12,7 +12,7 @@ var itemCollection = new EdmMetadataLoader(textTransform.Host, textTransform.Err
 var codeStringGenerator = new CodeStringGenerator(code, typeMapper, ef);
 
 var baseType = "";
-string moreNamespace = ""; // "Ark.Iskools.Entities";
+string moreNamespace = ""; // "Ark.ResultCheckers.Entities";
 
 if (!typeMapper.VerifyCaseInsensitiveTypeUniqueness(typeMapper.GetAllGlobalItems(itemCollection), inputFile))
 {

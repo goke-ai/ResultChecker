@@ -10,10 +10,10 @@ var typeMapper = new TypeMapper(code, ef, textTransform.Errors);
 var	fileManager = EntityFrameworkTemplateFileManager.Create(this);
 var itemCollection = new EdmMetadataLoader(textTransform.Host, textTransform.Errors).CreateEdmItemCollection(inputFile);
 var codeStringGenerator = new CodeStringGenerator(code, typeMapper, ef);
-var moreNamespace = ""; // "Ark.Iskools.Dtos";
+var moreNamespace = ""; // "Ark.ResultCheckers.Dtos";
 var usinglist = new string[]{
 					"Microsoft.EntityFrameworkCore",
-					"Ark.Iskools.Entities",
+					"Ark.ResultCheckers.Entities",
 				};
 
 if (!typeMapper.VerifyCaseInsensitiveTypeUniqueness(typeMapper.GetAllGlobalItems(itemCollection), inputFile))
@@ -397,7 +397,7 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 	{
 #>            
             Name = x.Name,
-            DisplayName = x.DisplayName,
+            // DisplayName = x.DisplayName,
             // Description = x.Description,
 <#
 	}
@@ -510,7 +510,7 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 	{
 #>            
             Name = x.Name,
-            DisplayName = x.DisplayName,
+            // DisplayName = x.DisplayName,
             // Description = x.Description,
 <#
 	}
@@ -588,7 +588,7 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 	{
 #>            
             y.Name = x.Name;
-            y.DisplayName = x.DisplayName;
+            // y.DisplayName = x.DisplayName;
 <#
 	}
 	if(entityBaseType?.StartsWith("Bulk") == true)
@@ -2102,7 +2102,7 @@ public class CodeStringGenerator
                 (Environment.NewLine + "using System.ComponentModel.DataAnnotations.Schema;"),
                 (Environment.NewLine + "using System.Linq;"),
                 (Environment.NewLine + "using System.Linq.Expressions;"),
-                //(Environment.NewLine + "using Ark.Iskools.Entities;"),
+                //(Environment.NewLine + "using Ark.ResultCheckers.Entities;"),
                 (Environment.NewLine + "using " + ns + ".Entities;"),
                 inHeader ? "" : Environment.NewLine)
             : "";

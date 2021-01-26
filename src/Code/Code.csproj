@@ -7,7 +7,7 @@
     <ProjectGuid>{26C977EB-925F-470D-8AAC-2DD36347F701}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Code</RootNamespace>
+    <RootNamespace>Ark.ResultCheckers</RootNamespace>
     <AssemblyName>Code</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -31,8 +31,33 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Extensions.Configuration.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Extensions.Logging.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Primitives, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Extensions.Primitives.5.0.0\lib\net461\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,40 +72,106 @@
     <Compile Include="Api2\Controllers\Base\ApiController.cs" />
     <Compile Include="Api2\Controllers\Base\ApiServiceExtension.cs" />
     <Compile Include="Api2\Controllers\Cache\ApiController.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>ApiController.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="Api2\Controllers\Cache\CachesController.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>CachesController.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="Api2\Controllers\CardsController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
     </Compile>
     <Compile Include="Api2\Controllers\Contollers.cs">
-      <AutoGen>True</AutoGen>
+      <DependentUpon>Contollers.tt</DependentUpon>
       <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="Api2\Controllers\CoursesController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api2\Controllers\GradesController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api2\Controllers\SemestersController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api2\Controllers\SessionsController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api2\Controllers\StudentCoursesController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Api2\Controllers\StudentsController.cs">
       <DependentUpon>Contollers.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\AppDbContext.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>AppDbContext.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="Data\Core\DesignTimeDbContextFactory.cs" />
+    <Compile Include="Data\Seeding\SeedData.cs" />
+    <Compile Include="Data\Services\AppSettingService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
     <Compile Include="Data\Services\Base\BaseService.cs" />
     <Compile Include="Data\Services\Base\RemoveUnique.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>RemoveUnique.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="Data\Services\CardService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Services\CourseService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\Services\DataServiceExtension.cs">
+      <DependentUpon>DataServiceExtension.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="Data\Services\GradeService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Services\SemesterService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Services\Services.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>DataServiceExtension.tt</DependentUpon>
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Services\SessionService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Services\StudentCourseService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Services\StudentService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\AppSettingDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\BaseEntityDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\BaseNameEntityDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
     </Compile>
     <Compile Include="Dtos\Base\BaseEntityDto.cs" />
     <Compile Include="Dtos\Base\BulkEntityDto.cs" />
     <Compile Include="Dtos\Base\IBaseEntityDto.cs" />
+    <Compile Include="Dtos\BulkEntityDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\BulkStudentCourseDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
     <Compile Include="Dtos\Caches\AppSettingCache.cs">
       <DependentUpon>_Cache.tt</DependentUpon>
     </Compile>
@@ -91,15 +182,62 @@
       <DependentUpon>_Cache.tt</DependentUpon>
     </Compile>
     <Compile Include="Dtos\Caches\Base\BaseCache.cs" />
-    <Compile Include="Dtos\Caches\_Cache.cs">
+    <Compile Include="Dtos\Caches\CacheKeys.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
+      <DependentUpon>CacheKeys.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\Caches\CardCache.cs">
       <DependentUpon>_Cache.tt</DependentUpon>
     </Compile>
-    <Compile Include="Dtos\_Dto.cs">
-      <AutoGen>True</AutoGen>
+    <Compile Include="Dtos\Caches\CourseCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\Caches\GradeCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\Caches\SemesterCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\Caches\SessionCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\Caches\StudentCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\Caches\StudentCourseCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\Caches\_Cache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
       <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="Dtos\CardDto.cs">
       <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\CourseDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\GradeDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\SemesterDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\SessionDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\StudentCourseDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\StudentDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Dtos\_Dto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="Entities\Address.cs">
       <DependentUpon>_Entities.tt</DependentUpon>
@@ -117,11 +255,20 @@
     <Compile Include="Entities\Base\IBaseEntity.cs" />
     <Compile Include="Entities\Base\RemoveNavigation.cs" />
     <Compile Include="Entities\Base\RemoveNavigation1.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>RemoveNavigation.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="Entities\BulkEntity.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\BulkStudentCourse.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Card.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Course.cs">
       <DependentUpon>_Entities.tt</DependentUpon>
     </Compile>
     <Compile Include="Entities\CurriculumType.cs">
@@ -133,13 +280,28 @@
     <Compile Include="Entities\Gender.cs">
       <DependentUpon>_Entities.tt</DependentUpon>
     </Compile>
+    <Compile Include="Entities\Grade.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
     <Compile Include="Entities\MediaType.cs">
       <DependentUpon>_Entities.tt</DependentUpon>
     </Compile>
-    <Compile Include="Entities\_Entities.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
+    <Compile Include="Entities\Semester.cs">
       <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Session.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\Student.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\StudentCourse.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Entities\_Entities.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
     <Compile Include="Model.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -167,6 +329,7 @@
     <None Include="copyEntities.bat" />
     <None Include="copyit - Copy.bat" />
     <None Include="copyit.bat" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Api2\Controllers\Cache\ApiController.tt">
@@ -193,6 +356,14 @@
     <Content Include="Data\Services\DataServiceExtension.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>DataServiceExtension.cs</LastGenOutput>
+    </Content>
+    <Content Include="Data\Services\Services.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Services.cs</LastGenOutput>
+    </Content>
+    <Content Include="Dtos\Caches\CacheKeys.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CacheKeys.cs</LastGenOutput>
     </Content>
     <Content Include="Dtos\Caches\_Cache.tt">
       <Generator>TextTemplatingFileGenerator</Generator>

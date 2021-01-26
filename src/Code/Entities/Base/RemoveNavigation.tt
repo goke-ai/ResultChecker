@@ -28,7 +28,7 @@ if (container == null)
 //------------------------------------------------------------------------------
 
 <#
-var useNamespace = "Ark.Iskools.Entities";
+var useNamespace = "Ark.ResultCheckers.Entities";
 var usinglist = new string[]{
 					"Microsoft.EntityFrameworkCore",
 					codeStringGenerator.GetRootNamespace() + ".Entities",
