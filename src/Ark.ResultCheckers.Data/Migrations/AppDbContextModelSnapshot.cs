@@ -98,6 +98,10 @@ namespace Ark.ResultCheckers.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("BulkStudentCourses");
@@ -229,16 +233,17 @@ namespace Ark.ResultCheckers.Data.Migrations
                     b.Property<bool>("IsVisible")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("LastActivityDateTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("LastActivityUser")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<double>("NextBeginMark")
                         .HasColumnType("float");
@@ -401,7 +406,6 @@ namespace Ark.ResultCheckers.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Middlename")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdateDateTime")

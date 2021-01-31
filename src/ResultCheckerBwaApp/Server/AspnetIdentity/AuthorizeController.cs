@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ark.ResultCheckers.Data;
 
 namespace ResultCheckerBwaApp.Server.AspnetIdentity.Controllers
 {
@@ -17,24 +18,84 @@ namespace ResultCheckerBwaApp.Server.AspnetIdentity.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        AppDbContext _context;
+        RoleManager<IdentityRole> _roleManager;
 
-        public AuthorizeController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AuthorizeController(UserManager<ApplicationUser> userManager, 
+            SignInManager<ApplicationUser> signInManager,
+            RoleManager<IdentityRole> roleManager,
+            AppDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _context = context;
+            _roleManager = roleManager;
         }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginParameters parameters)
         {
             var user = await _userManager.FindByNameAsync(parameters.UserName);
-            if (user == null) return BadRequest("User does not exist");
+            if (user == null)
+            {
+                //
+                user = await CreateUserFromPin(parameters);
+                if (user == null)
+                {
+                    return BadRequest("User does not exist");
+                }
+            }
             var singInResult = await _signInManager.CheckPasswordSignInAsync(user, parameters.Password, false);
             if (!singInResult.Succeeded) return BadRequest("Invalid password");
 
             await _signInManager.SignInAsync(user, parameters.RememberMe);
 
             return Ok();
+        }
+
+        async Task<ApplicationUser> CreateUserFromPin(LoginParameters parameters)
+        {
+            ApplicationUser user = null;
+            //
+            var x = ValidPin(parameters.Password);
+            if (x.Valid)
+            {
+                if (x.Owner == parameters.UserName)
+                {
+                    // used just login
+                }
+                else if ( string.IsNullOrWhiteSpace(x.Owner))
+                {
+                    // new pin
+                    user = new ApplicationUser();
+                    user.UserName = parameters.UserName;
+                    var result = await _userManager.CreateAsync(user, parameters.Password);
+                    if (!result.Succeeded) 
+                        throw new Exception(result.Errors.FirstOrDefault()?.Description);
+
+                    // add role
+                    IdentityResult IR = null;
+                    var role = "Students";
+                    if (!await _roleManager.RoleExistsAsync(role))
+                    {
+                        IR = await _roleManager.CreateAsync(new IdentityRole(role));
+                    }
+
+                    IR = await _userManager.AddToRoleAsync(user, role);
+
+                }
+                else
+                {
+
+                }
+            }
+            return user;
+        }
+
+        (bool Valid, string Owner) ValidPin(string pin)
+        {
+            var card = _context.Cards.FirstOrDefault(a => a.Pin == pin);
+            return (card?.Pin == pin, card?.LastActivityUser);
         }
 
 

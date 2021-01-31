@@ -1,0 +1,23 @@
+﻿<MatSnackbar @bind-IsOpen="@IsOpen">
+    <MatSnackbarContent>@Message</MatSnackbarContent>
+    <MatSnackbarActions>
+        <MatButton  Raised="true">Retry</MatButton>
+    </MatSnackbarActions>
+</MatSnackbar>
+
+@code {
+
+    [Parameter]
+    public bool IsOpen { get; set; } = false;
+
+    [Parameter]
+    public string Message { get; set; }
+
+    public void Show()
+    {
+        IsOpen = true;
+        //Message = message;
+        this.StateHasChanged();
+    }
+
+}

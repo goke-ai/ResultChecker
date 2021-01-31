@@ -136,10 +136,11 @@ namespace Ark.ResultCheckers.Data.Services
     
             IQueryable<StudentCourseDto> query = StudentCourseDtoQuery(includeNavigations, filters);
     
-            return await query
+            var y = await query
                         // Use AsNoTracking to disable EF change tracking
                         // Use ToListAsync to avoid blocking a thread
                         .AsNoTracking().ToListAsync();
+            return y;
         }
     
         public async Task<StudentCourseDto> GetStudentCourseDtoAsync(String[] includeNavigations, params Expression<Func<StudentCourseDto, bool>>[] filters)

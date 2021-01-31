@@ -204,9 +204,14 @@ namespace Ark.ResultCheckers.Dtos
     			// +navigation
     			StudentName = x.Student == null ? default : x.Student.StudentName,
     			CourseName = x.Course == null ? default : x.Course.CourseName,
-    			SessionName = x.Session != null ? x.Session.Name : default,
-    			SemesterName = x.Semester != null ? x.Semester.Name : default,
-                
+                SessionName = x.Session != null ? x.Session.Name : default,
+                SemesterName = x.Semester != null ? x.Semester.Name : default,
+
+
+    			CourseCode = x.Course == null ? default : x.Course.Code,
+                StudentMatricNo = x.Student == null ? default : x.Student.MatricNo,
+
+
                 IsVisible = x.IsVisible,
                 InsertUser = x.InsertUser,
                 InsertDateTime = x.InsertDateTime,

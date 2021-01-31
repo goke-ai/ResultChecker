@@ -7,7 +7,7 @@
     <ProjectGuid>{26C977EB-925F-470D-8AAC-2DD36347F701}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Ark.ResultCheckers</RootNamespace>
+    <RootNamespace>Ark</RootNamespace>
     <AssemblyName>Code</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -31,20 +31,111 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.AspNetCore.Authentication.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Authentication.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Authentication.Core, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Authentication.Core.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authentication.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Authorization, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Authorization.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authorization.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Authorization.Policy, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Authorization.Policy.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Authorization.Policy.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Hosting.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Hosting.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Hosting.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Hosting.Server.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Hosting.Server.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Hosting.Server.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Http.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Http.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Extensions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Http.Extensions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Http.Features, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Http.Features.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Http.Features.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Mvc.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Mvc.Core, Version=2.2.5.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Mvc.Core.2.2.5\lib\netstandard2.0\Microsoft.AspNetCore.Mvc.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.ResponseCaching.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.ResponseCaching.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.ResponseCaching.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Routing, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Routing.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Routing.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.Routing.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.Routing.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.Routing.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNetCore.WebUtilities, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNetCore.WebUtilities.2.2.0\lib\netstandard2.0\Microsoft.AspNetCore.WebUtilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DotNet.PlatformAbstractions, Version=2.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.DotNet.PlatformAbstractions.2.1.0\lib\net45\Microsoft.DotNet.PlatformAbstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Caching.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Extensions.Caching.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.Caching.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Caching.Memory, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Extensions.Caching.Memory.5.0.0\lib\net461\Microsoft.Extensions.Caching.Memory.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Extensions.Configuration.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Extensions.Configuration.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.Configuration.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Extensions.DependencyInjection.2.2.0\lib\net461\Microsoft.Extensions.DependencyInjection.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.DependencyModel, Version=2.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Extensions.DependencyModel.2.1.0\lib\net451\Microsoft.Extensions.DependencyModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.FileProviders.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Extensions.FileProviders.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Abstractions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Hosting.Abstractions, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Extensions.Hosting.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.Logging.Abstractions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Extensions.Logging.Abstractions.5.0.0\lib\net461\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Extensions.ObjectPool, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Extensions.ObjectPool.2.2.0\lib\netstandard2.0\Microsoft.Extensions.ObjectPool.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Extensions.Options, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Extensions.Options.5.0.0\lib\net461\Microsoft.Extensions.Options.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Extensions.Primitives, Version=5.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Extensions.Primitives.5.0.0\lib\net461\Microsoft.Extensions.Primitives.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Net.Http.Headers, Version=2.2.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Net.Http.Headers.2.2.0\lib\netstandard2.0\Microsoft.Net.Http.Headers.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ComponentModel.Annotations.4.5.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Diagnostics.DiagnosticSource, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Diagnostics.DiagnosticSource.4.5.0\lib\net46\System.Diagnostics.DiagnosticSource.dll</HintPath>
+    </Reference>
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
     </Reference>
@@ -54,6 +145,17 @@
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.5.0.0\lib\net45\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Runtime.InteropServices.RuntimeInformation.4.0.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+      <Private>True</Private>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Text.Encodings.Web.4.5.0\lib\netstandard2.0\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Threading.Tasks.Extensions.4.5.1\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
@@ -66,325 +168,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api2\Controllers\AppSettingsController.cs">
-      <DependentUpon>Contollers.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Api2\Controllers\Base\ApiController.cs" />
-    <Compile Include="Api2\Controllers\Base\ApiServiceExtension.cs" />
-    <Compile Include="Api2\Controllers\Cache\ApiController.cs">
-      <DependentUpon>ApiController.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Include="Api2\Controllers\Cache\CachesController.cs">
-      <DependentUpon>CachesController.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Include="Api2\Controllers\CardsController.cs">
-      <DependentUpon>Contollers.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Api2\Controllers\Contollers.cs">
-      <DependentUpon>Contollers.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Include="Api2\Controllers\CoursesController.cs">
-      <DependentUpon>Contollers.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Api2\Controllers\GradesController.cs">
-      <DependentUpon>Contollers.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Api2\Controllers\SemestersController.cs">
-      <DependentUpon>Contollers.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Api2\Controllers\SessionsController.cs">
-      <DependentUpon>Contollers.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Api2\Controllers\StudentCoursesController.cs">
-      <DependentUpon>Contollers.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Api2\Controllers\StudentsController.cs">
-      <DependentUpon>Contollers.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\AppDbContext.cs">
-      <DependentUpon>AppDbContext.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Include="Data\Core\DesignTimeDbContextFactory.cs" />
-    <Compile Include="Data\Seeding\SeedData.cs" />
-    <Compile Include="Data\Services\AppSettingService.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\Services\Base\BaseService.cs" />
-    <Compile Include="Data\Services\Base\RemoveUnique.cs">
-      <DependentUpon>RemoveUnique.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Include="Data\Services\CardService.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\Services\CourseService.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\Services\DataServiceExtension.cs">
-      <DependentUpon>DataServiceExtension.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Include="Data\Services\GradeService.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\Services\SemesterService.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\Services\Services.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\Services\SessionService.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\Services\StudentCourseService.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Data\Services\StudentService.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\AppSettingDto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\BaseEntityDto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\BaseNameEntityDto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Base\BaseEntityDto.cs" />
-    <Compile Include="Dtos\Base\BulkEntityDto.cs" />
-    <Compile Include="Dtos\Base\IBaseEntityDto.cs" />
-    <Compile Include="Dtos\BulkEntityDto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\BulkStudentCourseDto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Caches\AppSettingCache.cs">
-      <DependentUpon>_Cache.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Caches\BaseEntityCache.cs">
-      <DependentUpon>_Cache.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Caches\BaseNameEntityCache.cs">
-      <DependentUpon>_Cache.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Caches\Base\BaseCache.cs" />
-    <Compile Include="Dtos\Caches\CacheKeys.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>CacheKeys.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Caches\CardCache.cs">
-      <DependentUpon>_Cache.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Caches\CourseCache.cs">
-      <DependentUpon>_Cache.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Caches\GradeCache.cs">
-      <DependentUpon>_Cache.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Caches\SemesterCache.cs">
-      <DependentUpon>_Cache.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Caches\SessionCache.cs">
-      <DependentUpon>_Cache.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Caches\StudentCache.cs">
-      <DependentUpon>_Cache.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Caches\StudentCourseCache.cs">
-      <DependentUpon>_Cache.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\Caches\_Cache.cs">
-      <DependentUpon>_Cache.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Include="Dtos\CardDto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\CourseDto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\GradeDto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\SemesterDto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\SessionDto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\StudentCourseDto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\StudentDto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Dtos\_Dto.cs">
-      <DependentUpon>_Dto.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Include="Entities\Address.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\AppSetting.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\BaseEntity.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\BaseNameEntity.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\Base\BaseEntity.cs" />
-    <Compile Include="Entities\Base\IBaseEntity.cs" />
-    <Compile Include="Entities\Base\RemoveNavigation.cs" />
-    <Compile Include="Entities\Base\RemoveNavigation1.cs">
-      <DependentUpon>RemoveNavigation.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Include="Entities\BulkEntity.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\BulkStudentCourse.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\Card.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\Course.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\CurriculumType.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\File.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\Gender.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\Grade.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\MediaType.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\Semester.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\Session.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\Student.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\StudentCourse.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Entities\_Entities.cs">
-      <DependentUpon>_Entities.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-    <Compile Include="Model.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Model.edmx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EntityDeploy Include="Model.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>Model.Designer.cs</LastGenOutput>
-    </EntityDeploy>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="App.Config" />
-    <None Include="copyApi.bat" />
-    <None Include="copyApi2.bat" />
-    <None Include="copyBlazor.bat" />
-    <None Include="copyBlazor1.bat" />
-    <None Include="copyBlazorPage.bat" />
-    <None Include="copyData.bat" />
-    <None Include="copyDataServices.bat" />
-    <None Include="copyDtos.bat" />
-    <None Include="copyEntities.bat" />
-    <None Include="copyit - Copy.bat" />
-    <None Include="copyit.bat" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Api2\Controllers\Cache\ApiController.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>ApiController.cs</LastGenOutput>
-    </Content>
-    <Content Include="Api2\Controllers\Cache\CachesController.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>CachesController.cs</LastGenOutput>
-    </Content>
-    <Content Include="Api2\Controllers\Contollers.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Contollers.cs</LastGenOutput>
-    </Content>
-    <Content Include="copyit-xlist.txt" />
-    <Content Include="Data\AppDbContext.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>AppDbContext.cs</LastGenOutput>
-    </Content>
-    <Content Include="Data\Services\Base\RemoveUnique.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>RemoveUnique.cs</LastGenOutput>
-    </Content>
-    <Content Include="Data\Services\DataServiceExtension.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>DataServiceExtension.cs</LastGenOutput>
-    </Content>
-    <Content Include="Data\Services\Services.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Services.cs</LastGenOutput>
-    </Content>
-    <Content Include="Dtos\Caches\CacheKeys.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>CacheKeys.cs</LastGenOutput>
-    </Content>
-    <Content Include="Dtos\Caches\_Cache.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>_Cache.cs</LastGenOutput>
-    </Content>
-    <Content Include="Dtos\_Dto.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>_Dto.cs</LastGenOutput>
-    </Content>
-    <Content Include="Entities\Base\RemoveNavigation.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>RemoveNavigation1.cs</LastGenOutput>
-    </Content>
-    <Content Include="Entities\_Entities.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>_Entities.cs</LastGenOutput>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

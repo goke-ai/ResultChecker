@@ -1,0 +1,40 @@
+﻿<div style="display: flex; justify-content: space-between; align-items: center;">
+    @if (Items != null)
+    {
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+
+                @foreach (var item in Items.SkipLast(1))
+                {
+                    <li class="breadcrumb-item"><a href=@item.Url>@item.DisplayName</a></li>
+                }
+
+                <li class="breadcrumb-item active" aria-current="@CurrentPage.DisplayName">@CurrentPage.DisplayName</li>
+
+            </ol>
+        </nav>
+        <div> <a href="@PreviousPage.Url"> &lt;&lt; @PreviousPage.DisplayName</a></div>
+    }
+</div>
+
+@code {
+
+    public BreadCrumbItem CurrentPage
+    {
+        get
+        {
+            return Items.Last();
+        }
+    }
+
+    public BreadCrumbItem PreviousPage
+    {
+        get
+        {
+            return Items.SkipLast(1).Last();
+        }
+    }
+
+    [Parameter]
+    public IReadOnlyList<BreadCrumbItem> Items { get; set; }
+}

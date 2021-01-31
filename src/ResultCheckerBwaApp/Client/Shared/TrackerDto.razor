@@ -1,0 +1,55 @@
+﻿<div>
+    <div class="form-group">
+        <label for="LastActivityUser">LastActivityUser</label>
+        <InputText id="LastActivityUser" @bind-Value="@Model.LastActivityUser" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="LastActivityDateTime">LastActivityDateTime</label>
+        <InputText id="LastActivityDateTime" @bind-Value="@LastActivityDateTimeText" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="InsertUser">InsertUser</label>
+        <InputText id="InsertUser" @bind-Value="@Model.InsertUser" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="InsertDateTime">InsertDateTime</label>
+        <InputText id="InsertDateTime" @bind-Value="@InsertDateTimeText" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="UpdateUser">UpdateUser</label>
+        <InputText id="UpdateUser" @bind-Value="@Model.UpdateUser" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="UpdateDateTime">UpdateDateTime</label>
+        <InputText id="UpdateDateTime" @bind-Value="@UpdateDateTimeText" class="form-control" />
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public Ark.ResultCheckers.Dtos.BaseEntityDto Model { get; set; }
+
+    private String _lastActivityDateTimeText;
+    public String LastActivityDateTimeText
+    {
+        get { return Model.LastActivityDateTime?.ToString("R"); }
+        set { _lastActivityDateTimeText = value; }
+    }
+
+    private String _insertDateTimeText;
+    public String InsertDateTimeText
+    {
+        get { return Model.InsertDateTime?.ToString("R"); }
+        set { _insertDateTimeText = value; }
+    }
+
+    private String _updateDateTimeText;
+    public String UpdateDateTimeText
+    {
+        get { return Model.UpdateDateTime?.ToString("R"); }
+        set { _updateDateTimeText = value; }
+    }
+
+
+}

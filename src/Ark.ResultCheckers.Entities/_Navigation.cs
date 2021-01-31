@@ -29,7 +29,7 @@ namespace Ark.ResultCheckers.Entities
     
     public partial class Course
     {
-        public String CourseName { get; }
+        public String CourseName => $"{Code}-{Title} ({Unit})";
     }
     
     public partial class Grade
@@ -39,7 +39,7 @@ namespace Ark.ResultCheckers.Entities
     
     public partial class Student
     {
-        public String StudentName { get; }
+        public string StudentName => $"{MatricNo}-{Firstname} {Middlename} {Lastname}";
     }
     
     public partial class StudentCourse

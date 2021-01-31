@@ -1,0 +1,24 @@
+﻿@page "/students/results"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize(Roles = "Administrators, Students")]
+
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+<div id="student-courses-page">
+
+    <StudentResultsComponent />
+
+</div>
+
+@code {
+
+}
+

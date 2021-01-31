@@ -11,13 +11,17 @@ namespace Ark.ResultCheckers.Data.Services
 {
     
     using System;
+    using System.Linq;
     using Ark.ResultCheckers.Dtos;
     
     public partial class AppSettingService
     {
         partial void OnCreate(AppSettingDto appSetting, string username)
         {
-            throw new NotImplementedException();
+            if (_context.AppSettings.Any(a => a.Key == appSetting.Key))
+            {
+                throw new Exception("Record not unique.");
+            }
         }
     }
     
@@ -25,7 +29,10 @@ namespace Ark.ResultCheckers.Data.Services
     {
         partial void OnCreate(CardDto card, string username)
         {
-            throw new NotImplementedException();
+            if (_context.Cards.Any(a => a.Pin == card.Pin))
+            {
+                throw new Exception("Record not unique.");
+            }
         }
     }
     
@@ -33,7 +40,10 @@ namespace Ark.ResultCheckers.Data.Services
     {
         partial void OnCreate(CourseDto course, string username)
         {
-            throw new NotImplementedException();
+            if (_context.Courses.Any(a => a.Code == course.Code))
+            {
+                throw new Exception("Record not unique.");
+            }
         }
     }
     
@@ -41,7 +51,10 @@ namespace Ark.ResultCheckers.Data.Services
     {
         partial void OnCreate(GradeDto grade, string username)
         {
-            throw new NotImplementedException();
+            if (_context.Grades.Any(a => a.Name == grade.Name))
+            {
+                throw new Exception("Record not unique.");
+            }
         }
     }
     
@@ -49,7 +62,10 @@ namespace Ark.ResultCheckers.Data.Services
     {
         partial void OnCreate(StudentDto student, string username)
         {
-            throw new NotImplementedException();
+            if (_context.Students.Any(a => a.MatricNo == student.MatricNo))
+            {
+                throw new Exception("Record not unique.");
+            }
         }
     }
     
@@ -57,7 +73,13 @@ namespace Ark.ResultCheckers.Data.Services
     {
         partial void OnCreate(StudentCourseDto studentCourse, string username)
         {
-            throw new NotImplementedException();
+            if (_context.StudentCourses.Any(a => a.SessionId == studentCourse.SessionId 
+                                                && a.CourseId == studentCourse.CourseId
+                                                && a.StudentId == studentCourse.StudentId
+                                                ))
+            {
+                throw new Exception("Record not unique.");
+            }
         }
     }
     

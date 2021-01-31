@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Goke.Net.Services;
+using MatBlazor;
 
 namespace ResultCheckerBwaApp.Client
 {
@@ -35,6 +37,19 @@ namespace ResultCheckerBwaApp.Client
                 default:
                     break;
             };
+
+            builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+            builder.Services.AddScoped<IApiService, ApiService>();
+
+            builder.Services.AddMatToaster(config =>
+            {
+                config.Position = MatToastPosition.TopRight;
+                config.PreventDuplicates = true;
+                config.NewestOnTop = true;
+                config.ShowCloseButton = true;
+                config.MaximumOpacity = 95;
+                config.VisibleStateDuration = 3000;
+            });
 
             await builder.Build().RunAsync();
         }
@@ -65,6 +80,7 @@ namespace ResultCheckerBwaApp.Client
                 option =>
                 {
                     option.UserOptions.RoleClaim = "role";
+                    option.UserOptions.NameClaim = "name";
                 });
 
             builder.Services.AddSingleton<IIdentitySetting, IdentityServerSetting>();

@@ -37,10 +37,10 @@ namespace ResultCheckerBwaApp.Server
             var identity = Configuration["Identity"];
             IsAspnetIdentity = identity == "AspnetIdentity";
 
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+            // External Data
+            ConfigureDataExtension(services);
 
+            // 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -62,6 +62,17 @@ namespace ResultCheckerBwaApp.Server
                     break;
             };
 
+            Ark.ResultCheckers.Api2.Services.ApiServiceExtension.ConfigureServices(services);
+        }
+
+        private void ConfigureDataExtension(IServiceCollection services)
+        {
+            // Ark.ResultCheckers.Data extensions
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(
+                    Configuration.GetConnectionString("DefaultConnection")));
+            //
+            Ark.ResultCheckers.Data.Services.DataServiceExtension.ConfigureServices(services);
         }
 
         private static void AddIdentityServer(IServiceCollection services)
@@ -104,14 +115,15 @@ namespace ResultCheckerBwaApp.Server
             builder.AddApiAuthorization<ApplicationUser, ApplicationDbContext>(
                 options =>
                 {
-                        // make role claim available
-                        options.IdentityResources["openid"].UserClaims.Add("role");
+                    // make role claim available
+                    options.IdentityResources["openid"].UserClaims.Add("role");
                     options.ApiResources.Single().UserClaims.Add("role");
+                    options.ApiResources.Single().UserClaims.Add("name");
 
-                        // make profile claim available
-                        // options.IdentityResources["profile"].UserClaims.Add("firstname");
-                        // options.IdentityResources["profile"].UserClaims.Add("lastname");
-                    }
+                    // make profile claim available
+                    // options.IdentityResources["profile"].UserClaims.Add("firstname");
+                    // options.IdentityResources["profile"].UserClaims.Add("lastname");
+                }
             );
 
             // Need to do this as it maps "role" to ClaimTypes.Role and causes issues
@@ -122,6 +134,7 @@ namespace ResultCheckerBwaApp.Server
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+
         }
 
         private static void AddAspnetIdentity(IServiceCollection services)
@@ -169,8 +182,6 @@ namespace ResultCheckerBwaApp.Server
 
             // This is the line we just added
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,0 +1,1933 @@
+﻿<#@ template language="C#" debug="false" hostspecific="true"#>
+<#@ include file="EF6.Utility.CS.ttinclude"#><#@ 
+ output extension=".razor"#><#
+
+const string inputFile = @"../Model.edmx";
+var textTransform = DynamicTextTransformation.Create(this);
+var code = new CodeGenerationTools(this);
+var ef = new MetadataTools(this);
+var typeMapper = new TypeMapper(code, ef, textTransform.Errors);
+var	fileManager = EntityFrameworkTemplateFileManager.Create(this);
+var itemCollection = new EdmMetadataLoader(textTransform.Host, textTransform.Errors).CreateEdmItemCollection(inputFile);
+var codeStringGenerator = new CodeStringGenerator(code, typeMapper, ef);
+
+var baseType = "";
+var moreNamespace = "Ark.Oluko.Dtos";
+
+if (!typeMapper.VerifyCaseInsensitiveTypeUniqueness(typeMapper.GetAllGlobalItems(itemCollection), inputFile))
+{
+    return string.Empty;
+}
+
+WriteHeader(codeStringGenerator, fileManager);
+
+foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection).Where(e => !(e.Name.StartsWith("BaseEntity") 
+					|| e.Name.StartsWith("Base") 
+					|| e.Name.StartsWith("BaseName")
+					|| e.Name.StartsWith("Bulk")
+					|| e.Name.StartsWith("Archive")
+					)))
+{
+    fileManager.StartNewFile(entity.Name + "Edit.razor");
+
+	var colspan =0;
+
+	var entityBaseType = typeMapper.GetTypeName(entity.BaseType);
+	var hasMediaType = false;
+	var isBase = entity.Name.Contains("BaseEntity") 
+					|| entity.Name.StartsWith("Base") 
+					|| entity.Name.StartsWith("BaseName")
+					|| entity.Name.Contains("BulkObject")
+					|| entity.Name.Contains("ArchiveObject");
+
+    var propertiesWithDefaultValues = typeMapper.GetPropertiesWithDefaultValues(entity);
+    var collectionNavigationProperties = typeMapper.GetCollectionNavigationProperties(entity);
+    var complexProperties = typeMapper.GetComplexProperties(entity);
+
+	var medias = complexProperties.Where(a => a.TypeUsage.EdmType.Name == "Media");
+
+    var simpleProperties = typeMapper.GetSimpleProperties(entity);
+
+	var isNameObject = entityBaseType?.StartsWith("BaseName");
+
+    if (false && simpleProperties.Any())
+    {
+        foreach (var edmProperty in simpleProperties)
+        {
+#>
+    <#=codeStringGenerator.Property(entity, edmProperty)#>
+<#
+        }
+    }
+
+    if (false && complexProperties.Any())
+    {
+#>
+
+<#
+        foreach(var complexProperty in complexProperties)
+        {
+#>
+    <#=codeStringGenerator.Property(complexProperty)#>
+<#
+        }
+    }
+
+    var navigationProperties = typeMapper.GetNavigationProperties(entity);
+	
+    if (false && navigationProperties.Any())
+    {
+#>
+
+<#
+        foreach (var navigationProperty in navigationProperties)
+        {
+            if (navigationProperty.ToEndMember.RelationshipMultiplicity == RelationshipMultiplicity.Many)
+            {
+#>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+<#
+            }
+			var navEntityType = navigationProperty.ToEndMember.GetEntityType();
+#>
+    <#=codeStringGenerator.NavigationProperty(entity, navigationProperty)#>
+<#
+        }
+    }
+#>
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+	<div>
+		<EditForm Model="@FormData" OnValidSubmit="@Save<#= code.Escape(entity) #>" Context="<#= code.Escape(entity) #>EditContext">
+			        <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mat-layout-grid">
+                        <div class="mat-layout-grid-inner">
+<#
+	var propCount = simpleProperties?.Count();
+	var gridType = propCount > 8 ? "mat-layout-grid-cell-span-6" : "mat-layout-grid-cell-span-12";
+
+	if(entityBaseType?.StartsWith("BaseName") == true)
+	{
+#>
+                            <div class="<#= gridType #>">
+								<MatTextField Label="Name" @bind-Value="FormData.Name" FullWidth="true" />
+							</div>
+<#	
+	}
+	//else
+	{
+		if (simpleProperties.Any())
+		{
+			foreach (var edmProperty in simpleProperties.Where(w => (w.Name == "id") == false))
+			{
+				var isForeignKey = IsPropertyForeignKey(entity, edmProperty);
+				var type = typeMapper.GetTypeName(edmProperty.TypeUsage);
+#>
+				<!-- <#= code.Escape(edmProperty) #> | isForeignKey(<#= code.Escape(isForeignKey.ToString())  #>) | <#= code.Escape(type)  #> | <#= MaxLengthValue(edmProperty) != null ? MaxLengthValue(edmProperty) : "00" #> -->
+<#
+				if(isForeignKey == false)
+				{
+					var isUrl = edmProperty.Name.Contains("Url");
+
+					if(!isUrl)
+					{
+#>
+<#
+						switch (type)
+						{
+							case string s when s.Contains("bool"):
+								type = "bool";
+#>							
+						
+					<div class="<#= gridType #>">
+						<MatCheckbox Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								break;
+							case string s when s.Contains("DateTime"):
+								type = "DateTime";
+#>							
+					<div class="<#= gridType #>">
+						<MatDatePicker  Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								break;
+							case string s when s.Contains("int"):
+								type = "int";
+#>							
+					<div class="<#= gridType #>">
+						<MatNumericUpDownField  Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								break;
+							case string s when s.Contains("short"):
+								type = "short";
+#>							
+					<div class="<#= gridType #>">
+						<MatNumericUpDownField  Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								break;
+							case string s when s.Contains("byte"):
+								type = "byte";
+#>							
+					<div class="<#= gridType #>">
+						<MatNumericUpDownField  Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								break;
+							case string s when s.Contains("double"):
+								type = "double";
+#>							
+					<div class="<#= gridType #>">
+						<MatNumericUpDownField  Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								break;
+							case string s when s.Contains("Gender"):
+								type = "Gender";
+#>							
+					<div class="<#= gridType #>">
+						<MatSelectValue Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" Items="@(Enum.GetValues(typeof(Gender)).Cast<Gender>().ToArray())" ValueSelector=@(i=>i)></MatSelectValue>
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								break;
+							case string s when s.Contains("CurriculumType"):
+								type = "CurriculumType";
+#>							
+					<div class="<#= gridType #>">
+						<MatSelectValue Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" Items="@(Enum.GetValues(typeof(CurriculumType)).Cast<CurriculumType>().ToArray())" ValueSelector=@(i=>i)></MatSelectValue>
+                        @*<MatRadioGroup Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" Items="@(Enum.GetValues(typeof(CurriculumType)).Cast<CurriculumType>().ToArray())"></MatRadioGroup>*@
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								break;
+							case string s when s.Contains("RelationshipType"):
+								type = "RelationshipType";
+#>							
+					<div class="<#= gridType #>">
+						<MatSelectValue Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" Items="@(Enum.GetValues(typeof(RelationshipType)).Cast<RelationshipType>().ToArray())" ValueSelector=@(i=>i)></MatSelectValue>
+                        @*<MatRadioGroup Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" Items="@(Enum.GetValues(typeof(RelationshipType)).Cast<RelationshipType>().ToArray())"></MatRadioGroup>*@
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								break;
+							case string s when s.Contains("MediaType"):
+								continue;
+								type = "MediaType";
+#>							
+					<div class="<#= gridType #>">
+						<MatSelectValue Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" Items="@(Enum.GetValues(typeof(MediaType)).Cast<MediaType>().ToArray())" ValueSelector=@(i=>i)></MatSelectValue>
+                        @*<MatRadioGroup Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" Items="@(Enum.GetValues(typeof(MediaType)).Cast<MediaType>().ToArray())"></MatRadioGroup>*@
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								break;
+							case string s when s.Contains("ProcessType"):
+								type = "ProcessType";
+#>							
+					<div class="<#= gridType #>">
+						<InputSelect id="<#= ToCamelCase(code.Escape(edmProperty)) #>" @bind-Value="@FormData.<#= code.Escape(edmProperty) #>" class="form-control">
+							<option value="@(ProcessType.None)">@(ProcessType.None.ToString())</option>
+							<option value="@(ProcessType.Normal)">@(ProcessType.Normal.ToString())</option>
+							<option value="@(ProcessType.Practical)">@(ProcessType.Practical.ToString())</option>
+							<option value="@(ProcessType.QAQC)">@(ProcessType.QAQC.ToString())</option>
+							<option value="@(ProcessType.OJT)">@(ProcessType.OJT.ToString())</option>
+						</InputSelect>
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								break;
+							default:
+								if(MaxLengthValue(edmProperty) != null && int.Parse(MaxLengthValue(edmProperty)) <= 100)
+								{
+									if(int.Parse(MaxLengthValue(edmProperty)) <= 50)
+									{
+#>
+					<div class="<#= gridType #>">
+<#
+									}
+									else
+									{
+#>
+					<div class="mat-layout-grid-cell-span-12">
+<#
+									}
+#>							
+						<MatTextField Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								}
+								else
+								{
+#>							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatTextField TextArea="true" Label="@(Localize["<#= ToSentence(code.Escape(edmProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+								}
+								break;
+						}
+					}
+					else
+					{
+						hasMediaType = true;
+#>
+					<div class="<#= gridType #>">
+						<FileUploadEdit @bind-ContentMediaType=FormData.<#= code.Escape(edmProperty).Replace("Url","MediaType") #> @bind-ContentUrl=@FormData.<#= code.Escape(edmProperty) #> />
+					</div>
+<#
+					}
+				}
+				else
+				{
+					var navigationProperty = entity.NavigationProperties.FirstOrDefault(np=>np.GetDependentProperties().Contains(edmProperty));
+					var navEntityType = navigationProperty.ToEndMember.GetEntityType();
+#>
+				<!-- Foreign Key <#= code.Escape(navEntityType) #> -->
+					<div class="<#= gridType #>">
+						<MatSelectValue Label="@(Localize["<#= ToSentence(code.Escape(navigationProperty)) #>"])" @bind-Value="FormData.<#= code.Escape(edmProperty) #>" Items="@<#= code.Escape(navEntityType) #>Caches" ValueSelector="@(i=>i.Id)" FullWidth="true">
+							<ItemTemplate Context="<#= ToCamelCase(code.Escape(navEntityType)) #>">
+								<span>@<#= ToCamelCase(code.Escape(navEntityType)) #>?.Name</span>
+							</ItemTemplate>
+						</MatSelectValue>
+						<ValidationMessage For="@(() => FormData.<#= code.Escape(edmProperty) #>)" />
+					</div>
+<#
+
+				}
+#>
+<#
+
+			}
+		}	
+	}
+
+	if (complexProperties.Any())
+    {			
+#>
+<#
+        foreach(var complexProperty in complexProperties)
+        {
+			var complexType = typeMapper.GetItemsToGenerate<ComplexType>(itemCollection).First( f => f.Name == complexProperty.TypeUsage.EdmType.Name);
+			var complexSimpleProperties = typeMapper.GetSimpleProperties(complexType);
+			if (complexSimpleProperties.Any())
+			{
+				foreach(var edmProperty in complexSimpleProperties)
+				{
+#>
+		<!-- complex <#= code.Escape(complexType) #> | <#= code.Escape(edmProperty) #> | <#= code.Escape(complexProperty) #>  -->
+<#
+				}
+			}
+			if(complexType.Name == "Media")
+			{
+				hasMediaType = true;
+#>
+						<!-- Media Type -->
+						<div class="form-group">
+							<label for="contentType"><#= code.Escape(complexProperty) #> Type</label>
+							<InputSelect id="contentType" @bind-Value="@FormData.<#= code.Escape(complexProperty) #>Type" class="form-control">
+								@*<option value="0">Select a Media Type ...</option>*@
+
+								<option value="@(MediaType.None)">@(MediaType.None.ToString())</option>
+								<option value="@(MediaType.Text)">@(MediaType.Text.ToString())</option>
+								<option value="@(MediaType.Image)">@(MediaType.Image.ToString())</option>
+								<option value="@(MediaType.Video)">@(MediaType.Video.ToString())</option>
+								<option value="@(MediaType.Music)">@(MediaType.Music.ToString())</option>
+							</InputSelect>
+							@*@contentType*@
+						</div>
+						<!-- Media Uri -->
+						<div class="form-group">
+							@if (@FormData.<#= code.Escape(complexProperty) #>Type != MediaType.None && @FormData.<#= code.Escape(complexProperty) #>Type != MediaType.Text)
+							{
+								<div>
+									<input type="hidden" @bind="@@FormData.<#= code.Escape(complexProperty) #>Uri" />
+									@*@contentUri*@
+									<FileUpload @bind-FileDataList="FileDataList" />
+								</div>
+							}
+							else
+							{
+								<label for="contentUri"><#= code.Escape(complexProperty) #> Uri</label>
+
+								<InputTextArea id="contentUri" @bind-Value="@@FormData.<#= code.Escape(complexProperty) #>Uri" class="form-control" />
+								<ValidationMessage For="@(() => FormData.<#= code.Escape(complexProperty) #>Uri)" />
+							}
+						</div>
+<#
+			}
+        }
+    }
+
+	// 
+	if (navigationProperties.Any())
+    {
+#>
+
+<#
+        foreach (var navigationProperty in navigationProperties)
+        {
+			var navEntityType = navigationProperty.ToEndMember.GetEntityType();
+			var dependentProperties = navigationProperty.GetDependentProperties();
+
+			foreach(var depProperty in dependentProperties)
+			{
+				var type = typeMapper.GetTypeName(depProperty.TypeUsage);
+#>
+		<!-- ForeignKey <#= code.Escape(depProperty)  #> | <#= code.Escape(type)  #> -->
+<#
+			}
+
+            if (navigationProperty.ToEndMember.RelationshipMultiplicity == RelationshipMultiplicity.Many)
+            {
+#>
+		<!-- <#= code.Escape(navigationProperty) #> | <#= code.Escape(navEntityType) #> | Collection -->
+<#
+            }
+			else
+			{
+				var depProperty = dependentProperties.First();
+				var type = typeMapper.GetTypeName(depProperty.TypeUsage);
+#>
+		<!-- <#= code.Escape(navigationProperty) #> | <#= code.Escape(navEntityType) #> | <#= code.Escape(depProperty) #>-->
+<#
+			}
+        }
+    }
+#>
+						<div class="mat-layout-grid-cell-span-12">
+							<MatSlideToggle Label="Tracker"  @bind-Value="@showTracker"></MatSlideToggle>
+							@if (showTracker)
+							{
+								<fieldset disabled>
+									<TrackerDto Model="FormData" />
+								</fieldset>
+							}
+						</div>
+					</div>
+				</div>
+
+				<MatDivider></MatDivider>
+
+			    <MatButton Type="button" OnClick="@(e => { DialogIsOpen = false; })">@Localize["CANCEL"]</MatButton>
+                @if(CanAdd || CanUpdate)
+				{
+				<!-- Button to save the product -->
+                <MatButton Type="submit" title="@(Localize["Save <#= ToSentence(code.Escape(entity)) #>"])">@Localize["SAVE"]</MatButton>
+                }
+				<!-- Only show button if not a new record -->
+                @if (FormData.Id > 0 && CanDelete)
+                {
+                    <!-- Button to delete the product -->
+                    <MatButton Type="button" OnClick="Delete<#= code.Escape(entity) #>" Icon="@MatIconNames.Restore_from_trash" title="Delete <#= ToSentence(code.Escape(entity)) #>">DELETE</MatButton>
+                }
+
+		</EditForm>
+				
+	</div>
+
+@code {
+    
+    
+    [Parameter] public <#= code.Escape(entity) #>Dto FormData { get; set; } = new <#= code.Escape(entity) #>Dto();
+    [Parameter] public bool DialogIsOpen { get; set; }
+    [Parameter] public bool CanView { get; set; } = true;
+    [Parameter] public bool CanAdd { get; set; }
+    [Parameter] public bool CanUpdate { get; set; }
+    [Parameter] public bool CanDelete { get; set; }
+
+    bool showTracker;
+
+<#
+    foreach (var navigationProperty in navigationProperties)
+    {
+		var navEntityType = navigationProperty.ToEndMember.GetEntityType();
+		var dependentProperties = navigationProperty.GetDependentProperties();
+
+		foreach(var depProperty in dependentProperties)
+		{
+			var type = typeMapper.GetTypeName(depProperty.TypeUsage);
+#>
+	// <!-- ForeignKey <#= code.Escape(depProperty)  #> | <#= code.Escape(type)  #> -->
+<#
+		}
+
+        if (navigationProperty.ToEndMember.RelationshipMultiplicity == RelationshipMultiplicity.Many)
+        {
+#>
+    //<!-- <#= code.Escape(navigationProperty) #> | <#= code.Escape(navEntityType) #> | Collectiion -->
+
+<#
+        }
+		else
+		{
+			var depProperty = dependentProperties.First();
+			var type = typeMapper.GetTypeName(depProperty.TypeUsage);
+#>
+	// <!-- <#= code.Escape(navigationProperty) #> | <#= code.Escape(navEntityType) #> | <#= depProperty.Nullable ? "Nullable" : "" #> -->
+	[Parameter] public <#= code.Escape(navEntityType) #>Cache[] <#= code.Escape(navEntityType) #>Caches { get; set; }
+
+<#
+		}
+    }
+
+#>
+	
+    [Parameter] public EventCallback<<#= code.Escape(entity) #>Dto> OnSave<#= code.Escape(entity) #> { get; set; }
+    [Parameter] public EventCallback<<#= code.Escape(entity) #>Dto> OnDelete<#= code.Escape(entity) #> { get; set; }
+
+
+    void Save<#= code.Escape(entity) #>()
+    {
+        OnSave<#= code.Escape(entity) #>.InvokeAsync(FormData);
+    }
+
+    void Delete<#= code.Escape(entity) #>()
+    {
+        OnDelete<#= code.Escape(entity) #>.InvokeAsync(FormData);
+    }
+
+<#
+	if(hasMediaType)
+	{
+		if (simpleProperties.Any())
+		{
+			foreach (var edmProperty in simpleProperties.Where(w => w.Name.Contains("Url") == true))
+			{
+#>
+    void OnUpload<#= code.Escape(edmProperty) #>((MediaType ContentMediaType, string ContentUrl) content)
+    {
+        FormData.<#= code.Escape(edmProperty).Replace("Url","MediaType") #> = content.ContentMediaType;
+        FormData.<#= code.Escape(edmProperty) #> = content.ContentUrl;
+    }
+
+<#			}
+		}
+
+	}
+#>
+
+
+}
+
+<#
+}
+
+foreach (var complex in typeMapper.GetItemsToGenerate<ComplexType>(itemCollection))
+{
+	break; 
+
+    fileManager.StartNewFile(complex.Name + ".cs");
+    BeginNamespace(code);
+#>
+<#=codeStringGenerator.UsingDirectives(inHeader: false, includeCollections: false)#>
+<#=Accessibility.ForType(complex)#> partial class <#=code.Escape(complex)#>
+{
+<#
+    var complexProperties = typeMapper.GetComplexProperties(complex);
+    var propertiesWithDefaultValues = typeMapper.GetPropertiesWithDefaultValues(complex);
+
+    if (propertiesWithDefaultValues.Any() || complexProperties.Any())
+    {
+#>
+    public <#=code.Escape(complex)#>()
+    {
+<#
+        foreach (var edmProperty in propertiesWithDefaultValues)
+        {
+#>
+        this.<#=code.Escape(edmProperty)#> = <#=typeMapper.CreateLiteral(edmProperty.DefaultValue)#>;
+<#
+        }
+
+        foreach (var complexProperty in complexProperties)
+        {
+#>
+        this.<#=code.Escape(complexProperty)#> = new <#=typeMapper.GetTypeName(complexProperty.TypeUsage)#>();
+<#
+        }
+#>
+    }
+
+<#
+    }
+
+    var simpleProperties = typeMapper.GetSimpleProperties(complex);
+    if (simpleProperties.Any())
+    {
+        foreach(var edmProperty in simpleProperties)
+        {
+#>
+    <#=codeStringGenerator.Property(edmProperty)#>
+<#
+        }
+    }
+
+    if (complexProperties.Any())
+    {
+#>
+
+<#
+        foreach(var edmProperty in complexProperties)
+        {
+#>
+    <#=codeStringGenerator.Property(edmProperty)#>
+<#
+        }
+    }
+#>
+}
+<#
+    EndNamespace(code);
+}
+
+foreach (var enumType in typeMapper.GetEnumItemsToGenerate(itemCollection))
+{
+	break;
+
+    fileManager.StartNewFile(enumType.Name + ".cs");
+    BeginNamespace(code);
+#>
+<#=codeStringGenerator.UsingDirectives(inHeader: false, includeCollections: false)#>
+<#
+    if (typeMapper.EnumIsFlags(enumType))
+    {
+#>
+[Flags]
+<#
+    }
+#>
+<#=codeStringGenerator.EnumOpening(enumType)#>
+{
+<#
+    var foundOne = false;
+    
+    foreach (MetadataItem member in typeMapper.GetEnumMembers(enumType))
+    {
+        foundOne = true;
+#>
+    <#=code.Escape(typeMapper.GetEnumMemberName(member))#> = <#=typeMapper.GetEnumMemberValue(member)#>,
+<#
+    }
+
+    if (foundOne)
+    {
+        this.GenerationEnvironment.Remove(this.GenerationEnvironment.Length - 3, 1);
+    }
+#>
+}
+<#
+    EndNamespace(code);
+}
+
+fileManager.Process();
+
+#>
+<#+
+
+public void WriteHeader(CodeStringGenerator codeStringGenerator, EntityFrameworkTemplateFileManager fileManager)
+{
+    fileManager.StartHeader();
+#>
+<!--
+//------------------------------------------------------------------------------
+// <auto-generated>
+// <#=CodeGenerationTools.GetResourceString("Template_GeneratedCodeCommentLine1")#>
+//
+// <#=CodeGenerationTools.GetResourceString("Template_GeneratedCodeCommentLine2")#>
+// <#=CodeGenerationTools.GetResourceString("Template_GeneratedCodeCommentLine3")#>
+// </auto-generated>
+//------------------------------------------------------------------------------
+-->
+<#=codeStringGenerator.UsingDirectives(inHeader: true)#>
+<#+
+    fileManager.EndBlock();
+}
+
+public static bool IsPropertyKey(EntityType entity, EdmProperty edmProperty)
+{
+	return entity.KeyMembers.Any(k => k.Name == edmProperty.Name);
+}
+
+public static bool IsPropertyForeignKey(EntityType entity, EdmProperty edmProperty)
+{
+	return entity.NavigationProperties.Any(np=>np.GetDependentProperties().Contains(edmProperty));
+}
+
+public static string ToSentence(string s, string fill=" ")
+{
+	if (string.IsNullOrWhiteSpace(s))
+		return s;
+
+	string r = string.Empty;
+	//int c = 0;
+	for (int i = 0; i < s.Count(); i++)
+	{
+		var q = s[i];
+		if (char.IsUpper(q) && i > 0 && char.IsLower(s[(i-1)]))
+		{
+			r = string.Format("{0}{1}{2}", r, fill, q);
+			//c++;
+		}
+		else
+		{
+			r = string.Format("{0}{1}", r, q);
+		}
+	}
+
+	//
+	for (int i = 0; i < r.Count(); i++)
+	{
+		var q = r[i];
+		if (char.IsLower(q))
+		{
+			if(i > 1){
+				var j = i-1;
+				r = string.Format("{0}{1}{2}", r.Substring(0,j), fill, r.Substring(j));		
+			}
+			break;
+		}
+	}
+
+	return r;
+}
+
+public static string ToPlural(string word)
+{
+    string s = null;
+    var len = word.Length;
+    var w = word.ToLower();
+    if (System.String.Compare(w, "person", System.StringComparison.Ordinal) == 0)
+    {
+        s = word.Substring(0, 1) + "eople";
+        return s;
+    }
+	if (w.EndsWith("curriculum")) { return word.Substring(0, (len - 2)) + "a"; } if (w.EndsWith("staff"))
+    {
+        return word + "s";
+    }
+    if (System.String.Compare(w, "staff", System.StringComparison.Ordinal) == 0)
+    {
+        return word + "s";
+    }
+
+    var l = w.Last();
+    switch (l)
+    {
+        case 'f': s = word.Substring(0, (len - 1)) + "ves"; break;
+        case 'h': 
+        case 'o': 
+        case 's': 
+        case 'x': s = word + "es"; break;
+        case 'y': s = word.Substring(0, (len - 1)) + "ies"; break;
+        default:
+            s = word + "s"; break;
+    }
+    return s;
+}
+
+public static string ToCamelCase(string s)
+{
+	if (string.IsNullOrWhiteSpace(s))
+		return s;
+	// CGPAText, GodExcellent
+	var j = 0;
+	for (int i = 0; i < s.Count(); i++)
+	{
+		var q = s[i];
+		if (char.IsLower(q))
+		{
+			j = i;
+			if(i > 1)
+				j = i-1;
+			
+			break;
+		}
+	}
+
+	var	l = s.Substring(0,j);
+	var r = s.Substring(j);
+	return l.ToLower() + r;
+
+}
+
+public static string ToDisplayName(string propertyName)
+{
+	var name = propertyName;
+    if (propertyName.EndsWith("Id"))
+    {
+        name = propertyName.Remove(propertyName.Length - 2);
+    };
+
+	return ToSentence(name);
+}
+
+
+public static string GetAttributeValue(Facet attrib)
+{
+	var aVal=attrib.Value;
+	return Convert.ToString(aVal);
+}
+
+public static string MaxLengthValue(EdmProperty prop)
+{
+	var attrib=prop.TypeUsage.Facets.FirstOrDefault(p=>p.Name=="MaxLength");
+	if (attrib != null)
+	{
+		string aVal= GetAttributeValue(attrib);
+		if (aVal == "Max" || aVal=="" || prop.TypeUsage.EdmType.Name == "Binary")
+			return null;
+		else
+		{
+			return aVal;
+		}
+	}
+	else
+	{
+		return null;
+	}
+}
+
+public void BeginNamespace(CodeGenerationTools code)
+{
+    var codeNamespace = code.VsNamespaceSuggestion();
+    if (!String.IsNullOrEmpty(codeNamespace))
+    {
+#>
+namespace <#=code.EscapeNamespace(codeNamespace)#>
+{
+<#+
+        PushIndent("    ");
+    }
+}
+
+public void BeginNamespace(CodeGenerationTools code, string moreNamespace)
+{
+    var codeNamespace = code.VsNamespaceSuggestion();
+    if (!String.IsNullOrEmpty(codeNamespace))
+    {
+#>
+namespace <#= moreNamespace #>
+{
+<#+
+        PushIndent("    ");
+    }
+}
+
+public void EndNamespace(CodeGenerationTools code)
+{
+    if (!String.IsNullOrEmpty(code.VsNamespaceSuggestion()))
+    {
+        PopIndent();
+#>
+}
+<#+
+    }
+}
+
+public const string TemplateId = "CSharp_DbContext_Types_EF6";
+
+public class CodeStringGenerator
+{
+    private readonly CodeGenerationTools _code;
+    private readonly TypeMapper _typeMapper;
+    private readonly MetadataTools _ef;
+
+    public CodeStringGenerator(CodeGenerationTools code, TypeMapper typeMapper, MetadataTools ef)
+    {
+        ArgumentNotNull(code, "code");
+        ArgumentNotNull(typeMapper, "typeMapper");
+        ArgumentNotNull(ef, "ef");
+
+        _code = code;
+        _typeMapper = typeMapper;
+        _ef = ef;
+    }
+
+    public string Property(EdmProperty edmProperty)
+    {
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0} {1} {2} {{ {3}get; {4}set; }}",
+            Accessibility.ForProperty(edmProperty),
+            _typeMapper.GetTypeName(edmProperty.TypeUsage),
+            _code.Escape(edmProperty),
+            _code.SpaceAfter(Accessibility.ForGetter(edmProperty)),
+            _code.SpaceAfter(Accessibility.ForSetter(edmProperty)));
+    }
+
+    public string NavigationProperty(NavigationProperty navProp)
+    {
+        var endType = _typeMapper.GetTypeName(navProp.ToEndMember.GetEntityType());
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0} {1} {2} {{ {3}get; {4}set; }}",
+            AccessibilityAndVirtual(Accessibility.ForNavigationProperty(navProp)),
+            navProp.ToEndMember.RelationshipMultiplicity == RelationshipMultiplicity.Many ? ("ICollection<" + endType + ">") : endType,
+            _code.Escape(navProp),
+            _code.SpaceAfter(Accessibility.ForGetter(navProp)),
+            _code.SpaceAfter(Accessibility.ForSetter(navProp)));
+    }
+
+	// goke+ 
+	public string Property(EntityType entity, EdmProperty edmProperty)
+	{
+		return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0}{1}",
+			PropertyAnnotation(entity, edmProperty),
+			Property(edmProperty)
+			);
+	}
+
+	public string Property(ComplexType complex, EdmProperty edmProperty)
+	{
+		return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0}{1}",
+			PropertyAnnotation(complex, edmProperty),
+			Property(edmProperty)
+			);
+	}
+    
+	public string PropertyAnnotation(EntityType entity, EdmProperty edmProperty)
+    {
+		var result = String.Empty;
+		var isKey = IsPropertyKey(entity, edmProperty);
+		var isForeignKey = IsPropertyForeignKey(entity, edmProperty);
+		var type = _typeMapper.GetTypeName(edmProperty.TypeUsage);
+		if(isKey)
+		{
+			var count=	entity.KeyMembers.Count;
+			var index =	entity.KeyMembers.IndexOf(edmProperty);
+			result = string.Format(
+				CultureInfo.InvariantCulture,
+				"[Key{0}{1}]", 
+				count > 1 ? (", Column(Order = " + index + ")") : null,
+				//count == 1 && (edmProperty.Name != "PersonId") && (edmProperty.Name != "Id") && (type == "byte" || type == "int" || type == "short") ? _code.StringBefore(", ", "DatabaseGenerated(DatabaseGeneratedOption.None)") : ""
+				count == 1 && (type == "byte" || type == "short") ? _code.StringBefore(", ", "DatabaseGenerated(DatabaseGeneratedOption.Identity)") : ""
+				);
+		}
+
+		if(isForeignKey)
+		{
+			var p = entity.NavigationProperties.FirstOrDefault(np=>np.GetDependentProperties().Contains(edmProperty));
+			result = string.Format(
+				CultureInfo.InvariantCulture,
+				"{0}[ForeignKey(\"{1}\")]", 
+				string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t",
+				_code.Escape(p)
+				);
+			
+			if(!isKey)
+			{
+				var p1 = p.GetDependentProperties();
+				if(p1.Count() > 1)
+				{
+					var k = p1.ToList().FindIndex(f => f.Name == edmProperty.Name);
+					result = string.Format(
+					CultureInfo.InvariantCulture,
+					"{0}[Column(Order = {1})]", 
+					string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t",
+					(k + entity.KeyMembers.Count)
+					);
+				}
+			}
+		}
+
+		if(!edmProperty.Nullable && !(type=="byte" || type=="int" || type=="long" || type=="bool" || type=="float" || type=="double" || type=="decimal"))
+		{
+			result = string.Format(
+				CultureInfo.InvariantCulture,
+				"{0}[Required(ErrorMessage = \"The {1} is a mandatory Field.\")]", 
+				string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t",
+				ToSentence(_code.Escape(edmProperty))
+				);
+		}
+		
+
+		if(MaxLengthValue(edmProperty) != null)
+		{
+			result = string.Format(
+				CultureInfo.InvariantCulture,
+				"{0}[MaxLength({1}), StringLength({1}, ErrorMessage = \"The {2} value cannot exceed {1} characters.\")]",
+				string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t",
+				MaxLengthValue(edmProperty),
+				ToSentence(_code.Escape(edmProperty))
+				);
+		}
+
+		if(edmProperty.Name.Contains("Email"))
+		{
+			result = string.Format(
+				CultureInfo.InvariantCulture,
+				"{0}[EmailAddress][DataType(DataType.EmailAddress)]",
+				string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t",
+				MaxLengthValue(edmProperty),
+				ToSentence(_code.Escape(edmProperty))
+				);
+		}
+		
+        //[DisplayFormat(DataFormatString = "{0:dd-MMM-yyyy hh:mm:ss}")]
+
+		if(type=="DateTime" || type=="System.DateTime" || type=="Nullable<System.DateTime>" || type=="System.DateTime?")
+		{
+			result = string.Format(
+				CultureInfo.InvariantCulture,
+        
+				"{0}[DataType(DataType.Date)]{1}[DisplayFormat(DataFormatString = \"{{0:yyyy-MM-dd}}\", ApplyFormatInEditMode = true)]", 
+				string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t",
+				Environment.NewLine + "\t",
+				ToSentence(_code.Escape(edmProperty))
+				);
+		}
+
+		if(type=="decimal" || type=="Nullable<decimal>")
+		{
+			result = string.Format(
+				CultureInfo.InvariantCulture,
+				"{0}[DisplayFormat(DataFormatString = \"{{0:#,#0.00}}\")]", 
+				string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t",
+				ToSentence(_code.Escape(edmProperty))
+				);
+		}
+		result = string.Format(
+			CultureInfo.InvariantCulture,
+			"{0}[Display(Name = \"{1}\")]", 
+			string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t",
+			isKey && !isForeignKey ? ToSentence(_code.Escape(edmProperty)) : ToDisplayName(_code.Escape(edmProperty))
+			);
+		
+		
+		result = string.Format(
+				CultureInfo.InvariantCulture,
+				"{0}", 
+				string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t"
+				);
+
+		return result;
+    }
+
+	public string PropertyAnnotation(ComplexType complex, EdmProperty edmProperty)
+    {
+		var result = String.Empty;
+		
+		if(!edmProperty.Nullable)
+		{
+			result = string.Format(
+				CultureInfo.InvariantCulture,
+				"{0}[Required(ErrorMessage = \"The {1} is a mandatory Field.\")]", 
+				string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t",
+				ToSentence(_code.Escape(edmProperty))
+				);
+		}
+
+		if(MaxLengthValue(edmProperty) != null)
+		{
+			result = string.Format(
+				CultureInfo.InvariantCulture,
+				"{0}[MaxLength({1}), StringLength({1}, ErrorMessage = \"The {2} value cannot exceed {1} characters.\")]",
+				string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t",
+				MaxLengthValue(edmProperty),
+				ToSentence(_code.Escape(edmProperty))
+				);
+		}
+		
+		result = string.Format(
+			CultureInfo.InvariantCulture,
+			"{0}[Display(Name = \"{1}\")]", 
+			string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t",
+			ToDisplayName(_code.Escape(edmProperty))
+			);
+		
+		
+		result = string.Format(
+				CultureInfo.InvariantCulture,
+				"{0}", 
+				string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t"
+				);
+
+		return result;
+    }
+
+	public string NavigationProperty(EntityType entity, NavigationProperty navigationProperty)
+	{
+		return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0}{1}",
+			NavigationPropertyAnnotation(entity, navigationProperty),
+			NavigationProperty(navigationProperty)
+			);
+	}
+
+    public string NavigationPropertyAnnotation(EntityType entity, NavigationProperty navigationProperty)
+    {
+		var result = String.Empty;
+        var navigationProperties = _typeMapper.GetNavigationProperties(entity);
+		var endType = navigationProperty.ToEndMember.GetEntityType();
+		if(navigationProperties.Count(np=>np.ToEndMember.GetEntityType() == endType) > 1 /*&& navigationProperty.ToEndMember.RelationshipMultiplicity != RelationshipMultiplicity.Many*/)
+		{
+			result = string.Format(
+				CultureInfo.InvariantCulture,
+				"[InverseProperty(\"{0}\")]", 
+				_code.Escape(_ef.Inverse(navigationProperty))
+				);
+		}
+
+		result = string.Format(
+				CultureInfo.InvariantCulture,
+				"{0}", 
+				string.IsNullOrEmpty(result) ? "" : result + Environment.NewLine + "\t"
+				);
+
+		return result;
+	}
+	
+	public string ForeignProperty2(EntityType entity, NavigationProperty navigationProperty, EntityType endEntityType = null)
+	{
+		var result = String.Empty;
+
+		var navEntityType = endEntityType != null ? endEntityType : navigationProperty.ToEndMember.GetEntityType();
+
+		var isNameObject = _typeMapper.GetTypeName(navEntityType.BaseType).StartsWith("BaseName");
+		var propertySuffix = isNameObject ? "Name" : String.Empty;
+		var navPropertyName = endEntityType != null ? _code.Escape(navEntityType) + propertySuffix : _code.Escape(navigationProperty) + propertySuffix;
+		var navPropertyId = endEntityType != null ? _code.Escape(navEntityType) + "Id" : "";
+		var navPropertyIdType = "int";
+		if(endEntityType != null)
+		{
+			if(endEntityType.BaseType.Name.Contains("Short"))
+				navPropertyIdType = "short";
+			if(endEntityType.BaseType.Name.Contains("Long"))
+				navPropertyIdType = "long";
+			if(endEntityType.BaseType.Name.Contains("Byte"))
+				navPropertyIdType = "byte";
+
+		}
+		
+		if(!isNameObject)
+		{
+			var simpleProperties = _typeMapper.GetSimpleProperties(navEntityType);
+			var edmProperty = simpleProperties.FirstOrDefault(f => _typeMapper.GetTypeName(f.TypeUsage) ==  "string");
+			propertySuffix = edmProperty != null ? _code.Escape(edmProperty) : String.Empty;
+
+			if(endEntityType != null)
+			{
+				navPropertyName = _code.Escape(navEntityType) + propertySuffix;
+			}
+			else
+			{
+				navPropertyName = _code.Escape(navigationProperty) == _code.Escape(navEntityType) ? propertySuffix : _code.Escape(navigationProperty) + propertySuffix;
+			}
+		}
+
+
+		if(!string.IsNullOrEmpty(propertySuffix))
+		{
+			var property = string.Format(
+							CultureInfo.InvariantCulture,
+							"{0} {1} {2} {{ get; set; }}",
+							"public",// : Accessibility.ForProperty(edmProperty),
+							"string", //: _typeMapper.GetTypeName(edmProperty.TypeUsage),
+							navPropertyName
+							);
+
+			var propertyAnnotation = string.Format(
+										CultureInfo.InvariantCulture,
+										"[Display(Name = \"{0}\")]", 
+										ToSentence(navPropertyName)
+										);
+
+			result = string.Format(
+						CultureInfo.InvariantCulture,
+						"{0}{1}",
+						propertyAnnotation + Environment.NewLine + "\t",
+						property
+						);
+
+			if(endEntityType != null)
+			{
+				result += Environment.NewLine + "\t";
+
+				property = string.Format(
+							CultureInfo.InvariantCulture,
+							"{0} {1}? {2} {{ get; set; }}",
+							"public",// : Accessibility.ForProperty(edmProperty),
+							navPropertyIdType, //: _typeMapper.GetTypeName(edmProperty.TypeUsage),
+							navPropertyId
+							);
+
+				propertyAnnotation = string.Format(
+										CultureInfo.InvariantCulture,
+										"[Display(Name = \"{0}\")]", 
+										ToSentence(navPropertyId)
+										);
+
+				result += string.Format(
+							CultureInfo.InvariantCulture,
+							"{0}{1}",
+							propertyAnnotation + Environment.NewLine + "\t",
+							property
+							);
+
+			}
+
+		}
+
+		return result;
+	}
+
+	public string ForeignProperty(EntityType entity, NavigationProperty navigationProperty)
+	{
+		var result = String.Empty;
+		var isNameObject = false;
+
+		var endEntityType = navigationProperty.ToEndMember.GetEntityType();
+		var endEntityTypes = ToSentence(_code.Escape(endEntityType),"|").Split('|');
+
+		var entityBaseType = _typeMapper.GetTypeName(endEntityType.BaseType);
+		var simpleProperties = _typeMapper.GetSimpleProperties(endEntityType);
+		if(entityBaseType.StartsWith("BaseName"))
+		{
+			//simpleProperties = _typeMapper.GetSimpleProperties(endEntityType.BaseType);
+			isNameObject = true;
+
+		}
+		var edmProperty = simpleProperties.FirstOrDefault(f => _typeMapper.GetTypeName(f.TypeUsage) ==  "string");
+		
+		
+		if(edmProperty != null || isNameObject)
+		{
+			var propName = isNameObject ? (_code.Escape(navigationProperty) + "Name") : (_code.Escape(edmProperty).StartsWith(_code.Escape(navigationProperty)) || endEntityTypes.Length > 1 ?   _code.Escape(edmProperty) : (_code.Escape(navigationProperty) + _code.Escape(edmProperty)));
+			var property = string.Format(
+							CultureInfo.InvariantCulture,
+							"{0} {1} {2} {{ {3}get; {4}set; }}",
+							isNameObject ? "public" : Accessibility.ForProperty(edmProperty),
+							isNameObject ? "string" : _typeMapper.GetTypeName(edmProperty.TypeUsage),
+							propName,
+							_code.SpaceAfter(Accessibility.ForGetter(edmProperty)),
+							_code.SpaceAfter(Accessibility.ForSetter(edmProperty)));
+
+			var propertyAnnotation = string.Format(
+										CultureInfo.InvariantCulture,
+										"[Display(Name = \"{0}\")]", 
+										ToSentence(propName)
+										);
+
+			result = string.Format(
+						CultureInfo.InvariantCulture,
+						"{0}{1}",
+						propertyAnnotation + Environment.NewLine + "\t",
+						property
+						);
+		}
+		
+
+		return result;
+	}
+
+	public string ForeignNavigationProperty(EntityType endEntityType, EntityType entity, NavigationProperty navigationProperty)
+	{
+		var result = String.Empty;
+		var isNameObject = false;
+
+		var npEndEntityType = navigationProperty.ToEndMember.GetEntityType();
+
+		//
+		var endEntityTypes = ToSentence(_code.Escape(endEntityType),"|").Split('|');
+
+		var entityBaseType = _typeMapper.GetTypeName(endEntityType.BaseType);
+		var simpleProperties = _typeMapper.GetSimpleProperties(endEntityType);
+		if(entityBaseType.StartsWith("BaseName"))
+		{
+			//simpleProperties = _typeMapper.GetSimpleProperties(endEntityType.BaseType);
+			isNameObject = true;
+
+		}
+		var edmProperty = simpleProperties.FirstOrDefault(f => _typeMapper.GetTypeName(f.TypeUsage) ==  "string");
+		
+		if(_typeMapper.GetSimpleProperties(entity).Any(a => _code.Escape(a) == _code.Escape(edmProperty)))
+		{
+			edmProperty = null;
+		}
+		var navigationProperties = _typeMapper.GetNavigationProperties(npEndEntityType)
+							.Where(np => np.ToEndMember.RelationshipMultiplicity != RelationshipMultiplicity.Many );
+		if(!navigationProperties.Any(a => _code.Escape(a) == _code.Escape(endEntityType)))
+		{
+			isNameObject = false;
+			edmProperty = null;
+		}
+		navigationProperties = _typeMapper.GetNavigationProperties(entity)
+							.Where(np => np.ToEndMember.RelationshipMultiplicity != RelationshipMultiplicity.Many );
+		if(navigationProperties.Any(a => _code.Escape(a) == _code.Escape(endEntityType)) 
+		)
+		{
+			isNameObject = false;
+			edmProperty = null;
+		}
+		
+		
+		if(edmProperty != null || isNameObject)
+		{
+			var propName = isNameObject ? (_code.Escape(endEntityType) + "Name") : (_code.Escape(edmProperty).StartsWith(_code.Escape(endEntityType)) || endEntityTypes.Length > 1 ?   _code.Escape(edmProperty) : (_code.Escape(endEntityType) + _code.Escape(edmProperty)));
+			var property = string.Format(
+							CultureInfo.InvariantCulture,
+							"{0} {1} {2} {{ {3}get; {4}set; }}",
+							isNameObject ? "public" : Accessibility.ForProperty(edmProperty),
+							isNameObject ? "string" : _typeMapper.GetTypeName(edmProperty.TypeUsage),
+							propName,
+							_code.SpaceAfter(Accessibility.ForGetter(edmProperty)),
+							_code.SpaceAfter(Accessibility.ForSetter(edmProperty)));
+
+			var propertyAnnotation = string.Format(
+										CultureInfo.InvariantCulture,
+										"[Display(Name = \"{0}\")]", 
+										ToSentence(propName) 
+										);
+
+			result = string.Format(
+						CultureInfo.InvariantCulture,
+						"{0}{1}",
+						propertyAnnotation + Environment.NewLine + "\t",
+						property
+						);
+		}
+		
+
+		return result;
+	}
+
+	public string ForeignPropertyAsDto2(EntityType entity, NavigationProperty navigationProperty, EntityType endEntityType = null)
+	{
+		var result = String.Empty;
+
+		var navEntityType = endEntityType != null ? endEntityType : navigationProperty.ToEndMember.GetEntityType();
+
+		var isNameObject = _typeMapper.GetTypeName(navEntityType.BaseType).StartsWith("BaseName");
+		var propertySuffix = isNameObject ? "Name" : String.Empty;
+		var navPropertyName = endEntityType != null ? _code.Escape(navEntityType) + propertySuffix : _code.Escape(navigationProperty) + propertySuffix;
+		var navPropertyId = endEntityType != null ? _code.Escape(navEntityType) + "Id" : "";
+		var navPropertyIdType = "int";
+		if(endEntityType != null)
+		{
+			if(endEntityType.BaseType.Name.Contains("Short"))
+				navPropertyIdType = "short";
+			if(endEntityType.BaseType.Name.Contains("Long"))
+				navPropertyIdType = "long";
+			if(endEntityType.BaseType.Name.Contains("Byte"))
+				navPropertyIdType = "byte";
+
+		}
+		
+		if(!isNameObject)
+		{
+			var simpleProperties = _typeMapper.GetSimpleProperties(navEntityType);
+			var edmProperty = simpleProperties.FirstOrDefault(f => _typeMapper.GetTypeName(f.TypeUsage) ==  "string");
+			propertySuffix = edmProperty != null ? _code.Escape(edmProperty) : String.Empty;
+
+			if(endEntityType != null)
+			{
+				navPropertyName = _code.Escape(navEntityType) + propertySuffix;
+			}
+			else
+			{
+				navPropertyName = _code.Escape(navigationProperty) == _code.Escape(navEntityType) ? propertySuffix : _code.Escape(navigationProperty) + propertySuffix;
+			}
+		}
+
+		if(!string.IsNullOrEmpty(propertySuffix))
+		{
+			if(endEntityType == null)
+			{
+				result = string.Format(
+							CultureInfo.InvariantCulture,
+							"{0} = x.{1} != null ? x.{1}.{2} : null,",
+							navPropertyName,
+							_code.Escape(navigationProperty),
+							propertySuffix
+							);
+			}
+			else
+			{
+				result = string.Format(
+							CultureInfo.InvariantCulture,
+							"{0} = x.{1} != null ? (x.{1}.{2} != null ? x.{1}.{2}.{3} : null) : null,",
+							navPropertyName,
+							_code.Escape(navigationProperty),
+							_code.Escape(navEntityType),
+							propertySuffix
+							);
+
+				result += Environment.NewLine + "\t\t";
+
+				result += string.Format(
+							CultureInfo.InvariantCulture,
+							"{0} = x.{1} != null ? (x.{1}.{2} != null ? x.{1}.{2}.{3} : default({4}?)) : null,",
+							navPropertyId,
+							_code.Escape(navigationProperty),
+							_code.Escape(navEntityType),
+							"Id",
+							navPropertyIdType
+							);
+
+
+			}
+		}
+
+		return result;
+	}
+
+	public string ForeignPropertyAsDto(EntityType entity, NavigationProperty navigationProperty)
+	{
+		var result = String.Empty;
+
+		var isNameObject = false;
+
+		var endEntityType = navigationProperty.ToEndMember.GetEntityType();
+		var endEntityTypes = ToSentence(_code.Escape(endEntityType),"|").Split('|');
+		var entityBaseType = _typeMapper.GetTypeName(endEntityType.BaseType);
+		var simpleProperties = _typeMapper.GetSimpleProperties(endEntityType);
+		if(entityBaseType.StartsWith("BaseName"))
+		{
+			//simpleProperties = _typeMapper.GetSimpleProperties(endEntityType.BaseType);
+			isNameObject = true;
+
+		}
+		var field = /*_typeMapper.GetTypeName(endEntityType) +*/ "Name";
+		//var edmProperty = simpleProperties.FirstOrDefault(f => f.Name.Contains(field) ==  true);
+		var edmProperty = simpleProperties.FirstOrDefault(f => _typeMapper.GetTypeName(f.TypeUsage) ==  "string");
+
+		if(edmProperty != null || isNameObject)
+		{
+			var propName = isNameObject ? (_code.Escape(navigationProperty) + "Name") : (_code.Escape(edmProperty).StartsWith(_code.Escape(navigationProperty)) || endEntityTypes.Length > 1 ?   _code.Escape(edmProperty) : (_code.Escape(navigationProperty) + _code.Escape(edmProperty)));
+			result = string.Format(
+						CultureInfo.InvariantCulture,
+						"{0} = x.{1} != null ? x.{1}.{2} : null,",
+						propName,
+						_code.Escape(navigationProperty),
+						isNameObject ? "Name" : _code.Escape(edmProperty)
+						);
+		}
+		
+
+		return result;
+	}
+
+	public string ForeignNavigationPropertyAsDto(EntityType endEntityType, EntityType entity, NavigationProperty navigationProperty)
+	{
+		var result = String.Empty;
+
+		var isNameObject = false;
+
+		var npEndEntityType = navigationProperty.ToEndMember.GetEntityType();
+		var endEntityTypes = ToSentence(_code.Escape(endEntityType),"|").Split('|');
+		var entityBaseType = _typeMapper.GetTypeName(endEntityType.BaseType);
+		var simpleProperties = _typeMapper.GetSimpleProperties(endEntityType);
+		if(entityBaseType.StartsWith("BaseName"))
+		{
+			//simpleProperties = _typeMapper.GetSimpleProperties(endEntityType.BaseType);
+			isNameObject = true;
+
+		}
+		var edmProperty = simpleProperties.FirstOrDefault(f => _typeMapper.GetTypeName(f.TypeUsage) ==  "string");
+		if(_typeMapper.GetSimpleProperties(entity).Any(a => _code.Escape(a) == _code.Escape(edmProperty)))
+		{
+			edmProperty = null;
+		}
+		var navigationProperties = _typeMapper.GetNavigationProperties(npEndEntityType)
+							.Where(np => np.ToEndMember.RelationshipMultiplicity != RelationshipMultiplicity.Many );
+		if(!navigationProperties.Any(a => _code.Escape(a) == _code.Escape(endEntityType)))
+		{
+			isNameObject = false;
+			edmProperty = null;
+		}
+		navigationProperties = _typeMapper.GetNavigationProperties(entity)
+							.Where(np => np.ToEndMember.RelationshipMultiplicity != RelationshipMultiplicity.Many );
+		if(navigationProperties.Any(a => _code.Escape(a) == _code.Escape(endEntityType)))
+		{
+			isNameObject = false;
+			edmProperty = null;
+		}
+
+		if(edmProperty != null || isNameObject)
+		{
+			var propName = isNameObject ? (_code.Escape(endEntityType) + "Name") : (_code.Escape(edmProperty).StartsWith(_code.Escape(endEntityType)) || endEntityTypes.Length > 1 ?   _code.Escape(edmProperty) : (_code.Escape(endEntityType) + _code.Escape(edmProperty)));
+			result = string.Format(
+						CultureInfo.InvariantCulture,
+						"{0} = x.{1} != null ? (x.{1}.{2} != null ? x.{1}.{2}.{3} : null) : null,",
+						propName,
+						_code.Escape(navigationProperty),
+						_code.Escape(endEntityType),
+						isNameObject ? "Name" : _code.Escape(edmProperty)
+						);
+		}
+		
+
+		return result;
+	}
+
+	// goke- 
+
+    public string AccessibilityAndVirtual(string accessibility)
+    {
+        return accessibility + (accessibility != "private" ? " virtual" : "");
+    }
+    
+    public string EntityClassOpening(EntityType entity)
+    {
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0} {1}partial class {2}{3}",
+            Accessibility.ForType(entity),
+            _code.SpaceAfter(_code.AbstractOption(entity)),
+            _code.Escape(entity),
+            _code.StringBefore(" : ", _typeMapper.GetTypeName(entity.BaseType)));
+    }
+
+	public string EntityClassOpening(EntityType entity, string baseType)
+    {
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0} {1}partial class {2}{3}",
+            Accessibility.ForType(entity),
+            _code.SpaceAfter(_code.AbstractOption(entity)),
+            _code.Escape(entity),
+            _code.StringBefore(" : ", (_typeMapper.GetTypeName(entity.BaseType) ?? baseType))
+			);
+    }
+    
+    public string EnumOpening(SimpleType enumType)
+    {
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0} enum {1} : {2}",
+            Accessibility.ForType(enumType),
+            _code.Escape(enumType),
+            _code.Escape(_typeMapper.UnderlyingClrType(enumType)));
+        }
+    
+    public void WriteFunctionParameters(EdmFunction edmFunction, Action<string, string, string, string> writeParameter)
+    {
+        var parameters = FunctionImportParameter.Create(edmFunction.Parameters, _code, _ef);
+        foreach (var parameter in parameters.Where(p => p.NeedsLocalVariable))
+        {
+            var isNotNull = parameter.IsNullableOfT ? parameter.FunctionParameterName + ".HasValue" : parameter.FunctionParameterName + " != null";
+            var notNullInit = "new ObjectParameter(\"" + parameter.EsqlParameterName + "\", " + parameter.FunctionParameterName + ")";
+            var nullInit = "new ObjectParameter(\"" + parameter.EsqlParameterName + "\", typeof(" + TypeMapper.FixNamespaces(parameter.RawClrTypeName) + "))";
+            writeParameter(parameter.LocalVariableName, isNotNull, notNullInit, nullInit);
+        }
+    }
+    
+    public string ComposableFunctionMethod(EdmFunction edmFunction, string modelNamespace)
+    {
+        var parameters = _typeMapper.GetParameters(edmFunction);
+        
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0} IQueryable<{1}> {2}({3})",
+            AccessibilityAndVirtual(Accessibility.ForMethod(edmFunction)),
+            _typeMapper.GetTypeName(_typeMapper.GetReturnType(edmFunction), modelNamespace),
+            _code.Escape(edmFunction),
+            string.Join(", ", parameters.Select(p => TypeMapper.FixNamespaces(p.FunctionParameterType) + " " + p.FunctionParameterName).ToArray()));
+    }
+    
+    public string ComposableCreateQuery(EdmFunction edmFunction, string modelNamespace)
+    {
+        var parameters = _typeMapper.GetParameters(edmFunction);
+        
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            "return ((IObjectContextAdapter)this).ObjectContext.CreateQuery<{0}>(\"[{1}].[{2}]({3})\"{4});",
+            _typeMapper.GetTypeName(_typeMapper.GetReturnType(edmFunction), modelNamespace),
+            edmFunction.NamespaceName,
+            edmFunction.Name,
+            string.Join(", ", parameters.Select(p => "@" + p.EsqlParameterName).ToArray()),
+            _code.StringBefore(", ", string.Join(", ", parameters.Select(p => p.ExecuteParameterName).ToArray())));
+    }
+    
+    public string FunctionMethod(EdmFunction edmFunction, string modelNamespace, bool includeMergeOption)
+    {
+        var parameters = _typeMapper.GetParameters(edmFunction);
+        var returnType = _typeMapper.GetReturnType(edmFunction);
+
+        var paramList = String.Join(", ", parameters.Select(p => TypeMapper.FixNamespaces(p.FunctionParameterType) + " " + p.FunctionParameterName).ToArray());
+        if (includeMergeOption)
+        {
+            paramList = _code.StringAfter(paramList, ", ") + "MergeOption mergeOption";
+        }
+
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0} {1} {2}({3})",
+            AccessibilityAndVirtual(Accessibility.ForMethod(edmFunction)),
+            returnType == null ? "int" : "ObjectResult<" + _typeMapper.GetTypeName(returnType, modelNamespace) + ">",
+            _code.Escape(edmFunction),
+            paramList);
+    }
+    
+    public string ExecuteFunction(EdmFunction edmFunction, string modelNamespace, bool includeMergeOption)
+    {
+        var parameters = _typeMapper.GetParameters(edmFunction);
+        var returnType = _typeMapper.GetReturnType(edmFunction);
+
+        var callParams = _code.StringBefore(", ", String.Join(", ", parameters.Select(p => p.ExecuteParameterName).ToArray()));
+        if (includeMergeOption)
+        {
+            callParams = ", mergeOption" + callParams;
+        }
+        
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            "return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction{0}(\"{1}\"{2});",
+            returnType == null ? "" : "<" + _typeMapper.GetTypeName(returnType, modelNamespace) + ">",
+            edmFunction.Name,
+            callParams);
+    }
+    
+    public string DbSet(EntitySet entitySet)
+    {
+        return string.Format(
+            CultureInfo.InvariantCulture,
+            "{0} virtual DbSet<{1}> {2} {{ get; set; }}",
+            Accessibility.ForReadOnlyProperty(entitySet),
+            _typeMapper.GetTypeName(entitySet.ElementType),
+            _code.Escape(entitySet));
+    }
+
+    public string UsingDirectives(bool inHeader, bool includeCollections = true)
+    {
+
+        return inHeader == string.IsNullOrEmpty(_code.VsNamespaceSuggestion())
+            ? string.Format(
+                CultureInfo.InvariantCulture,
+                "{0}using System;{1}{2}{3}" +
+                "{4}",
+                inHeader ? Environment.NewLine : "",
+                includeCollections ? (Environment.NewLine + "using System.Collections.Generic;") : "",
+                (Environment.NewLine + "using System.ComponentModel.DataAnnotations;"),
+                (Environment.NewLine + "using System.ComponentModel.DataAnnotations.Schema;"),
+                inHeader ? "" : Environment.NewLine)
+            : "";
+    }
+}
+
+public class TypeMapper
+{
+    private const string ExternalTypeNameAttributeName = @"http://schemas.microsoft.com/ado/2006/04/codegeneration:ExternalTypeName";
+
+    private readonly System.Collections.IList _errors;
+    private readonly CodeGenerationTools _code;
+    private readonly MetadataTools _ef;
+
+    public TypeMapper(CodeGenerationTools code, MetadataTools ef, System.Collections.IList errors)
+    {
+        ArgumentNotNull(code, "code");
+        ArgumentNotNull(ef, "ef");
+        ArgumentNotNull(errors, "errors");
+
+        _code = code;
+        _ef = ef;
+        _errors = errors;
+    }
+
+    public static string FixNamespaces(string typeName)
+    {
+        return typeName.Replace("System.Data.Spatial.", "System.Data.Entity.Spatial.");
+    }
+
+    public string GetTypeName(TypeUsage typeUsage)
+    {
+        return typeUsage == null ? null : GetTypeName(typeUsage.EdmType, _ef.IsNullable(typeUsage), modelNamespace: null);
+    }
+
+    public string GetTypeName(EdmType edmType)
+    {
+        return GetTypeName(edmType, isNullable: null, modelNamespace: null);
+    }
+
+    public string GetTypeName(TypeUsage typeUsage, string modelNamespace)
+    {
+        return typeUsage == null ? null : GetTypeName(typeUsage.EdmType, _ef.IsNullable(typeUsage), modelNamespace);
+    }
+
+    public string GetTypeName(EdmType edmType, string modelNamespace)
+    {
+        return GetTypeName(edmType, isNullable: null, modelNamespace: modelNamespace);
+    }
+
+    public string GetTypeName(EdmType edmType, bool? isNullable, string modelNamespace)
+    {
+        if (edmType == null)
+        {
+            return null;
+        }
+
+        var collectionType = edmType as CollectionType;
+        if (collectionType != null)
+        {
+            return String.Format(CultureInfo.InvariantCulture, "ICollection<{0}>", GetTypeName(collectionType.TypeUsage, modelNamespace));
+        }
+
+        var typeName = _code.Escape(edmType.MetadataProperties
+                                .Where(p => p.Name == ExternalTypeNameAttributeName)
+                                .Select(p => (string)p.Value)
+                                .FirstOrDefault())
+            ?? (modelNamespace != null && edmType.NamespaceName != modelNamespace ?
+                _code.CreateFullName(_code.EscapeNamespace(edmType.NamespaceName), _code.Escape(edmType)) :
+                _code.Escape(edmType));
+
+        if (edmType is StructuralType)
+        {
+            return typeName;
+        }
+
+        if (edmType is SimpleType)
+        {
+            var clrType = UnderlyingClrType(edmType);
+            if (!IsEnumType(edmType))
+            {
+                typeName = _code.Escape(clrType);
+            }
+
+            typeName = FixNamespaces(typeName);
+
+            return clrType.IsValueType && isNullable == true ?
+                String.Format(CultureInfo.InvariantCulture, "Nullable<{0}>", typeName) :
+                typeName;
+        }
+
+        throw new ArgumentException("edmType");
+    }
+    
+    public Type UnderlyingClrType(EdmType edmType)
+    {
+        ArgumentNotNull(edmType, "edmType");
+
+        var primitiveType = edmType as PrimitiveType;
+        if (primitiveType != null)
+        {
+            return primitiveType.ClrEquivalentType;
+        }
+
+        if (IsEnumType(edmType))
+        {
+            return GetEnumUnderlyingType(edmType).ClrEquivalentType;
+        }
+
+        return typeof(object);
+    }
+    
+    public object GetEnumMemberValue(MetadataItem enumMember)
+    {
+        ArgumentNotNull(enumMember, "enumMember");
+        
+        var valueProperty = enumMember.GetType().GetProperty("Value");
+        return valueProperty == null ? null : valueProperty.GetValue(enumMember, null);
+    }
+    
+    public string GetEnumMemberName(MetadataItem enumMember)
+    {
+        ArgumentNotNull(enumMember, "enumMember");
+        
+        var nameProperty = enumMember.GetType().GetProperty("Name");
+        return nameProperty == null ? null : (string)nameProperty.GetValue(enumMember, null);
+    }
+
+    public System.Collections.IEnumerable GetEnumMembers(EdmType enumType)
+    {
+        ArgumentNotNull(enumType, "enumType");
+
+        var membersProperty = enumType.GetType().GetProperty("Members");
+        return membersProperty != null 
+            ? (System.Collections.IEnumerable)membersProperty.GetValue(enumType, null)
+            : Enumerable.Empty<MetadataItem>();
+    }
+    
+    public bool EnumIsFlags(EdmType enumType)
+    {
+        ArgumentNotNull(enumType, "enumType");
+        
+        var isFlagsProperty = enumType.GetType().GetProperty("IsFlags");
+        return isFlagsProperty != null && (bool)isFlagsProperty.GetValue(enumType, null);
+    }
+
+    public bool IsEnumType(GlobalItem edmType)
+    {
+        ArgumentNotNull(edmType, "edmType");
+
+        return edmType.GetType().Name == "EnumType";
+    }
+
+    public PrimitiveType GetEnumUnderlyingType(EdmType enumType)
+    {
+        ArgumentNotNull(enumType, "enumType");
+
+        return (PrimitiveType)enumType.GetType().GetProperty("UnderlyingType").GetValue(enumType, null);
+    }
+
+    public string CreateLiteral(object value)
+    {
+        if (value == null || value.GetType() != typeof(TimeSpan))
+        {
+            return _code.CreateLiteral(value);
+        }
+
+        return string.Format(CultureInfo.InvariantCulture, "new TimeSpan({0})", ((TimeSpan)value).Ticks);
+    }
+    
+    public bool VerifyCaseInsensitiveTypeUniqueness(IEnumerable<string> types, string sourceFile)
+    {
+        ArgumentNotNull(types, "types");
+        ArgumentNotNull(sourceFile, "sourceFile");
+        
+        var hash = new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
+        if (types.Any(item => !hash.Add(item)))
+        {
+            _errors.Add(
+                new CompilerError(sourceFile, -1, -1, "6023",
+                    String.Format(CultureInfo.CurrentCulture, CodeGenerationTools.GetResourceString("Template_CaseInsensitiveTypeConflict"))));
+            return false;
+        }
+        return true;
+    }
+    
+    public IEnumerable<SimpleType> GetEnumItemsToGenerate(IEnumerable<GlobalItem> itemCollection)
+    {
+        return GetItemsToGenerate<SimpleType>(itemCollection)
+            .Where(e => IsEnumType(e));
+    }
+    
+    public IEnumerable<T> GetItemsToGenerate<T>(IEnumerable<GlobalItem> itemCollection) where T: EdmType
+    {
+        return itemCollection
+            .OfType<T>()
+            .Where(i => !i.MetadataProperties.Any(p => p.Name == ExternalTypeNameAttributeName))
+            .OrderBy(i => i.Name);
+    }
+
+    public IEnumerable<string> GetAllGlobalItems(IEnumerable<GlobalItem> itemCollection)
+    {
+        return itemCollection
+            .Where(i => i is EntityType || i is ComplexType || i is EntityContainer || IsEnumType(i))
+            .Select(g => GetGlobalItemName(g));
+    }
+
+    public string GetGlobalItemName(GlobalItem item)
+    {
+        if (item is EdmType)
+        {
+            return ((EdmType)item).Name;
+        }
+        else
+        {
+            return ((EntityContainer)item).Name;
+        }
+    }
+
+    public IEnumerable<EdmProperty> GetSimpleProperties(EntityType type)
+    {
+        return type.Properties.Where(p => p.TypeUsage.EdmType is SimpleType && p.DeclaringType == type);
+    }
+    
+    public IEnumerable<EdmProperty> GetSimpleProperties(ComplexType type)
+    {
+        return type.Properties.Where(p => p.TypeUsage.EdmType is SimpleType && p.DeclaringType == type);
+    }
+    
+    public IEnumerable<EdmProperty> GetComplexProperties(EntityType type)
+    {
+        return type.Properties.Where(p => p.TypeUsage.EdmType is ComplexType && p.DeclaringType == type);
+    }
+    
+    public IEnumerable<EdmProperty> GetComplexProperties(ComplexType type)
+    {
+        return type.Properties.Where(p => p.TypeUsage.EdmType is ComplexType && p.DeclaringType == type);
+    }
+
+    public IEnumerable<EdmProperty> GetPropertiesWithDefaultValues(EntityType type)
+    {
+        return type.Properties.Where(p => p.TypeUsage.EdmType is SimpleType && p.DeclaringType == type && p.DefaultValue != null);
+    }
+    
+    public IEnumerable<EdmProperty> GetPropertiesWithDefaultValues(ComplexType type)
+    {
+        return type.Properties.Where(p => p.TypeUsage.EdmType is SimpleType && p.DeclaringType == type && p.DefaultValue != null);
+    }
+
+    public IEnumerable<NavigationProperty> GetNavigationProperties(EntityType type)
+    {
+        return type.NavigationProperties.Where(np => np.DeclaringType == type);
+    }
+    
+    public IEnumerable<NavigationProperty> GetCollectionNavigationProperties(EntityType type)
+    {
+        return type.NavigationProperties.Where(np => np.DeclaringType == type && np.ToEndMember.RelationshipMultiplicity == RelationshipMultiplicity.Many);
+    }
+    
+    public FunctionParameter GetReturnParameter(EdmFunction edmFunction)
+    {
+        ArgumentNotNull(edmFunction, "edmFunction");
+
+        var returnParamsProperty = edmFunction.GetType().GetProperty("ReturnParameters");
+        return returnParamsProperty == null
+            ? edmFunction.ReturnParameter
+            : ((IEnumerable<FunctionParameter>)returnParamsProperty.GetValue(edmFunction, null)).FirstOrDefault();
+    }
+
+    public bool IsComposable(EdmFunction edmFunction)
+    {
+        ArgumentNotNull(edmFunction, "edmFunction");
+
+        var isComposableProperty = edmFunction.GetType().GetProperty("IsComposableAttribute");
+        return isComposableProperty != null && (bool)isComposableProperty.GetValue(edmFunction, null);
+    }
+
+    public IEnumerable<FunctionImportParameter> GetParameters(EdmFunction edmFunction)
+    {
+        return FunctionImportParameter.Create(edmFunction.Parameters, _code, _ef);
+    }
+
+    public TypeUsage GetReturnType(EdmFunction edmFunction)
+    {
+        var returnParam = GetReturnParameter(edmFunction);
+        return returnParam == null ? null : _ef.GetElementType(returnParam.TypeUsage);
+    }
+    
+    public bool GenerateMergeOptionFunction(EdmFunction edmFunction, bool includeMergeOption)
+    {
+        var returnType = GetReturnType(edmFunction);
+        return !includeMergeOption && returnType != null && returnType.EdmType.BuiltInTypeKind == BuiltInTypeKind.EntityType;
+    }
+}
+
+public static void ArgumentNotNull<T>(T arg, string name) where T : class
+{
+    if (arg == null)
+    {
+        throw new ArgumentNullException(name);
+    }
+}
+#>
