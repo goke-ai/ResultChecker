@@ -9,6 +9,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
+namespace Ark.ResultCheckers.Api1.Controllers
+{
+    public interface IWebHostEnvironment : IHostingEnvironment
+    {
+    }
+
+
+}
 namespace Ark.ResultCheckers.Api2.Controllers
 {
     public interface IWebHostEnvironment : IHostingEnvironment

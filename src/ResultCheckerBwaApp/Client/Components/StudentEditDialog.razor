@@ -73,12 +73,12 @@
 			</MatDialogContent>
                 <MatDialogActions>
                     <MatButton Type="button" OnClick=@CancelStudent>@Localize["CANCEL"]</MatButton>
-                    @if(CanAdd || CanUpdate)
-					{
-					<!-- Button to save the product -->
-                    <MatButton Type="submit" title="@(Localize["Save Student"])">@Localize["SAVE"]</MatButton>
+                    @if (CanAdd || CanUpdate)
+                    {
+                        <!-- Button to save the product -->
+                        <MatButton Type="submit" title="@(Localize["Save Student"])">@Localize["SAVE"]</MatButton>
                     }
-					<!-- Only show button if not a new record -->
+                    <!-- Only show button if not a new record -->
                     @if (FormData.Id > 0 && CanDelete)
                     {
                         <!-- Button to delete the product -->

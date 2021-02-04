@@ -15,11 +15,9 @@
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 
 @attribute [Authorize(Roles= "Administrators")]
-
-@inject IApiService ApiSvc
+@inject HttpClient Http
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-@inject IStringLocalizer<App> Localize
 @inject IMatToaster Toaster
 
 

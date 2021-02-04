@@ -26,6 +26,8 @@
 				<MatSortHeader SortId="id">@Localize["Id"]</MatSortHeader>
 			}
 			<MatSortHeader SortId="pin">@Localize["Pin"]</MatSortHeader>
+			<MatSortHeader SortId="owner">@Localize["Owner"]</MatSortHeader>
+			<MatSortHeader SortId="role">@Localize["Role"]</MatSortHeader>
 			<MatSortHeader>@EditColumnName</MatSortHeader>
 		</MatSortHeaderRow>
 	</MatTableHeader>
@@ -35,6 +37,8 @@
 			<td>@card.Id</td>
 		}
 			<td>@card.Pin</td>
+			<td>@card.Owner</td>
+			<td>@card.Role</td>
 			<td>
 				@if(CanUpdate)
 				{
@@ -58,6 +62,8 @@
     [Parameter] public MatFilter[] FilterColumns { get; set; } = new[]
             {            
             new MatFilter{ Key= "Pin", Text="Pin" },
+            new MatFilter{ Key= "Owner", Text="Owner" },
+            new MatFilter{ Key= "Role", Text="Role" },
             };
 	
 	[Parameter] public string EditColumnName { get; set; }
@@ -98,6 +104,12 @@
                     break;
 				case "pin":
                     comparison = (s1, s2) => string.Compare(s1.Pin.ToString(), s2.Pin.ToString(), StringComparison.InvariantCultureIgnoreCase);
+                    break;
+				case "owner":
+                    comparison = (s1, s2) => string.Compare(s1.Owner.ToString(), s2.Owner.ToString(), StringComparison.InvariantCultureIgnoreCase);
+                    break;
+				case "role":
+                    comparison = (s1, s2) => string.Compare(s1.Role.ToString(), s2.Role.ToString(), StringComparison.InvariantCultureIgnoreCase);
                     break;
             }
             if (comparison != null)

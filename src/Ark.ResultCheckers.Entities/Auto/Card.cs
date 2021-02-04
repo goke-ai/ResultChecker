@@ -20,6 +20,7 @@ namespace Ark.ResultCheckers.Entities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Card()
         {
+            this.Role = "Users";
     		Initialize();
         }
     	partial void Initialize();
@@ -27,5 +28,10 @@ namespace Ark.ResultCheckers.Entities
         [Required(ErrorMessage = "The Pin is a mandatory Field.")]
     	[Display(Name = "Pin")]
     	public string Pin { get; set; }
+        [Display(Name = "Owner")]
+    	public string Owner { get; set; }
+        [Required(ErrorMessage = "The Role is a mandatory Field.")]
+    	[Display(Name = "Role")]
+    	public string Role { get; set; }
     }
 }

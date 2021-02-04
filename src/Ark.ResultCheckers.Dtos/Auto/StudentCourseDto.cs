@@ -19,6 +19,8 @@ namespace Ark.ResultCheckers.Dtos
     
     public partial class StudentCourseDto : BaseEntityDto
     {
+    	public String StudentCourseDescription { get; private set; }
+    
         public StudentCourseDto()
         {
     		
@@ -45,14 +47,14 @@ namespace Ark.ResultCheckers.Dtos
         // +Student
     	[Display(Name = "Student Matric No")]
     	public string StudentMatricNo { get; set; }
-    	[Display(Name = "Student Name")]
-    	public string StudentName { get; set; } //Basic-Nav-Property
+    	[Display(Name = "Student Description")]
+    	public string StudentDescription { get; set; } //Basic-Nav-Property
     	// -Student
         // +Course
     	[Display(Name = "Course Code")]
     	public string CourseCode { get; set; }
-    	[Display(Name = "Course Name")]
-    	public string CourseName { get; set; } //Basic-Nav-Property
+    	[Display(Name = "Course Description")]
+    	public string CourseDescription { get; set; } //Basic-Nav-Property
     	// -Course
         // +Session
     	[Display(Name = "Session Name")]
@@ -166,11 +168,20 @@ namespace Ark.ResultCheckers.Dtos
         public static string[] IncludeNavigations()
         {
             _includeNavigations = new string[] { 
-    		// +navigation
-    			"Student",
-    			"Course",
-    			"Session",
-    			"Semester",
+    	// +navigation
+        // +Student
+    			"Student",//String-Nav-Property
+    			// -Student
+        // +Course
+    			"Course",//String-Nav-Property
+    			// -Course
+        // +Session
+    			"Session",//String-Nav-Property
+    			// -Session
+        // +Semester
+    			"Semester",//String-Nav-Property
+    			// -Semester
+    	// -navigation
     		};
             OnSetIncludeNavigations();
             return _includeNavigations;
@@ -193,6 +204,7 @@ namespace Ark.ResultCheckers.Dtos
         {
             _asStudentCourseDto = x => new StudentCourseDto
             {
+    			StudentCourseDescription = x.StudentCourseDescription,
                 
                 Id = x.Id,
     			// +simplex
@@ -202,16 +214,21 @@ namespace Ark.ResultCheckers.Dtos
     			CourseId = x.CourseId,
     			Score = x.Score,
     			// +navigation
-    			StudentName = x.Student == null ? default : x.Student.StudentName,
-    			CourseName = x.Course == null ? default : x.Course.CourseName,
-                SessionName = x.Session != null ? x.Session.Name : default,
-                SemesterName = x.Semester != null ? x.Semester.Name : default,
-
-
+    			// +Student
+    			StudentMatricNo = x.Student == null ? default : x.Student.MatricNo,
+    			StudentDescription = x.Student == null ? default : (x.Student.StudentDescription), //Basic-Nav-Property
+    			// -Student
+    			// +Course
     			CourseCode = x.Course == null ? default : x.Course.Code,
-                StudentMatricNo = x.Student == null ? default : x.Student.MatricNo,
-
-
+    			CourseDescription = x.Course == null ? default : (x.Course.CourseDescription), //Basic-Nav-Property
+    			// -Course
+    			// +Session
+    			SessionName = x.Session == null ? default : x.Session.Name,
+    			// -Session
+    			// +Semester
+    			SemesterName = x.Semester == null ? default : x.Semester.Name,
+    			// -Semester
+                
                 IsVisible = x.IsVisible,
                 InsertUser = x.InsertUser,
                 InsertDateTime = x.InsertDateTime,

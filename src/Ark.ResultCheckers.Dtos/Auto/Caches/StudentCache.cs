@@ -64,7 +64,7 @@ namespace Ark.ResultCheckers.Dtos.Caches
             {
     			Id = x.Id,
                 
-                Name = x.StudentName,
+                Name = x.StudentDescription,
     			
             };
     

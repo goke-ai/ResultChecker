@@ -12,7 +12,7 @@ var itemCollection = new EdmMetadataLoader(textTransform.Host, textTransform.Err
 var codeStringGenerator = new CodeStringGenerator(code, typeMapper, ef);
 
 var baseType = "";
-var moreNamespace = "Ark.Oluko.Dtos";
+var moreNamespace = "Ark.ResultCheckers.Dtos";
 
 if (!typeMapper.VerifyCaseInsensitiveTypeUniqueness(typeMapper.GetAllGlobalItems(itemCollection), inputFile))
 {
@@ -98,11 +98,9 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 
 @attribute [Authorize(Roles= "Administrators")]
-
-@inject IApiService ApiSvc
+@inject HttpClient Http
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavigationManager
-@inject IStringLocalizer<App> Localize
 @inject IMatToaster Toaster
 
 

@@ -48,7 +48,7 @@
                             <!-- SessionId | isForeignKey(True) | Nullable<int> | 00 -->
                             <!-- Foreign Key Session -->
                             <div class="mat-layout-grid-cell-span-12">
-                                <MatSelectValue Label="@(Localize["Session"])" @bind-Value="searchFormData.SessionId" Items="@sessionCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
+                                <MatSelectValue Label="@(Localize["Session"])" @bind-Value="searchFormData.SessionId" Items="@sessionCaches" ValueSelector="@(i=>i.Id)" FullWidth="false">
                                     <ItemTemplate Context="session">
                                         <span>@session?.Name</span>
                                     </ItemTemplate>
@@ -58,7 +58,7 @@
                             <!-- SemesterId | isForeignKey(True) | Nullable<int> | 00 -->
                             <!-- Foreign Key Semester -->
                             <div class="mat-layout-grid-cell-span-12">
-                                <MatSelectValue Label="@(Localize["Semester"])" @bind-Value="searchFormData.SemesterId" Items="@semesterCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
+                                <MatSelectValue Label="@(Localize["Semester"])" @bind-Value="searchFormData.SemesterId" Items="@semesterCaches" ValueSelector="@(i=>i.Id)" FullWidth="false">
                                     <ItemTemplate Context="semester">
                                         <span>@semester?.Name</span>
                                     </ItemTemplate>
@@ -68,19 +68,22 @@
                             <!-- StudentId | isForeignKey(True) | @int | 00 -->
                             <!-- Foreign Key Student -->
                             <div class="mat-layout-grid-cell-span-12">
-                                <MatSelectValue Label="@(Localize["Student"])" @bind-Value="searchFormData.StudentId" Items="@studentCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
+                                <MatSelectValue Label="@(Localize["Student"])" @bind-Value="searchFormData.StudentId" Items="@studentCaches" ValueSelector="@(i=>i.Id)" FullWidth="false">
                                     <ItemTemplate Context="student">
                                         <span>@student?.Name</span>
                                     </ItemTemplate>
                                 </MatSelectValue>
                                 <ValidationMessage For="@(() => searchFormData.StudentId)" />
                             </div>
+                            <div class="mat-layout-grid-cell-span-12">
+                                <!-- Search -->
+                                <MatButton Type="submit" Raised="true" Icon="@MatIconNames.Search" title="@(Localize["Search"])">@(Localize["Search"])</MatButton>
+
+                            </div>
 
                         </div>
                     </div>
-                    <div>
-                        <button type="submit">Search</button>
-                    </div>
+                    
                 </EditForm>
             </div>
 
@@ -104,7 +107,7 @@
 </div>
 
 @code {
-    string apiRootUrl = "/api2";
+    string apiRootUrl = "/api1";
 
     Overlay studentCourseOverlay;
 
@@ -192,11 +195,7 @@
         {
             canViewStudentCourse = true;
 
-            var student = studentCaches.FirstOrDefault(f => f.Name.StartsWith($"{User.Identity.Name}-"));
-            if (student != null)
-            {
-                searchFormData.StudentId = student.Id;
-            }
+
         }
 
         if (User.Identity != null)
@@ -215,6 +214,18 @@
                 // <!-- ForeignKey SemesterId | Nullable<int> -->
                 // <!-- Semester | Semester -->
                 semesterCaches = await ApiSvc.GetAsync<SemesterCache[]>(apiRootUrl + "/Caches/Semesters");
+
+
+                if (User.IsInRole("Students"))
+                {
+                    //var student = studentCaches.FirstOrDefault(f => f.Name.StartsWith($"{User.Identity.Name}-"));
+                    //if (student != null)
+                    //{
+                    //    searchFormData.StudentId = student.Id;
+                    //}
+
+                    studentCaches = studentCaches.Where(w => w.Name.StartsWith($"{User.Identity.Name}-")).ToArray();
+                }
             }
             catch (AccessTokenNotAvailableException exception)
             {

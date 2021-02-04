@@ -169,13 +169,494 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResultCheckers\Api1\Controllers\AppSettingsController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Api1\Controllers\Base\ApiController.cs" />
+    <Compile Include="ResultCheckers\Api1\Controllers\Base\ApiServiceExtension.cs" />
+    <Compile Include="ResultCheckers\Api1\Controllers\Cache\ApiController.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApiController.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Api1\Controllers\Cache\CachesController.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CachesController.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Api1\Controllers\CardsController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Api1\Controllers\Contollers.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Api1\Controllers\CoursesController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Api1\Controllers\GradesController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Api1\Controllers\SemestersController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Api1\Controllers\SessionsController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Api1\Controllers\StudentCoursesController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Api1\Controllers\StudentsController.cs">
+      <DependentUpon>Contollers.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Data\AppDbContext.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AppDbContext.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Data\Core\DesignTimeDbContextFactory.cs" />
+    <Compile Include="ResultCheckers\Data\Seeding\SeedData.cs" />
+    <Compile Include="ResultCheckers\Data\Services\AppSettingService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Data\Services\Base\BaseService.cs" />
+    <Compile Include="ResultCheckers\Data\Services\Base\RemoveUnique.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>RemoveUnique.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Data\Services\CardService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Data\Services\CourseService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Data\Services\DataServiceExtension.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataServiceExtension.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Data\Services\GradeService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Data\Services\SemesterService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Data\Services\Services.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Data\Services\SessionService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Data\Services\StudentCourseService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Data\Services\StudentService.cs">
+      <DependentUpon>Services.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\AppSettingDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\BaseEntityDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\BaseNameEntityDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Base\BaseEntityDto.cs" />
+    <Compile Include="ResultCheckers\Dtos\Base\BulkEntityDto.cs" />
+    <Compile Include="ResultCheckers\Dtos\Base\IBaseEntityDto.cs" />
+    <Compile Include="ResultCheckers\Dtos\BulkCardDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\BulkEntityDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\BulkStudentCourseDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Caches\AppSettingCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Caches\BaseEntityCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Caches\BaseNameEntityCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Caches\Base\BaseCache.cs" />
+    <Compile Include="ResultCheckers\Dtos\Caches\CacheKeys.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>CacheKeys.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Caches\CardCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Caches\CourseCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Caches\GradeCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Caches\SemesterCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Caches\SessionCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Caches\StudentCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Caches\StudentCourseCache.cs">
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\Caches\_Cache.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>_Cache.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\CardDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\CourseDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\GradeDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\SemesterDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\SessionDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\StudentCourseDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\StudentDto.cs">
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Dtos\_Dto.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>_Dto.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\Address.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\AppSetting.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\BaseEntity.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\BaseNameEntity.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\Base\BaseEntity.cs" />
+    <Compile Include="ResultCheckers\Entities\Base\IBaseEntity.cs" />
+    <Compile Include="ResultCheckers\Entities\Base\Navigation.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Navigation.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\BulkCard.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\BulkEntity.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\BulkStudentCourse.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\Card.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\Course.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\CurriculumType.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\File.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\Gender.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\Grade.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\MediaType.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\Semester.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\Session.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\Student.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\StudentCourse.cs">
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Entities\_Entities.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>_Entities.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ResultCheckers\Model2.Designer.cs">
+      <DependentUpon>Model.edmx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Include="ResultCheckers\_Code\RemoveDesignTimeDbContextFactory.cs" />
+    <Compile Include="ResultCheckers\_Code\RemoveEntityFrameworkCore.cs" />
+    <Compile Include="ResultCheckers\_Code\RemoveGokeCoreExtension.cs" />
+    <Compile Include="ResultCheckers\_Code\RemoveIWebHostEnvironment.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />
     <None Include="packages.config" />
+    <None Include="ResultCheckers\BlazorEditDialog\AppSettingEditDialog.razor">
+      <DependentUpon>_blazorEditDialog.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEditDialog\CardEditDialog.razor">
+      <DependentUpon>_blazorEditDialog.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEditDialog\CourseEditDialog.razor">
+      <DependentUpon>_blazorEditDialog.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEditDialog\GradeEditDialog.razor">
+      <DependentUpon>_blazorEditDialog.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEditDialog\SemesterEditDialog.razor">
+      <DependentUpon>_blazorEditDialog.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEditDialog\SessionEditDialog.razor">
+      <DependentUpon>_blazorEditDialog.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEditDialog\StudentCourseEditDialog.razor">
+      <DependentUpon>_blazorEditDialog.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEditDialog\StudentEditDialog.razor">
+      <DependentUpon>_blazorEditDialog.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEditDialog\_blazorEditDialog.razor">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>_blazorEditDialog.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEdit\AppSettingEdit.razor">
+      <DependentUpon>_blazorEdit.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEdit\CardEdit.razor">
+      <DependentUpon>_blazorEdit.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEdit\CourseEdit.razor">
+      <DependentUpon>_blazorEdit.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEdit\GradeEdit.razor">
+      <DependentUpon>_blazorEdit.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEdit\SemesterEdit.razor">
+      <DependentUpon>_blazorEdit.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEdit\SessionEdit.razor">
+      <DependentUpon>_blazorEdit.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEdit\StudentCourseEdit.razor">
+      <DependentUpon>_blazorEdit.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEdit\StudentEdit.razor">
+      <DependentUpon>_blazorEdit.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorEdit\_blazorEdit.razor">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>_blazorEdit.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorList\AppSettingList.razor">
+      <DependentUpon>_blazorList.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorList\CardList.razor">
+      <DependentUpon>_blazorList.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorList\CourseList.razor">
+      <DependentUpon>_blazorList.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorList\GradeList.razor">
+      <DependentUpon>_blazorList.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorList\SemesterList.razor">
+      <DependentUpon>_blazorList.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorList\SessionList.razor">
+      <DependentUpon>_blazorList.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorList\StudentCourseList.razor">
+      <DependentUpon>_blazorList.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorList\StudentList.razor">
+      <DependentUpon>_blazorList.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorList\_blazorList.razor">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>_blazorList.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorPage\AppSettings.razor">
+      <DependentUpon>_allpages.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorPage\Cards.razor">
+      <DependentUpon>_allpages.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorPage\Courses.razor">
+      <DependentUpon>_allpages.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorPage\Grades.razor">
+      <DependentUpon>_allpages.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorPage\Semesters.razor">
+      <DependentUpon>_allpages.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorPage\Sessions.razor">
+      <DependentUpon>_allpages.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorPage\StudentCourses.razor">
+      <DependentUpon>_allpages.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorPage\Students.razor">
+      <DependentUpon>_allpages.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\BlazorPage\_allpages1.razor">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>_allpages.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\Blazor\AppSettingsComponent.razor">
+      <DependentUpon>_blazor.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\Blazor\CardsComponent.razor">
+      <DependentUpon>_blazor.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\Blazor\CoursesComponent.razor">
+      <DependentUpon>_blazor.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\Blazor\GradesComponent.razor">
+      <DependentUpon>_blazor.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\Blazor\SemestersComponent.razor">
+      <DependentUpon>_blazor.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\Blazor\SessionsComponent.razor">
+      <DependentUpon>_blazor.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\Blazor\StudentCoursesComponent.razor">
+      <DependentUpon>_blazor.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\Blazor\StudentsComponent.razor">
+      <DependentUpon>_blazor.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\Blazor\_blazor.razor">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>_blazor.tt</DependentUpon>
+    </None>
+    <None Include="ResultCheckers\copyApi1.bat" />
+    <None Include="ResultCheckers\copyApi2.bat" />
+    <None Include="ResultCheckers\copyBlazor.bat" />
+    <None Include="ResultCheckers\copyBlazorPage.bat" />
+    <None Include="ResultCheckers\copyData.bat" />
+    <None Include="ResultCheckers\copyDtos.bat" />
+    <None Include="ResultCheckers\copyEntities.bat" />
+    <None Include="ResultCheckers\copyit.bat" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ResultCheckers\Api1\Controllers\Cache\ApiController.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ApiController.cs</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\Api1\Controllers\Cache\CachesController.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CachesController.cs</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\Api1\Controllers\Contollers.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Contollers.cs</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\BlazorEditDialog\_blazorEditDialog.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>_blazorEditDialog.razor</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\BlazorEdit\_blazorEdit.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>_blazorEdit.razor</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\BlazorList\_blazorList.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>_blazorList.razor</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\BlazorPage\_allpages.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>_allpages1.razor</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\Blazor\_blazor.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>_blazor.razor</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\copyit-xlist.txt" />
+    <Content Include="ResultCheckers\Data\AppDbContext.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AppDbContext.cs</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\Data\Services\Base\RemoveUnique.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>RemoveUnique.cs</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\Data\Services\DataServiceExtension.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>DataServiceExtension.cs</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\Data\Services\Services.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Services.cs</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\Dtos\Caches\CacheKeys.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>CacheKeys.cs</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\Dtos\Caches\_Cache.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>_Cache.cs</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\Dtos\_Dto.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>_Dto.cs</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\Entities\Base\Navigation.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Navigation.cs</LastGenOutput>
+    </Content>
+    <Content Include="ResultCheckers\Entities\_Entities.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>_Entities.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EntityDeploy Include="ResultCheckers\Model.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>Model2.Designer.cs</LastGenOutput>
+    </EntityDeploy>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

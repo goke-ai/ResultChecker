@@ -12,7 +12,7 @@ var itemCollection = new EdmMetadataLoader(textTransform.Host, textTransform.Err
 var codeStringGenerator = new CodeStringGenerator(code, typeMapper, ef);
 
 var baseType = "";
-var moreNamespace = "Ark.Oluko.Dtos";
+var moreNamespace = "Ark.ResultCheckers.Dtos";
 
 if (!typeMapper.VerifyCaseInsensitiveTypeUniqueness(typeMapper.GetAllGlobalItems(itemCollection), inputFile))
 {
@@ -356,7 +356,7 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 </div>
 
 @code {
-    string apiRootUrl = "/api2";
+    string apiRootUrl = "/api1";
 
 	Overlay <#= ToCamelCase(code.Escape(entity)) #>Overlay;
 

@@ -37,7 +37,12 @@ namespace Ark.ResultCheckers.Data
             
             if (context.Sessions.Any() == false)
             {
-                
+
+
+                // card
+                var cards = new List<Card> { new Card { Pin = "123456789" }, };
+                cards.ForEach(o => o.AddTracker("SeedAdmin"));
+                context.Cards.AddRange(cards);
 
                 // Session
                 var sessions = new List<Session> { new Session { Name = "0000/0000" }, };

@@ -19,6 +19,8 @@ namespace Ark.ResultCheckers.Dtos
     
     public partial class AppSettingDto : BaseEntityDto
     {
+    	public String AppSettingDescription { get; private set; }
+    
         public AppSettingDto()
         {
     		
@@ -157,6 +159,7 @@ namespace Ark.ResultCheckers.Dtos
         {
             _asAppSettingDto = x => new AppSettingDto
             {
+    			AppSettingDescription = x.AppSettingDescription,
                 
                 Id = x.Id,
     			// +simplex

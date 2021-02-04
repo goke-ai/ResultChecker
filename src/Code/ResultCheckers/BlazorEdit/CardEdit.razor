@@ -34,6 +34,18 @@
 						<MatTextField TextArea="true" Label="@(Localize["Pin"])" @bind-Value="FormData.Pin" FullWidth="true" />
 						<ValidationMessage For="@(() => FormData.Pin)" />
 					</div>
+				<!-- Owner | isForeignKey(False) | @string | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatTextField TextArea="true" Label="@(Localize["Owner"])" @bind-Value="FormData.Owner" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Owner)" />
+					</div>
+				<!-- Role | isForeignKey(False) | @string | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatTextField TextArea="true" Label="@(Localize["Role"])" @bind-Value="FormData.Role" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Role)" />
+					</div>
 						<div class="mat-layout-grid-cell-span-12">
 							<MatSlideToggle Label="Tracker"  @bind-Value="@showTracker"></MatSlideToggle>
 							@if (showTracker)

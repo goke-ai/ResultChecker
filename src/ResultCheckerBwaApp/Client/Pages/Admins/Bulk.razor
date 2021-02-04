@@ -3,9 +3,8 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 
-@*@attribute [Authorize(Roles = "Administrators")]*@
+@attribute [Authorize(Roles = "Administrators")]
 
-@inject HttpClient Http
 @inject IApiService ApiSvc
 @inject IStringLocalizer<App> Localize
 
@@ -16,27 +15,28 @@
             <div class="overlay-error">@error</div>
         }
     </Overlay>
+
     <h1>Bulk</h1>
 
-    <p>
-        <InputFile OnChange="@OnInputFileChange" multiple />
-    </p>
+    @*<p>
+            <InputFile OnChange="@OnInputFileChange" multiple />
+        </p>
 
-    @if (imageDataUrls.Count > 0)
-    {
-        <h4>Images</h4>
+        @if (imageDataUrls.Count > 0)
+        {
+            <h4>Images</h4>
 
-        <div class="card" style="width:30rem;">
-            <div class="card-body">
-                @foreach (var imageDataUrl in imageDataUrls)
-                {
-                    <img class="rounded m-1" src="@imageDataUrl" />
-                }
+            <div class="card" style="width:30rem;">
+                <div class="card-body">
+                    @foreach (var imageDataUrl in imageDataUrls)
+                    {
+                        <img class="rounded m-1" src="@imageDataUrl" />
+                    }
+                </div>
             </div>
-        </div>
-    }
+        }
 
-    <hr />
+        <hr />*@
 
     <p>
         <InputFile OnChange="@OnFileSave" accept="application/csv" />
@@ -44,29 +44,6 @@
 
     <p>@Message</p>
 
-    <div class="row">
-        @foreach (var record in SampleRecords)
-        {
-            <div class="col">
-
-                <table class="excel">
-                    <tbody>
-
-                        @foreach (var row in record)
-                        {
-                            <tr>
-                                @foreach (var cell in row)
-                                {
-                                    <td>@cell</td>
-                                }
-                            </tr>
-                        }
-
-                    </tbody>
-                </table>
-            </div>
-        }
-    </div>
     <div class="row">
         <div class="col">
             <table class="excel">
@@ -86,16 +63,115 @@
     </div>
 
     <hr />
-    <button @onclick="OnBulk">Post</button>
 
+    @if (dataList != null && dataList.Count > 0)
+    {
+        <MatButton Type="button" Raised="true" OnClick=@OnBulk Icon="@MatIconNames.Cloud_upload" title="Load Data">Load Data</MatButton>
+    }
+
+    <hr />
+
+    @if (succeeded != null)
+    {
+<div class="grid-area">
+    <h4>Successful</h4>
+    <MatTable Items="@succeeded" class="mat-elevation-z5" Striped="true" ShowPaging="true"
+              UseSortHeaderRow="true" AllowSelection="true">
+        <MatTableHeader>
+            <MatSortHeaderRow>
+                @if (isAdmin)
+                {
+                    <MatSortHeader SortId="id">@Localize["Id"]</MatSortHeader>
+                }
+                <MatSortHeader SortId="sessionname">@Localize["Session"]</MatSortHeader>
+                <MatSortHeader SortId="semestername">@Localize["Semester"]</MatSortHeader>
+                <MatSortHeader SortId="studentdescription">@Localize["Student Matric No"]</MatSortHeader>
+                <MatSortHeader SortId="coursedescription">@Localize["Course Code"]</MatSortHeader>
+                <MatSortHeader SortId="score">@Localize["Score"]</MatSortHeader>
+                <MatSortHeader SortId="username">@Localize["User Name"]</MatSortHeader>
+            </MatSortHeaderRow>
+        </MatTableHeader>
+        <MatTableRow Context="studentCourse">
+            @if (isAdmin)
+                {
+                <td>@studentCourse.Id</td>
+                }
+            <td>@studentCourse.Session</td>
+
+            <td>@studentCourse.Semester</td>
+
+            <td>@studentCourse.MatricNo</td>
+
+            <td>@studentCourse.Code</td>
+
+            <td>@studentCourse.Score</td>
+
+            <td>@studentCourse.Username</td>
+
+        </MatTableRow>
+    </MatTable>
+</div>
+    }
+
+    <hr />
+
+    @if (failed != null)
+    {
+        <div class="grid-area">
+            <h4>Failed</h4>
+            <MatTable Items="@failed" class="mat-elevation-z5" Striped="true" ShowPaging="true"
+                      UseSortHeaderRow="true" AllowSelection="true">
+                <MatTableHeader>
+                    <MatSortHeaderRow>
+                        @if (isAdmin)
+                        {
+                            <MatSortHeader SortId="id">@Localize["Id"]</MatSortHeader>
+                        }
+                        <MatSortHeader SortId="sessionname">@Localize["Session"]</MatSortHeader>
+                        <MatSortHeader SortId="semestername">@Localize["Semester"]</MatSortHeader>
+                        <MatSortHeader SortId="studentdescription">@Localize["Student Matric No"]</MatSortHeader>
+                        <MatSortHeader SortId="coursedescription">@Localize["Course Code"]</MatSortHeader>
+                        <MatSortHeader SortId="score">@Localize["Score"]</MatSortHeader>
+                        <MatSortHeader SortId="username">@Localize["User Name"]</MatSortHeader>
+                    </MatSortHeaderRow>
+                </MatTableHeader>
+                <MatTableRow Context="studentCourse">
+                    @if (isAdmin)
+                        {
+                        <td>@studentCourse.Id</td>
+                        }
+                    <td>@studentCourse.Session</td>
+
+                    <td>@studentCourse.Semester</td>
+
+                    <td>@studentCourse.MatricNo</td>
+
+                    <td>@studentCourse.Code</td>
+
+                    <td>@studentCourse.Score</td>
+
+                    <td>@studentCourse.Username</td>
+
+                </MatTableRow>
+            </MatTable>
+        </div>
+    }
 </div>
 
 
 @code {
 
-        Overlay overlay;
+    Overlay overlay;
 
-        string error = null;
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private System.Security.Claims.ClaimsPrincipal User;
+
+    bool isOwner;
+    bool isAdmin;
+
+    string error = null;
 
     private IList<string> imageDataUrls = new List<string>();
 
@@ -122,8 +198,24 @@
     List<string> labels = new List<string>();
 
     List<BulkStudentCourseDto> bulkStudentCourseDtos = new List<BulkStudentCourseDto>();
+    BulkStudentCourseDto[] loadedData;
+    BulkStudentCourseDto[] succeeded;
+    BulkStudentCourseDto[] failed;
 
     string Message;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the current user
+        var authState = await authenticationStateTask;
+        User = authState.User;
+
+        var username = User.Identity.IsAuthenticated ? User.Identity.Name : "Anoymous";
+
+        isOwner = username == "a1@ark.com";
+
+        isAdmin = User.IsInRole("Administrators") || isOwner;
+    }
 
     private async Task OnFileSave(InputFileChangeEventArgs e)
     {
@@ -182,6 +274,11 @@
 
             // Save the result
             var resp = await ApiSvc.AddAsync("api2/Bulks/StudentCourses", bulkStudentCourseDtos);
+
+            loadedData = await resp.Content.ReadFromJsonAsync<BulkStudentCourseDto[]>();
+
+            succeeded = loadedData.Where(w => w.Id > 0).ToArray();
+            failed = loadedData.Where(w => w.Id == 0).ToArray();
 
             //isAdded = true;
             //message = ($"Session '{formData.Id}' added successfully");

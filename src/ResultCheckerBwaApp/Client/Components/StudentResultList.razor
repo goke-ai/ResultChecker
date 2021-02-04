@@ -41,7 +41,7 @@
 
 			<td>@studentCourse.SemesterName</td>
 
-			<td>@studentCourse.CourseName</td>
+			<td>@studentCourse.CourseDescription</td>
 
 			<td>@studentCourse.Score</td>
 			<td>
@@ -132,10 +132,10 @@
                     comparison = (s1, s2) => string.Compare(s1.SemesterName, s2.SemesterName, StringComparison.InvariantCultureIgnoreCase);
                     break;
 				case "studentdescription":
-                    comparison = (s1, s2) => string.Compare(s1.StudentName, s2.StudentName, StringComparison.InvariantCultureIgnoreCase);
+                    comparison = (s1, s2) => string.Compare(s1.StudentDescription, s2.StudentDescription, StringComparison.InvariantCultureIgnoreCase);
                     break;
 				case "coursedescription":
-                    comparison = (s1, s2) => string.Compare(s1.CourseName, s2.CourseName, StringComparison.InvariantCultureIgnoreCase);
+                    comparison = (s1, s2) => string.Compare(s1.CourseDescription, s2.CourseDescription, StringComparison.InvariantCultureIgnoreCase);
                     break;
 				case "score":
                     comparison = (s1, s2) => string.Compare(s1.Score.ToString(), s2.Score.ToString(), StringComparison.InvariantCultureIgnoreCase);

@@ -22,7 +22,7 @@
 
 
 	<div>
-		<EditForm Model="@searchFormData" OnValidSubmit="@SaveAppSetting" Context="AppSettingEditContext">
+		<EditForm Model="@FormData" OnValidSubmit="@SaveAppSetting" Context="AppSettingEditContext">
 			        <DataAnnotationsValidator />
                     <ValidationSummary />
 
@@ -31,21 +31,21 @@
 				<!-- Key | isForeignKey(False) | @string | 100 -->
 					<div class="mat-layout-grid-cell-span-12">
 							
-						<MatTextField Label="@(Localize["Key"])" @bind-Value="searchFormData.Key" FullWidth="true" />
-						<ValidationMessage For="@(() => searchFormData.Key)" />
+						<MatTextField Label="@(Localize["Key"])" @bind-Value="FormData.Key" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Key)" />
 					</div>
 				<!-- Value | isForeignKey(False) | @string | 100 -->
 					<div class="mat-layout-grid-cell-span-12">
 							
-						<MatTextField Label="@(Localize["Value"])" @bind-Value="searchFormData.Value" FullWidth="true" />
-						<ValidationMessage For="@(() => searchFormData.Value)" />
+						<MatTextField Label="@(Localize["Value"])" @bind-Value="FormData.Value" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Value)" />
 					</div>
 						<div class="mat-layout-grid-cell-span-12">
 							<MatSlideToggle Label="Tracker"  @bind-Value="@showTracker"></MatSlideToggle>
 							@if (showTracker)
 							{
 								<fieldset disabled>
-									<TrackerDto Model="searchFormData" />
+									<TrackerDto Model="FormData" />
 								</fieldset>
 							}
 						</div>
@@ -61,7 +61,7 @@
                 <MatButton Type="submit" title="@(Localize["Save App Setting"])">@Localize["SAVE"]</MatButton>
                 }
 				<!-- Only show button if not a new record -->
-                @if (searchFormData.Id > 0 && CanDelete)
+                @if (FormData.Id > 0 && CanDelete)
                 {
                     <!-- Button to delete the product -->
                     <MatButton Type="button" OnClick="DeleteAppSetting" Icon="@MatIconNames.Restore_from_trash" title="Delete App Setting">DELETE</MatButton>
@@ -74,7 +74,7 @@
 @code {
     
     
-    [Parameter] public AppSettingDto searchFormData { get; set; } = new AppSettingDto();
+    [Parameter] public AppSettingDto FormData { get; set; } = new AppSettingDto();
     [Parameter] public bool DialogIsOpen { get; set; }
     [Parameter] public bool CanView { get; set; } = true;
     [Parameter] public bool CanAdd { get; set; }
@@ -90,12 +90,12 @@
 
     void SaveAppSetting()
     {
-        OnSaveAppSetting.InvokeAsync(searchFormData);
+        OnSaveAppSetting.InvokeAsync(FormData);
     }
 
     void DeleteAppSetting()
     {
-        OnDeleteAppSetting.InvokeAsync(searchFormData);
+        OnDeleteAppSetting.InvokeAsync(FormData);
     }
 
 

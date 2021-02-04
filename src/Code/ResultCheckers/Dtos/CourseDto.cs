@@ -19,6 +19,8 @@ namespace Ark.ResultCheckers.Dtos
     
     public partial class CourseDto : BaseEntityDto
     {
+    	public String CourseDescription { get; private set; }
+    
         public CourseDto()
         {
     		
@@ -158,6 +160,7 @@ namespace Ark.ResultCheckers.Dtos
         {
             _asCourseDto = x => new CourseDto
             {
+    			CourseDescription = x.CourseDescription,
                 
                 Id = x.Id,
     			// +simplex

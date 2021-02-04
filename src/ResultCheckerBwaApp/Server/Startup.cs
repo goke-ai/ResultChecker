@@ -62,7 +62,7 @@ namespace ResultCheckerBwaApp.Server
                     break;
             };
 
-            Ark.ResultCheckers.Api2.Services.ApiServiceExtension.ConfigureServices(services);
+            Ark.ResultCheckers.Api1.Services.ApiServiceExtension.ConfigureServices(services);
         }
 
         private void ConfigureDataExtension(IServiceCollection services)
@@ -141,6 +141,9 @@ namespace ResultCheckerBwaApp.Server
         {
             services.Configure<IdentityOptions>(options =>
             {
+                var user = options.User.AllowedUserNameCharacters;
+                options.User.AllowedUserNameCharacters += "/";
+
                 // Password settings
                 options.Password.RequireDigit = false;
                 options.Password.RequiredLength = 6;

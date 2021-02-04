@@ -95,7 +95,7 @@
 </div>
 
 @code {
-    string apiRootUrl = "/api2";
+    string apiRootUrl = "/api1";
 
 	Overlay courseOverlay;
 
@@ -106,7 +106,7 @@
 
     bool isOwner;
     bool isAdmin;
-	bool isExamOfficer;
+	bool isManager;
     bool isTeacher;
     bool canViewCourse, canAddCourse, canUpdateCourse, canDeleteCourse;
 
@@ -153,13 +153,13 @@
 		isOwner = username == "a1@ark.com";
 
 		isAdmin = User.IsInRole("Administrators") || isOwner;
-        isExamOfficer = User.IsInRole("ExamOfficers") || User.IsInRole("Administrators")  || isOwner;
-        // isTeacher = User.IsInRole("Teachers") || User.IsInRole("ExamOfficers") || User.IsInRole("Administrators")  || isOwner;
+        isManager = User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+        isTeacher = User.IsInRole("Teachers") || User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
                     
 
 		canViewCourse = canAddCourse = canUpdateCourse = canDeleteCourse = isAdmin;
-		canViewCourse = canAddCourse = canUpdateCourse = isExamOfficer;
-		// canViewCourse = canAddCourse = isTeacher;
+		canViewCourse = canAddCourse = canUpdateCourse = isManager;
+		canViewCourse = canAddCourse = isTeacher;
 
         if (User.Identity != null)
         {

@@ -22,7 +22,7 @@
 
 
 	<div>
-		<EditForm Model="@searchFormData" OnValidSubmit="@SaveStudentCourse" Context="StudentCourseEditContext">
+		<EditForm Model="@FormData" OnValidSubmit="@SaveStudentCourse" Context="StudentCourseEditContext">
 			        <DataAnnotationsValidator />
                     <ValidationSummary />
 
@@ -31,48 +31,48 @@
 				<!-- SessionId | isForeignKey(True) | Nullable<int> | 00 -->
 				<!-- Foreign Key Session -->
 					<div class="mat-layout-grid-cell-span-12">
-						<MatSelectValue Label="@(Localize["Session"])" @bind-Value="searchFormData.SessionId" Items="@SessionCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
+						<MatSelectValue Label="@(Localize["Session"])" @bind-Value="FormData.SessionId" Items="@SessionCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
 							<ItemTemplate Context="session">
 								<span>@session?.Name</span>
 							</ItemTemplate>
 						</MatSelectValue>
-						<ValidationMessage For="@(() => searchFormData.SessionId)" />
+						<ValidationMessage For="@(() => FormData.SessionId)" />
 					</div>
 				<!-- SemesterId | isForeignKey(True) | Nullable<int> | 00 -->
 				<!-- Foreign Key Semester -->
 					<div class="mat-layout-grid-cell-span-12">
-						<MatSelectValue Label="@(Localize["Semester"])" @bind-Value="searchFormData.SemesterId" Items="@SemesterCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
+						<MatSelectValue Label="@(Localize["Semester"])" @bind-Value="FormData.SemesterId" Items="@SemesterCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
 							<ItemTemplate Context="semester">
 								<span>@semester?.Name</span>
 							</ItemTemplate>
 						</MatSelectValue>
-						<ValidationMessage For="@(() => searchFormData.SemesterId)" />
+						<ValidationMessage For="@(() => FormData.SemesterId)" />
 					</div>
 				<!-- StudentId | isForeignKey(True) | @int | 00 -->
 				<!-- Foreign Key Student -->
 					<div class="mat-layout-grid-cell-span-12">
-						<MatSelectValue Label="@(Localize["Student"])" @bind-Value="searchFormData.StudentId" Items="@StudentCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
+						<MatSelectValue Label="@(Localize["Student"])" @bind-Value="FormData.StudentId" Items="@StudentCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
 							<ItemTemplate Context="student">
 								<span>@student?.Name</span>
 							</ItemTemplate>
 						</MatSelectValue>
-						<ValidationMessage For="@(() => searchFormData.StudentId)" />
+						<ValidationMessage For="@(() => FormData.StudentId)" />
 					</div>
 				<!-- CourseId | isForeignKey(True) | @int | 00 -->
 				<!-- Foreign Key Course -->
 					<div class="mat-layout-grid-cell-span-12">
-						<MatSelectValue Label="@(Localize["Course"])" @bind-Value="searchFormData.CourseId" Items="@CourseCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
+						<MatSelectValue Label="@(Localize["Course"])" @bind-Value="FormData.CourseId" Items="@CourseCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
 							<ItemTemplate Context="course">
 								<span>@course?.Name</span>
 							</ItemTemplate>
 						</MatSelectValue>
-						<ValidationMessage For="@(() => searchFormData.CourseId)" />
+						<ValidationMessage For="@(() => FormData.CourseId)" />
 					</div>
 				<!-- Score | isForeignKey(False) | @double | 00 -->
 							
 					<div class="mat-layout-grid-cell-span-12">
-						<MatNumericUpDownField  Label="@(Localize["Score"])" @bind-Value="searchFormData.Score" FullWidth="true" />
-						<ValidationMessage For="@(() => searchFormData.Score)" />
+						<MatNumericUpDownField  Label="@(Localize["Score"])" @bind-Value="FormData.Score" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Score)" />
 					</div>
 
 		<!-- ForeignKey StudentId | @int -->
@@ -88,7 +88,7 @@
 							@if (showTracker)
 							{
 								<fieldset disabled>
-									<TrackerDto Model="searchFormData" />
+									<TrackerDto Model="FormData" />
 								</fieldset>
 							}
 						</div>
@@ -104,7 +104,7 @@
                 <MatButton Type="submit" title="@(Localize["Save Student Course"])">@Localize["SAVE"]</MatButton>
                 }
 				<!-- Only show button if not a new record -->
-                @if (searchFormData.Id > 0 && CanDelete)
+                @if (FormData.Id > 0 && CanDelete)
                 {
                     <!-- Button to delete the product -->
                     <MatButton Type="button" OnClick="DeleteStudentCourse" Icon="@MatIconNames.Restore_from_trash" title="Delete Student Course">DELETE</MatButton>
@@ -117,7 +117,7 @@
 @code {
     
     
-    [Parameter] public StudentCourseDto searchFormData { get; set; } = new StudentCourseDto();
+    [Parameter] public StudentCourseDto FormData { get; set; } = new StudentCourseDto();
     [Parameter] public bool DialogIsOpen { get; set; }
     [Parameter] public bool CanView { get; set; } = true;
     [Parameter] public bool CanAdd { get; set; }
@@ -149,12 +149,12 @@
 
     void SaveStudentCourse()
     {
-        OnSaveStudentCourse.InvokeAsync(searchFormData);
+        OnSaveStudentCourse.InvokeAsync(FormData);
     }
 
     void DeleteStudentCourse()
     {
-        OnDeleteStudentCourse.InvokeAsync(searchFormData);
+        OnDeleteStudentCourse.InvokeAsync(FormData);
     }
 
 

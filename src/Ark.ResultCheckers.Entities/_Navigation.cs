@@ -9,42 +9,48 @@
 
 namespace Ark.ResultCheckers.Entities
 {
-    
+
     using System;
-        
+
     public partial class AppSetting
     {
-        public String AppSettingName { get; }
+        partial void OnAppSettingDescription()
+        {
+            _appSettingDescription = $"{Key}-{Value}";
+        }
     }
-    
+    public partial class BulkCard
+    {
+    }
     public partial class BulkStudentCourse
     {
-        public String BulkStudentCourseName { get; }
     }
-    
     public partial class Card
     {
-        public String CardName { get; }
+        partial void OnCardDescription()
+        {
+            _cardDescription = $"{Pin}-({Owner})";
+        }
     }
-    
     public partial class Course
     {
-        public String CourseName => $"{Code}-{Title} ({Unit})";
+        partial void OnCourseDescription()
+        {
+            _courseDescription = $"{Code}- {Title} ({Unit})";
+        }
     }
-    
-    public partial class Grade
-    {
-        public String GradeName { get; }
-    }
-    
     public partial class Student
     {
-        public string StudentName => $"{MatricNo}-{Firstname} {Middlename} {Lastname}";
+        partial void OnStudentDescription()
+        {
+            _studentDescription = $"{MatricNo}- {Firstname} {Middlename} {Lastname}";
+        }
     }
-    
     public partial class StudentCourse
     {
-        public String StudentCourseName { get; }
+        partial void OnStudentCourseDescription()
+        {
+            _studentCourseDescription = $"Session({SessionId})-Semester({SemesterId})-Course({CourseId})-Student({StudentId})-{Score} ";
+        }
     }
-    
 }

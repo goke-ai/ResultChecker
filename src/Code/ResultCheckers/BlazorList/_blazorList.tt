@@ -12,7 +12,7 @@ var itemCollection = new EdmMetadataLoader(textTransform.Host, textTransform.Err
 var codeStringGenerator = new CodeStringGenerator(code, typeMapper, ef);
 
 var baseType = "";
-var moreNamespace = "Ark.Oluko.Dtos";
+var moreNamespace = "Ark.ResultCheckers.Dtos";
 
 if (!typeMapper.VerifyCaseInsensitiveTypeUniqueness(typeMapper.GetAllGlobalItems(itemCollection), inputFile))
 {
@@ -231,7 +231,7 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 						else
 						{
 #>
-			<td>@<#= ToCamelCase(code.Escape(entity)) #>.<#= code.Escape(navigationProperty) #>Name</td>
+			<td>@<#= ToCamelCase(code.Escape(entity)) #>.<#= code.Escape(navigationProperty) #>Description</td>
 <#
 						}
 #>
@@ -300,7 +300,7 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 					else
 					{
 #>
-            new MatFilter{ Key= "<#= code.Escape(navigationProperty) #>Name", Text="<#= ToSentence(code.Escape(navigationProperty)) #> Description" },
+            new MatFilter{ Key= "<#= code.Escape(navigationProperty) #>Description", Text="<#= ToSentence(code.Escape(navigationProperty)) #> Description" },
 <#
 					}
 				}
@@ -421,7 +421,7 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 					{
 #>
 				case "<#= code.Escape(navigationProperty).ToLower() #>description":
-                    comparison = (s1, s2) => string.Compare(s1.<#= code.Escape(navigationProperty) #>Name, s2.<#= code.Escape(navigationProperty) #>Name, StringComparison.InvariantCultureIgnoreCase);
+                    comparison = (s1, s2) => string.Compare(s1.<#= code.Escape(navigationProperty) #>Description, s2.<#= code.Escape(navigationProperty) #>Description, StringComparison.InvariantCultureIgnoreCase);
                     break;
 <#
 					}

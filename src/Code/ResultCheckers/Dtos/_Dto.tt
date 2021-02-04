@@ -47,7 +47,13 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 					|| entity.Name.StartsWith("BulkName")
 					|| entity.Name.Contains("BulkEntity");
 
+	if(!isBase && entity.BaseType.Name.StartsWith("BaseName") != true && entity.Name.StartsWith("Bulk") == false)
+	{
+#>
+	public String <#= code.Escape(entity) #>Description { get; private set; }
 
+<#
+	}
 #>
     public <#=code.Escape(entity)#>Dto()
     {
@@ -131,9 +137,9 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 						if(itemEntityType != null)
 						{
 #>
-/*
+	// +split
     <#=codeStringGenerator.ForeignProperty2(entity, navigationProperty, itemEntityType)#>
-*/
+	// -split
 <#
 						}
 					}
@@ -147,8 +153,6 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 	// -navigation
 <#
     }
-
-
 #>
 	private static Expression<Func<<#=code.Escape(entity)#>, <#=code.Escape(entity)#>Dto>> _as<#=code.Escape(entity)#>Dto;
     public static Expression<Func<<#=code.Escape(entity)#>, <#=code.Escape(entity)#>Dto>> As<#=code.Escape(entity)#>Dto
@@ -345,20 +349,51 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
     {
         _includeNavigations = new string[] { 
 <#
-	navigationProperties = typeMapper.GetNavigationProperties(entity)
-							.Where(np => np.ToEndMember.RelationshipMultiplicity != RelationshipMultiplicity.Many );
     if (navigationProperties.Any())
     {
 #>
-		// +navigation
+	// +navigation
 <#
+
 		foreach (var navigationProperty in navigationProperties)
         {
 			var endEntityType = navigationProperty.ToEndMember.GetEntityType();
+			var endEntityTypes = ToSentence(code.Escape(endEntityType),"|").Split('|');
+			if(endEntityTypes.Length > 1)
+			{
+				//check if items are navigation in endEntityType
+				bool isAllItemNavProperty = true;
+				foreach(var item in endEntityTypes)
+				{
+					var endNavigationProperties = typeMapper.GetNavigationProperties(endEntityType).Where(np => np.ToEndMember.RelationshipMultiplicity != RelationshipMultiplicity.Many );
+					isAllItemNavProperty = endNavigationProperties.Any(np =>  typeMapper.GetTypeName(np.ToEndMember.GetEntityType()) == item);
+					if(!isAllItemNavProperty)
+						break;
+				}
+
+				if(isAllItemNavProperty)
+				{
+					foreach(var item in endEntityTypes.Where(w => simpleProperties.Any(a => !code.Escape(a).Contains(w))))
+					{
+						var itemEntityType = typeMapper.GetItemsToGenerate<EntityType>(itemCollection).FirstOrDefault(w => w.Name == item);
+						if(itemEntityType != null)
+						{
 #>
-			"<#= code.Escape(navigationProperty) #>",
+	// +split
+    <#=codeStringGenerator.ForeignPropertyInclude2(entity, navigationProperty, itemEntityType)#>
+	// -split
+<#
+						}
+					}
+				}
+			}
+#>
+    <#=codeStringGenerator.ForeignPropertyInclude2(entity, navigationProperty)#>
 <#
 		}
+#>
+	// -navigation
+<#
     }
 #>
 		};
@@ -387,6 +422,13 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
         _as<#=code.Escape(entity)#>Dto = x => new <#=code.Escape(entity)#>Dto
         {
 <#
+		if(!isBase && entity.BaseType.Name.StartsWith("BaseName") != true && entity.Name.StartsWith("Bulk") == false)
+	{
+#>
+			<#= code.Escape(entity) #>Description = x.<#= code.Escape(entity) #>Description,
+<#
+	}
+	
 	if(entityBaseType != null)
 	{
 #>            
@@ -467,16 +509,16 @@ foreach (var entity in typeMapper.GetItemsToGenerate<EntityType>(itemCollection)
 						if(itemEntityType != null)
 						{
 #>
-/*
-			<#=codeStringGenerator.ForeignPropertyAsDto2(entity, navigationProperty, itemEntityType)#>
-*/
+			// +split
+			<#=codeStringGenerator.ForeignPropertyAsDto3(entity, navigationProperty, itemEntityType)#>
+			// -split
 <#
 						}
 					}
 				}
 			}
 #>
-			<#=codeStringGenerator.ForeignPropertyAsDto2(entity, navigationProperty)#>
+			<#=codeStringGenerator.ForeignPropertyAsDto3(entity, navigationProperty)#>
 <#
 		}
     }
@@ -1332,6 +1374,7 @@ public class CodeStringGenerator
 		return result;
 	}
 
+	
 	public string ForeignProperty2(EntityType entity, NavigationProperty navigationProperty, EntityType endEntityType = null)
 	{
 		var result = String.Empty;
@@ -1367,7 +1410,16 @@ public class CodeStringGenerator
 			else
 			{
 				// navPropertyName = _code.Escape(navigationProperty) == _code.Escape(navEntityType) ? propertySuffix : _code.Escape(navigationProperty) + propertySuffix;
-				navPropertyName = _code.Escape(navigationProperty) + propertySuffix;
+
+				var x = _code.Escape(navigationProperty);
+				if(propertySuffix.StartsWith(x) && endEntityType == null)
+				{
+					navPropertyName = propertySuffix;
+				}
+				else
+				{
+					navPropertyName = _code.Escape(navigationProperty) + propertySuffix;
+				}
 			}
 		}
 
@@ -1404,6 +1456,7 @@ public class CodeStringGenerator
 
 			if(endEntityType != null)
 			{
+				
 				result += Environment.NewLine + "\t";
 
 				property = string.Format(
@@ -1411,13 +1464,13 @@ public class CodeStringGenerator
 							"{0} {1}? {2} {{ get; set; }}",
 							"public",// : Accessibility.ForProperty(edmProperty),
 							navPropertyIdType, //: _typeMapper.GetTypeName(edmProperty.TypeUsage),
-							navPropertyId
+							_code.Escape(navigationProperty) + navPropertyId
 							);
 
 				propertyAnnotation = string.Format(
 										CultureInfo.InvariantCulture,
 										"[Display(Name = \"{0}\")]", 
-										ToSentence(navPropertyId)
+										ToSentence(_code.Escape(navigationProperty) + navPropertyId)
 										);
 
 				result += string.Format(
@@ -1434,19 +1487,32 @@ public class CodeStringGenerator
 		if(!isNameObject)
 		{
 			result += Environment.NewLine + "\t";
-
-			var property = string.Format(
+			var property = String.Empty;
+			if(endEntityType == null)
+			{
+			 property = string.Format(
 						CultureInfo.InvariantCulture,
 						"{0} {1} {2} {{ get; set; }}",
 						"public",// : Accessibility.ForProperty(edmProperty),
 						"string", //: _typeMapper.GetTypeName(edmProperty.TypeUsage),
-						_code.Escape(navigationProperty) + "Name"
+						_code.Escape(navigationProperty) + "Description"
 						);
+			}
+			else
+			{
+			property = string.Format(
+						CultureInfo.InvariantCulture,
+						"{0} {1} {2} {{ get; set; }}",
+						"public",// : Accessibility.ForProperty(edmProperty),
+						"string", //: _typeMapper.GetTypeName(edmProperty.TypeUsage),
+						_code.Escape(navigationProperty) + _code.Escape(navEntityType) + "Description"
+						);
+			}
 
 			var propertyAnnotation = string.Format(
 									CultureInfo.InvariantCulture,
 									"[Display(Name = \"{0}\")]", 
-									ToSentence(_code.Escape(navigationProperty) + "Name")
+									ToSentence(_code.Escape(navigationProperty) + "Description")
 									);
 
 			result += string.Format(
@@ -1457,6 +1523,7 @@ public class CodeStringGenerator
 						);
 
 		}
+		
 
 		result += string.Format(
 			CultureInfo.InvariantCulture,
@@ -1467,6 +1534,156 @@ public class CodeStringGenerator
 
 		return result;
 	}
+
+	public string ForeignPropertyInclude2(EntityType entity, NavigationProperty navigationProperty, EntityType endEntityType = null)
+	{
+		var result = String.Empty;
+		var navPropertyName2 = String.Empty;
+		var navPropertyId2 = String.Empty;
+
+		var navEntityType = endEntityType != null ? endEntityType : navigationProperty.ToEndMember.GetEntityType();
+
+		var isNameObject = _typeMapper.GetTypeName(navEntityType.BaseType).StartsWith("BaseName");
+		var propertySuffix = isNameObject ? "Name" : String.Empty;
+		var navPropertyName = endEntityType != null ? _code.Escape(navigationProperty) + _code.Escape(navEntityType) + propertySuffix : _code.Escape(navigationProperty) + propertySuffix;
+
+		if(isNameObject)
+		{
+			navPropertyName2 = endEntityType != null ? $"{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)}" 
+												: $"{_code.Escape(navigationProperty)}" ;
+		}
+		else
+		{
+			navPropertyName2 = endEntityType != null ? $"{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)}" 
+												: $"{_code.Escape(navigationProperty)}";
+		}
+		var navPropertyId = endEntityType != null ? _code.Escape(navigationProperty) + _code.Escape(navEntityType) + "Id" : "";
+		navPropertyId2 = endEntityType != null ? $"{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)}" : "";
+		var navPropertyIdType = "int";
+		if(endEntityType != null)
+		{
+			if(endEntityType.BaseType.Name.Contains("Short"))
+				navPropertyIdType = "short";
+			if(endEntityType.BaseType.Name.Contains("Long"))
+				navPropertyIdType = "long";
+			if(endEntityType.BaseType.Name.Contains("Byte"))
+				navPropertyIdType = "byte";
+
+		}
+		
+		if(!isNameObject)
+		{
+			var simpleProperties = _typeMapper.GetSimpleProperties(navEntityType);
+			var edmProperty = simpleProperties.FirstOrDefault(f => _typeMapper.GetTypeName(f.TypeUsage) ==  "string");
+			propertySuffix = edmProperty != null ? _code.Escape(edmProperty) : String.Empty;
+
+			if(endEntityType != null)
+			{
+				navPropertyName = _code.Escape(navigationProperty) + _code.Escape(navEntityType) + propertySuffix;
+				navPropertyName2 = $"{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)}";
+			}
+			else
+			{
+				var x = _code.Escape(navigationProperty);
+				if(propertySuffix.StartsWith(x) && endEntityType == null)
+				{
+					navPropertyName = propertySuffix;
+					navPropertyName2 = $"{_code.Escape(navigationProperty)}";
+				}
+				else
+				{
+					navPropertyName = _code.Escape(navigationProperty) + propertySuffix;
+					navPropertyName2 = $"{_code.Escape(navigationProperty)}";
+				}
+			}
+		}
+
+
+		if(!string.IsNullOrEmpty(propertySuffix))
+		{
+			var property = string.Format(
+							CultureInfo.InvariantCulture,
+							"{0}",
+							navPropertyName2
+							);
+
+			result = string.Format(
+						CultureInfo.InvariantCulture,
+						"// +{0}{1}\t\t\t",
+						_code.Escape(navigationProperty),
+						Environment.NewLine
+						);
+
+			result += string.Format(
+						CultureInfo.InvariantCulture,
+						"\"{0}\",//String-Nav-Property",
+						property
+						);
+
+			if(endEntityType != null)
+			{
+				
+				result += Environment.NewLine + "\t\t\t";
+
+				property = string.Format(
+							CultureInfo.InvariantCulture,
+							"{0}",
+							navPropertyId2
+							);
+
+				result += string.Format(
+							CultureInfo.InvariantCulture,
+							"// \"{0}\", //Id-Nav-Property",
+							property
+							);
+
+			}
+		}
+		else
+		{
+
+			// basic
+			if(!isNameObject)
+			{
+				result += Environment.NewLine + "\t\t\t";
+				var property = String.Empty;
+				if(endEntityType == null)
+				{
+				 property = string.Format(
+							CultureInfo.InvariantCulture,
+							"{0}",
+							$"{_code.Escape(navigationProperty)}"
+							);
+				}
+				else
+				{
+				property = string.Format(
+							CultureInfo.InvariantCulture,
+							"{0}",
+							$"{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)}"
+							);
+				}
+
+				result += string.Format(
+							CultureInfo.InvariantCulture,
+							"\"{0}\", //Basic-Nav-Property",
+							property
+							);
+
+			}
+		}
+		
+
+		result += string.Format(
+			CultureInfo.InvariantCulture,
+			"{1}\t\t\t// -{0}",
+			_code.Escape(navigationProperty),
+			Environment.NewLine
+			);
+
+		return result;
+	}
+
 
 	public string ForeignProperty(EntityType entity, NavigationProperty navigationProperty)
 	{
@@ -1584,6 +1801,160 @@ public class CodeStringGenerator
 						);
 		}
 		
+
+		return result;
+	}
+
+
+	public string ForeignPropertyAsDto3(EntityType entity, NavigationProperty navigationProperty, EntityType endEntityType = null)
+	{
+		var result = String.Empty;
+		var navPropertyName2 = String.Empty;
+		var navPropertyId2 = String.Empty;
+
+		var navEntityType = endEntityType != null ? endEntityType : navigationProperty.ToEndMember.GetEntityType();
+
+		var isNameObject = _typeMapper.GetTypeName(navEntityType.BaseType).StartsWith("BaseName");
+		var propertySuffix = isNameObject ? "Name" : String.Empty;
+		var navPropertyName = endEntityType != null ? _code.Escape(navigationProperty) + _code.Escape(navEntityType) + propertySuffix : _code.Escape(navigationProperty) + propertySuffix;
+
+		if(isNameObject)
+		{
+		navPropertyName2 = endEntityType != null ? _code.Escape(navigationProperty) + "." + _code.Escape(navEntityType) + "." + propertySuffix : _code.Escape(navigationProperty) + "." + propertySuffix;
+		navPropertyName2 = endEntityType != null ? $"x.{_code.Escape(navigationProperty)} == null ? default : (x.{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)} == null ? default : (x.{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)}.{propertySuffix}))" 
+												: $"x.{_code.Escape(navigationProperty)} == null ? default : x.{_code.Escape(navigationProperty)}.{propertySuffix}" ;
+		}
+		else
+		{
+		navPropertyName2 = endEntityType != null ? $"x.{_code.Escape(navigationProperty)} == null ? default : (x.{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)}" 
+												: $"x.{_code.Escape(navigationProperty)}";
+		}
+		var navPropertyId = endEntityType != null ? _code.Escape(navigationProperty) + _code.Escape(navEntityType) + "Id" : "";
+		navPropertyId2 = endEntityType != null ? $"x.{_code.Escape(navigationProperty)} == null ? default : (x.{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)} == null ? default : (x.{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)}.Id))" : "";
+		var navPropertyIdType = "int";
+		if(endEntityType != null)
+		{
+			if(endEntityType.BaseType.Name.Contains("Short"))
+				navPropertyIdType = "short";
+			if(endEntityType.BaseType.Name.Contains("Long"))
+				navPropertyIdType = "long";
+			if(endEntityType.BaseType.Name.Contains("Byte"))
+				navPropertyIdType = "byte";
+
+		}
+		
+		if(!isNameObject)
+		{
+			var simpleProperties = _typeMapper.GetSimpleProperties(navEntityType);
+			var edmProperty = simpleProperties.FirstOrDefault(f => _typeMapper.GetTypeName(f.TypeUsage) ==  "string");
+			propertySuffix = edmProperty != null ? _code.Escape(edmProperty) : String.Empty;
+
+			if(endEntityType != null)
+			{
+				navPropertyName = _code.Escape(navigationProperty) + _code.Escape(navEntityType) + propertySuffix;
+				navPropertyName2 = $"x.{_code.Escape(navigationProperty)} == null ? default : (x.{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)} == null ? default : (x.{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)}.{propertySuffix}))";
+			}
+			else
+			{
+				// navPropertyName = _code.Escape(navigationProperty) == _code.Escape(navEntityType) ? propertySuffix : _code.Escape(navigationProperty) + propertySuffix;
+
+				var x = _code.Escape(navigationProperty);
+				if(propertySuffix.StartsWith(x) && endEntityType == null)
+				{
+					navPropertyName = propertySuffix;
+					navPropertyName2 = $"x.{_code.Escape(navigationProperty)} == null ? default : x.{_code.Escape(navigationProperty)}.{propertySuffix}";
+				}
+				else
+				{
+					navPropertyName = _code.Escape(navigationProperty) + propertySuffix;
+					navPropertyName2 = $"x.{_code.Escape(navigationProperty)} == null ? default : x.{_code.Escape(navigationProperty)}.{propertySuffix}";
+				}
+			}
+		}
+
+
+		if(!string.IsNullOrEmpty(propertySuffix))
+		{
+			var property = string.Format(
+							CultureInfo.InvariantCulture,
+							"{0} = {1},",
+							navPropertyName,
+							navPropertyName2
+							);
+
+			result = string.Format(
+						CultureInfo.InvariantCulture,
+						"// +{0}{1}\t\t\t",
+						_code.Escape(navigationProperty),
+						Environment.NewLine
+						);
+
+			result += string.Format(
+						CultureInfo.InvariantCulture,
+						"{0}",
+						property
+						);
+
+			if(endEntityType != null)
+			{
+				
+				result += Environment.NewLine + "\t\t\t";
+
+				property = string.Format(
+							CultureInfo.InvariantCulture,
+							"{0} = {1},",
+							navPropertyId,
+							navPropertyId2
+							);
+
+				result += string.Format(
+							CultureInfo.InvariantCulture,
+							"{0}",
+							property
+							);
+
+			}
+		}
+
+		// basic
+		if(!isNameObject)
+		{
+			result += Environment.NewLine + "\t\t\t";
+			var property = String.Empty;
+			if(endEntityType == null)
+			{
+			 property = string.Format(
+						CultureInfo.InvariantCulture,
+						"{0} = {1},",
+						_code.Escape(navigationProperty) + "Description",
+						$"x.{_code.Escape(navigationProperty)} == null ? default : (x.{_code.Escape(navigationProperty)}.{_code.Escape(navigationProperty)}Description)"
+						);
+			}
+			else
+			{
+			property = string.Format(
+						CultureInfo.InvariantCulture,
+						"{0} = {1},",
+						_code.Escape(navigationProperty) + _code.Escape(navEntityType) + "Description",
+						$"x.{_code.Escape(navigationProperty)} == null ? default : (x.{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)} == null ? default : (x.{_code.Escape(navigationProperty)}.{_code.Escape(navEntityType)}.{_code.Escape(navEntityType)}Description))"
+						);
+			}
+
+			result += string.Format(
+						CultureInfo.InvariantCulture,
+						"{0} //Basic-Nav-Property",
+						property
+						);
+
+		}
+		
+
+		result += string.Format(
+			CultureInfo.InvariantCulture,
+			"{1}\t\t\t// -{0}",
+			_code.Escape(navigationProperty),
+			Environment.NewLine
+			);
 
 		return result;
 	}

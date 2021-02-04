@@ -19,8 +19,11 @@ namespace Ark.ResultCheckers.Dtos
     
     public partial class CardDto : BaseEntityDto
     {
+    	public String CardDescription { get; private set; }
+    
         public CardDto()
         {
+            this.Role = "Users";
     		
             OnInitialize();
         }
@@ -30,6 +33,11 @@ namespace Ark.ResultCheckers.Dtos
         [Required(ErrorMessage = "The Pin is a mandatory Field.")]
     	[Display(Name = "Pin")]
     	public string Pin { get; set; }
+        [Display(Name = "Owner")]
+    	public string Owner { get; set; }
+        [Required(ErrorMessage = "The Role is a mandatory Field.")]
+    	[Display(Name = "Role")]
+    	public string Role { get; set; }
     	private static Expression<Func<Card, CardDto>> _asCardDto;
         public static Expression<Func<Card, CardDto>> AsCardDto
         {
@@ -97,6 +105,8 @@ namespace Ark.ResultCheckers.Dtos
             return 
     				w => w.Id.ToString().Contains(searchString) 
     			|| w.Pin.Contains(searchString) //@string
+    			|| w.Owner.Contains(searchString) //@string
+    			|| w.Role.Contains(searchString) //@string
     			;
         }
     
@@ -152,10 +162,13 @@ namespace Ark.ResultCheckers.Dtos
         {
             _asCardDto = x => new CardDto
             {
+    			CardDescription = x.CardDescription,
                 
                 Id = x.Id,
     			// +simplex
     			Pin = x.Pin,
+    			Owner = x.Owner,
+    			Role = x.Role,
                 
                 IsVisible = x.IsVisible,
                 InsertUser = x.InsertUser,
@@ -173,6 +186,8 @@ namespace Ark.ResultCheckers.Dtos
                 Id = x.Id,
     			// +simple
     			Pin = x.Pin,
+    			Owner = x.Owner,
+    			Role = x.Role,
                 
                 IsVisible = x.IsVisible,
                 InsertUser = x.InsertUser,
@@ -190,6 +205,8 @@ namespace Ark.ResultCheckers.Dtos
                 y.Id = x.Id;
     			// +simple
     			y.Pin = x.Pin;
+    			y.Owner = x.Owner;
+    			y.Role = x.Role;
                 
                 y.IsVisible = x.IsVisible;
                 y.InsertUser = x.InsertUser;
