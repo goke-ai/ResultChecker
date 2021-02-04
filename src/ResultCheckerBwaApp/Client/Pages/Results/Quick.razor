@@ -1,0 +1,194 @@
+﻿@page "/results/quick"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@*@attribute [Authorize(Roles = "Administrators")]*@
+
+@inject IApiService ApiSvc
+@inject IStringLocalizer<App> Localize
+
+<div>
+    <Overlay @ref="overlay">
+        @if (!string.IsNullOrWhiteSpace(error))
+        {
+            <div class="overlay-error">@error</div>
+        }
+    </Overlay>
+
+    <h1>Quick Checker</h1>
+
+
+    <div style="padding-top: 2rem">
+        <p>
+            <InputFile OnChange="@OnFileSave" accept="application/csv" />
+        </p>
+
+        <p>@Message</p>
+
+        <hr />
+
+        @if (valid != null)
+        {
+            <div class="grid-area">
+                <h4>Valid</h4>
+                <MatTable Items="@valid" class="mat-elevation-z5" Striped="true" ShowPaging="true"
+                          UseSortHeaderRow="true" AllowSelection="true">
+                    <MatTableHeader>
+                        <MatSortHeaderRow>
+                            <MatSortHeader SortId="id">@Localize["Id"]</MatSortHeader>
+                            <MatSortHeader SortId="sessionname">@Localize["Session"]</MatSortHeader>
+                            <MatSortHeader SortId="semestername">@Localize["Semester"]</MatSortHeader>
+                            <MatSortHeader SortId="studentdescription">@Localize["Student Matric No"]</MatSortHeader>
+                            <MatSortHeader SortId="coursedescription">@Localize["Course Code"]</MatSortHeader>
+                            <MatSortHeader SortId="score">@Localize["Score"]</MatSortHeader>
+                            <MatSortHeader SortId="username">@Localize["User Name"]</MatSortHeader>
+                        </MatSortHeaderRow>
+                    </MatTableHeader>
+                    <MatTableRow Context="studentCourse">
+                        <td>@studentCourse.Id</td>
+                        <td>@studentCourse.Session</td>
+
+                        <td>@studentCourse.Semester</td>
+
+                        <td>@studentCourse.MatricNo</td>
+
+                        <td>@studentCourse.Code</td>
+
+                        <td>@studentCourse.Score</td>
+
+                        <td>@studentCourse.Username</td>
+
+                    </MatTableRow>
+                </MatTable>
+            </div>
+        }
+
+        <hr />
+        @if (invalid != null)
+        {
+            <div class="grid-area">
+                <h4>Invalid</h4>
+                <MatTable Items="@invalid" class="mat-elevation-z5" Striped="true" ShowPaging="true"
+                          UseSortHeaderRow="true" AllowSelection="true">
+                    <MatTableHeader>
+                        <MatSortHeaderRow>
+                            <MatSortHeader SortId="id">@Localize["Id"]</MatSortHeader>
+                            <MatSortHeader SortId="sessionname">@Localize["Session"]</MatSortHeader>
+                            <MatSortHeader SortId="semestername">@Localize["Semester"]</MatSortHeader>
+                            <MatSortHeader SortId="studentdescription">@Localize["Student Matric No"]</MatSortHeader>
+                            <MatSortHeader SortId="coursedescription">@Localize["Course Code"]</MatSortHeader>
+                            <MatSortHeader SortId="score">@Localize["Score"]</MatSortHeader>
+                            <MatSortHeader SortId="username">@Localize["User Name"]</MatSortHeader>
+                        </MatSortHeaderRow>
+                    </MatTableHeader>
+                    <MatTableRow Context="studentCourse">
+                        <td>@studentCourse.Id</td>
+                        <td>@studentCourse.Session</td>
+
+                        <td>@studentCourse.Semester</td>
+
+                        <td>@studentCourse.MatricNo</td>
+
+                        <td>@studentCourse.Code</td>
+
+                        <td>@studentCourse.Score</td>
+
+                        <td>@studentCourse.Username</td>
+
+                    </MatTableRow>
+                </MatTable>
+            </div>
+        }
+
+    </div>
+</div>
+
+
+@code {
+
+        Overlay overlay;
+
+        [CascadingParameter]
+        private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private System.Security.Claims.ClaimsPrincipal User;
+
+    bool isOwner;
+    bool isAdmin;
+
+    string error = null;
+
+
+    List<string[]> dataList = new List<string[]>();
+    List<double[][]> SampleRecords = new List<double[][]>();
+    List<string> labels = new List<string>();
+
+    List<BulkStudentCourseDto> valid = new List<BulkStudentCourseDto>();
+    List<BulkStudentCourseDto> invalid = new List<BulkStudentCourseDto>();
+
+    string Message;
+
+
+    private async Task OnFileSave(InputFileChangeEventArgs e)
+    {
+        if (e.File != null)
+        {
+            var file = e.File;
+
+            Message = "Reading file...";
+            this.StateHasChanged();
+
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
+
+            Message = "Parsing file...";
+            this.StateHasChanged();
+            using (System.IO.MemoryStream memoryStream = new System.IO.MemoryStream(buffer))
+            using (var reader = new System.IO.StreamReader(memoryStream))
+            {
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var cells = line.Split(',');
+
+                    dataList.Add(cells);
+
+                    if (float.TryParse(cells[4], out var score))
+                    {
+
+                        var bulk = new BulkStudentCourseDto
+                        {
+                            Session = cells[0],
+                            Semester = cells[1],
+                            Code = cells[2],
+                            MatricNo = cells[3],
+                            Score = score,
+                            Username = cells[5]
+
+                        };
+                        valid.Add(bulk);
+                    }
+                    else
+                    {
+                        var bulk = new BulkStudentCourseDto
+                        {
+                            Session = cells[0],
+                            Semester = cells[1],
+                            Code = cells[2],
+                            MatricNo = cells[3],
+                            //Score = score,
+                            Username = cells[5]
+
+                        };
+                        invalid.Add(bulk);
+                    }
+                }
+            }
+
+            this.StateHasChanged();
+            Message = "Done.";
+        }
+    }
+
+}
