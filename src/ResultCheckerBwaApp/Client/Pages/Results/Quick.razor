@@ -36,17 +36,18 @@
                           UseSortHeaderRow="true" AllowSelection="true">
                     <MatTableHeader>
                         <MatSortHeaderRow>
-                            <MatSortHeader SortId="id">@Localize["Id"]</MatSortHeader>
+                            @* <MatSortHeader SortId="id">@Localize["Id"]</MatSortHeader> *@
                             <MatSortHeader SortId="sessionname">@Localize["Session"]</MatSortHeader>
                             <MatSortHeader SortId="semestername">@Localize["Semester"]</MatSortHeader>
                             <MatSortHeader SortId="studentdescription">@Localize["Student Matric No"]</MatSortHeader>
                             <MatSortHeader SortId="coursedescription">@Localize["Course Code"]</MatSortHeader>
                             <MatSortHeader SortId="score">@Localize["Score"]</MatSortHeader>
                             <MatSortHeader SortId="username">@Localize["User Name"]</MatSortHeader>
+                            <MatSortHeader SortId="remarks">@Localize["Remarks"]</MatSortHeader>
                         </MatSortHeaderRow>
                     </MatTableHeader>
                     <MatTableRow Context="studentCourse">
-                        <td>@studentCourse.Id</td>
+                        @* <td>@studentCourse.Id</td> *@
                         <td>@studentCourse.Session</td>
 
                         <td>@studentCourse.Semester</td>
@@ -58,6 +59,7 @@
                         <td>@studentCourse.Score</td>
 
                         <td>@studentCourse.Username</td>
+                        <td>@studentCourse.Remarks</td>
 
                     </MatTableRow>
                 </MatTable>
@@ -73,17 +75,18 @@
                           UseSortHeaderRow="true" AllowSelection="true">
                     <MatTableHeader>
                         <MatSortHeaderRow>
-                            <MatSortHeader SortId="id">@Localize["Id"]</MatSortHeader>
+                            @* <MatSortHeader SortId="id">@Localize["Id"]</MatSortHeader> *@
                             <MatSortHeader SortId="sessionname">@Localize["Session"]</MatSortHeader>
                             <MatSortHeader SortId="semestername">@Localize["Semester"]</MatSortHeader>
                             <MatSortHeader SortId="studentdescription">@Localize["Student Matric No"]</MatSortHeader>
                             <MatSortHeader SortId="coursedescription">@Localize["Course Code"]</MatSortHeader>
                             <MatSortHeader SortId="score">@Localize["Score"]</MatSortHeader>
                             <MatSortHeader SortId="username">@Localize["User Name"]</MatSortHeader>
+                            <MatSortHeader SortId="remarks">@Localize["Remarks"]</MatSortHeader>
                         </MatSortHeaderRow>
                     </MatTableHeader>
                     <MatTableRow Context="studentCourse">
-                        <td>@studentCourse.Id</td>
+                        @* <td>@studentCourse.Id</td> *@
                         <td>@studentCourse.Session</td>
 
                         <td>@studentCourse.Semester</td>
@@ -95,6 +98,7 @@
                         <td>@studentCourse.Score</td>
 
                         <td>@studentCourse.Username</td>
+                        <td>@studentCourse.Remarks</td>
 
                     </MatTableRow>
                 </MatTable>
@@ -129,6 +133,14 @@
 
     string Message;
 
+    List<Grade> grades = new List<Grade>{
+         new Grade{Name="A", BeginMark=70, NextBeginMark=100 },
+         new Grade{Name="B", BeginMark=60, NextBeginMark=70 },
+         new Grade{Name="C", BeginMark=50, NextBeginMark=60 },
+         new Grade{Name="D", BeginMark=45, NextBeginMark=50 },
+         new Grade{Name="E", BeginMark=40, NextBeginMark=45 },
+         new Grade{Name="F", BeginMark=0, NextBeginMark=40 },
+        };
 
     private async Task OnFileSave(InputFileChangeEventArgs e)
     {
@@ -143,12 +155,18 @@
             await file.OpenReadStream().ReadAsync(buffer);
 
             Message = "Parsing file...";
+            int count = 0;
             this.StateHasChanged();
             using (System.IO.MemoryStream memoryStream = new System.IO.MemoryStream(buffer))
             using (var reader = new System.IO.StreamReader(memoryStream))
             {
                 while (!reader.EndOfStream)
                 {
+                    if (count++ < 1)
+                    {
+                        continue;
+                    }
+
                     var line = reader.ReadLine();
                     var cells = line.Split(',');
 
@@ -164,8 +182,8 @@
                             Code = cells[2],
                             MatricNo = cells[3],
                             Score = score,
-                            Username = cells[5]
-
+                            Username = cells[5],
+                            Remarks = $"{score}({grades.FirstOrDefault(f => score >= f.BeginMark && score < f.NextBeginMark)?.Name})"
                         };
                         valid.Add(bulk);
                     }
@@ -178,8 +196,8 @@
                             Code = cells[2],
                             MatricNo = cells[3],
                             //Score = score,
-                            Username = cells[5]
-
+                            Username = cells[5],
+                            Remarks = "Invalid Score"
                         };
                         invalid.Add(bulk);
                     }
