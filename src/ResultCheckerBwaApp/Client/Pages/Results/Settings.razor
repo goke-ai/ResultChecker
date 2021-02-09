@@ -1,0 +1,392 @@
+﻿@page "/results/settings"
+
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@*@attribute [Authorize]*@
+
+@inject IJSRuntime JS
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+
+<div id="grades-cmpt">
+    <Overlay @ref="gradeOverlay">
+        @if (!string.IsNullOrWhiteSpace(error))
+        {
+            <div class="overlay-error">@error</div>
+        }
+    </Overlay>
+
+    <div>
+        <!-- Show this section if the user is logged in -->
+        <div>
+
+            <MatFAB Class="app-fab--absolute" Icon="@MatIconNames.Favorite"></MatFAB>
+
+            @if (grades == null)
+            {
+                <Busy />
+            }
+            else
+            {
+                if (canAddGrade)
+                {
+                    <div class="new-area">
+                        <!-- Add a new grade -->
+                        <MatButton Unelevated="true" @onclick="AddNewGrade" title="@(Localize["Add New GradeDto"])">@Localize["Add New GradeDto"]</MatButton>
+                    </div>
+                }
+
+                if (canViewGrade && grades.Count() > 0)
+                {
+                    <GradeList Grades=@grades.ToArray()
+                               IsAdmin=@isAdmin
+                               CanUpdate=@canUpdateGrade
+                               OnSelectionChanged=@SelectionChangedEvent
+                               OnEdit=@EditGrade />
+                }
+            }
+
+            @if (showPopup)
+            {
+                <div>
+                    <GradeEditDialog FormData=@formData
+                                     DialogIsOpen=@dialogIsOpen
+                                     OnSave=@SaveGrade
+                                     OnDelete=@DeleteGrade
+                                     OnCancel=@CancelGrade
+                                     CanView=@canViewGrade
+                                     CanAdd=@canAddGrade
+                                     CanUpdate=@canUpdateGrade
+                                     CanDelete=@canDeleteGrade />
+                </div>
+            }
+
+            <!-- +navigations -->
+            <!-- -navigations -->
+
+        </div>
+    </div>
+
+    <SnackBarMessage @ref="snackBarAdded" IsOpen="isAdded" Message="@(Localize["Congratualtions New GradeDto Added Successfully"])" />
+    <SnackBarMessage @ref="snackBarUpdated" IsOpen="isUpdated" Message="@(Localize["Wow! a GradeDto Updated Successfully"])" />
+    <SnackBarMessage @ref="snackBarDeleted" IsOpen="isDeleted" Message="@(Localize["Eh! you deleted a GradeDto"])" />
+</div>
+
+
+
+@code {
+        string apiRootUrl = "/api1";
+
+        Overlay gradeOverlay;
+
+        [CascadingParameter]
+        private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private System.Security.Claims.ClaimsPrincipal User;
+
+    bool isOwner;
+    bool isAdmin;
+    bool isManager;
+    bool isTeacher;
+    bool canViewGrade, canAddGrade, canUpdateGrade, canDeleteGrade;
+
+    bool isAdded, isUpdated, isDeleted;
+    bool showTracker;
+
+    bool dialogIsOpen = false;
+    GradeDto dialogData = null;
+
+    string toastMessage;
+    string error;
+
+    SnackBarMessage snackBarAdded;
+    SnackBarMessage snackBarUpdated;
+    SnackBarMessage snackBarDeleted;
+
+    // Stores the grades displayed in a list
+    private List<GradeDto> grades;
+    // Stores a single grade
+    GradeDto formData = new GradeDto();
+    // Controls if the popup is displayed
+    bool showPopup = false;
+
+    public string ReturnUrl
+    {
+        get
+        {
+            return NavigationManager.Uri.Replace(NavigationManager.BaseUri, "/");
+        }
+    }
+
+    string key = "grades";
+    bool isNetworkOn = false;
+
+    // First method to run when user navicates to this control
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the current user
+        var authState = await authenticationStateTask;
+        User = authState.User;
+
+        var username = User.Identity.IsAuthenticated ? User.Identity.Name : "Anoymous";
+
+        isOwner = username == "a1@ark.com";
+
+        isAdmin = true || User.IsInRole("Administrators") || isOwner;
+        isManager = User.IsInRole("Managers") || User.IsInRole("Administrators") || isOwner;
+        isTeacher = User.IsInRole("Teachers") || User.IsInRole("Managers") || User.IsInRole("Administrators") || isOwner;
+
+        if (isAdmin)
+        {
+            canViewGrade = canAddGrade = canUpdateGrade = canDeleteGrade = isAdmin;
+        }
+        else if (isManager)
+        {
+            canViewGrade = canAddGrade = canUpdateGrade = isManager;
+        }
+        else if (isTeacher)
+        {
+            canViewGrade = canAddGrade = isTeacher;
+        }
+
+        if (User.Identity != null)
+        {
+            try
+            {
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+
+            await Search();
+        }
+    }
+
+    async Task Search()
+    {
+        if (true || User.Identity.IsAuthenticated)
+        {
+            // Make a call to get the grades
+            // we don't pass the user because the server
+            // side code will determine who the user is
+            // from the authentication cookie
+
+            try
+            {
+                var gradeJson = await JS.InvokeAsync<string>("localStorageGetItem", key);
+
+                if (string.IsNullOrWhiteSpace(gradeJson))
+                {
+                    grades = new List<GradeDto>{
+                         new GradeDto{Name="A", BeginMark=70, NextBeginMark=100, Id=1, Point=5.0 },
+                         new GradeDto{Name="B", BeginMark=60, NextBeginMark=70, Id=2, Point=4.0 },
+                         new GradeDto{Name="C", BeginMark=50, NextBeginMark=60, Id=3, Point=3.0 },
+                         new GradeDto{Name="D", BeginMark=45, NextBeginMark=50, Id=4, Point=2.0 },
+                         new GradeDto{Name="E", BeginMark=40, NextBeginMark=45, Id=5, Point=1.0 },
+                         new GradeDto{Name="F", BeginMark=0, NextBeginMark=40, Id=6, Point=0.0 },
+                        };
+
+                    // set
+                    await SetLocalGrades();
+                }
+                else
+                {
+                    grades = JsonSerializer.Deserialize<List<GradeDto>>(gradeJson);
+                }
+                //grades = await ApiSvc.GetAsync<GradeDto[]>(apiRootUrl + "/Grades");
+
+                //
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+        }
+    }
+
+    public void SelectionChangedEvent(object row)
+    {
+        if (row != null)
+        {
+            var selectedGrade = (GradeDto)row;
+            EditGrade(selectedGrade);
+        }
+        this.StateHasChanged();
+    }
+
+    void AddNewGrade()
+    {
+        // Make new grade
+        formData = new GradeDto
+        {
+            // Set Id to 0 so we know it is a new record
+            Id = 0
+        };
+
+        OpenDialog();
+
+        // this.StateHasChanged();
+    }
+
+    void EditGrade(GradeDto grade)
+    {
+        // Set the selected grade
+        // as the current grade
+        formData = grade;
+        // Open the Popup
+        OpenDialog();
+    }
+
+    async Task SetLocalGrades()
+    {
+        await JS.InvokeVoidAsync("localStorageClear", key);
+        // set
+        var gradeJson = JsonSerializer.Serialize(grades);
+        await JS.InvokeAsync<string>("localStorageSetItem", key, gradeJson);
+    }
+
+    async Task SaveGrade()
+    {
+        error = null;
+
+        // Close the Popup
+        CloseDialog();
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new grade will have the Id set to 0
+        if (formData.Id == 0)
+        {
+            try
+            {
+                // Create new grade
+                // GradeDto objNewGrade = GradeDto.AsGradeFunc(formData);
+
+                // Save the result
+                if (isNetworkOn)
+                {
+                    var resp = await ApiSvc.AddAsync(apiRootUrl + "/Grades", formData);
+                }
+                else
+                {
+                    formData.Id = grades.Count + 1;
+                    grades.Add(formData);
+                    await SetLocalGrades();
+                }
+
+                isAdded = true;
+                snackBarAdded.Show();
+
+                toastMessage = ($"GradeDto '{formData.Id}' added successfully");
+                Toaster.Add(toastMessage, MatToastType.Info);
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                gradeOverlay.Show();
+            }
+        }
+        else
+        {
+            try
+            {
+                // This is an update
+                if (isNetworkOn)
+                {
+                    var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/Grades/" + Convert.ToInt32(formData.Id), formData);
+                }
+                else
+                {
+                    int i = grades.FindIndex(f => f.Name == formData.Name);
+                    grades.Insert(i, formData);
+                    grades.RemoveAt(i + 1);
+                    await SetLocalGrades();
+                }
+
+                isUpdated = true;
+                snackBarUpdated.Show();
+
+                toastMessage = ($"GradeDto '{formData.Id}' updated successfully");
+                Toaster.Add(toastMessage, MatToastType.Success);
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                gradeOverlay.Show();
+            }
+        }
+
+        // Get the grades for the current user
+        await Search();
+
+        toastMessage = ($"Grades record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+    async Task DeleteGrade()
+    {
+        error = null;
+        try
+        {
+            // Close the Popup
+            CloseDialog();
+            // Delete the grade
+            if (isNetworkOn)
+            {
+                var resp = await ApiSvc.DeleteAsync<GradeDto>(apiRootUrl + "/Grades/" + Convert.ToInt32(formData.Id));
+            }
+            else
+            {
+                int i = grades.FindIndex(f => f.Name == formData.Name);
+                grades.RemoveAt(i + 1);
+                await SetLocalGrades();
+            }
+
+            isDeleted = true;
+            snackBarDeleted.Show();
+
+
+            // Get the grades for the current user
+            await Search();
+
+            toastMessage = ($"GradeDto '{formData.Id}' deleted successfully");
+            Toaster.Add(toastMessage, MatToastType.Danger);
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            gradeOverlay.Show();
+        }
+    }
+
+    void CancelGrade()
+    {
+        CloseDialog();
+    }
+
+    void OpenDialog()
+    {
+        // Open the Popup
+        showPopup = true;
+        dialogData = null;
+        dialogIsOpen = true;
+    }
+
+    void CloseDialog()
+    {
+        // close the Popup
+        showPopup = false;
+        dialogIsOpen = false;
+    }
+
+}
+

@@ -2,9 +2,12 @@
 
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
 
 @*@attribute [Authorize(Roles = "Administrators")]*@
 
+@inject IJSRuntime JS
 @inject IApiService ApiSvc
 @inject IStringLocalizer<App> Localize
 
@@ -111,10 +114,10 @@
 
 @code {
 
-        Overlay overlay;
+    Overlay overlay;
 
-        [CascadingParameter]
-        private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     private System.Security.Claims.ClaimsPrincipal User;
 
@@ -141,6 +144,24 @@
          new Grade{Name="E", BeginMark=40, NextBeginMark=45 },
          new Grade{Name="F", BeginMark=0, NextBeginMark=40 },
         };
+
+    protected override async Task OnInitializedAsync()
+    {
+        var key = "grades";
+        var gradeJson = await JS.InvokeAsync<string>("localStorageGetItem", key);
+
+        if (string.IsNullOrWhiteSpace(gradeJson))
+        {
+            // set
+            gradeJson = JsonSerializer.Serialize(grades);
+            await JS.InvokeAsync<string>("localStorageSetItem", key, gradeJson);
+        }
+        else
+        {
+            grades = JsonSerializer.Deserialize<List<Grade>>(gradeJson);
+        }
+
+    }
 
     private async Task OnFileSave(InputFileChangeEventArgs e)
     {
