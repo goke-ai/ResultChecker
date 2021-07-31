@@ -9,3 +9,3276 @@
 //------------------------------------------------------------------------------
 -->
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+<div id="app-settings-cmpt">
+	<Overlay @ref="appSettingOverlay">
+	@if (!string.IsNullOrWhiteSpace(error))
+	{        
+		<div class="overlay-error">@error</div>
+	}
+	</Overlay>
+
+	<!-- AuthorizeView allows us to only show sections of the page -->
+	<!-- based on the security on the current user -->
+	<AuthorizeView>
+		<!-- Show this section if the user is logged in -->
+		<Authorized>
+
+			<MatFAB Class="app-fab--absolute" Icon="@MatIconNames.Favorite"></MatFAB>
+
+			@if (appSettings == null)
+			{
+				<Busy />
+			}
+			else
+			{
+				if (canAddAppSetting)
+				{
+					<div class="new-area">
+						<!-- Add a new appSetting -->
+						<MatButton Unelevated="true" @onclick="AddNewAppSetting" title="@(Localize["Add New App Setting"])">@Localize["Add New App Setting"]</MatButton>
+					</div>
+				}
+
+				if (canViewAppSetting && appSettings.Count() > 0)
+				{
+					<AppSettingList AppSettings=@appSettings 
+							IsAdmin=@isAdmin 
+							CanUpdate=@canUpdateAppSetting 
+							OnSelectionChanged=@SelectionChangedEvent 
+							OnEdit=@EditAppSetting 
+					/>
+				}
+			}
+
+			@if (showPopup)
+			{
+				<div>
+					<AppSettingEditDialog FormData=@formData 
+							DialogIsOpen=@dialogIsOpen 
+							OnSave=@SaveAppSetting 
+							OnDelete=@DeleteAppSetting
+							OnCancel=@CancelAppSetting
+							CanView=@canViewAppSetting 
+							CanAdd=@canAddAppSetting 
+							CanUpdate=@canUpdateAppSetting 
+							CanDelete=@canDeleteAppSetting
+					/>
+				</div>
+			}
+	
+		<!-- +navigations -->
+		<!-- -navigations -->
+
+		</Authorized>
+		<!-- Show this section if the user is not logged in -->
+		<NotAuthorized>
+			<p>You're not signed in.</p>
+		</NotAuthorized>
+	</AuthorizeView>
+
+	<SnackBarMessage @ref="snackBarAdded" IsOpen="isAdded" Message="@(Localize["Congratualtions New App Setting Added Successfully"])" />
+	<SnackBarMessage @ref="snackBarUpdated" IsOpen="isUpdated" Message="@(Localize["Wow! a App Setting Updated Successfully"])" />
+	<SnackBarMessage @ref="snackBarDeleted" IsOpen="isDeleted" Message="@(Localize["Eh! you deleted a App Setting"])" />
+</div>
+
+@code {
+    string apiRootUrl = "/api1";
+
+	Overlay appSettingOverlay;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private System.Security.Claims.ClaimsPrincipal User;
+
+    bool isOwner;
+    bool isAdmin;
+	bool isManager;
+    bool isTeacher;
+    bool canViewAppSetting, canAddAppSetting, canUpdateAppSetting, canDeleteAppSetting;
+
+    bool isAdded, isUpdated, isDeleted;
+	bool showTracker;
+
+    bool dialogIsOpen = false;
+    AppSettingDto dialogData = null;
+
+    string toastMessage;
+	string error;
+
+    SnackBarMessage snackBarAdded;
+    SnackBarMessage snackBarUpdated;
+    SnackBarMessage snackBarDeleted;
+
+    // Stores the appSettings displayed in a list
+    private AppSettingDto[] appSettings;
+    // Stores a single appSetting
+    AppSettingDto formData = new AppSettingDto();
+    // Controls if the popup is displayed
+    bool showPopup = false;
+    
+    public string ReturnUrl
+    {
+        get
+        {
+            return NavigationManager.Uri.Replace(NavigationManager.BaseUri, "/");
+        }
+    }
+
+	
+    // First method to run when user navicates to this control
+    protected override async Task OnInitializedAsync()
+    {
+		// Get the current user
+        var authState = await authenticationStateTask;
+        User = authState.User;
+
+        var username = User.Identity.IsAuthenticated ? User.Identity.Name : "Anoymous";
+
+		isOwner = username == "a1@ark.com";
+
+		isAdmin = User.IsInRole("Administrators") || isOwner;
+        isManager = User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+        isTeacher = User.IsInRole("Teachers") || User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+                    
+
+		canViewAppSetting = canAddAppSetting = canUpdateAppSetting = canDeleteAppSetting = isAdmin;
+		canViewAppSetting = canAddAppSetting = canUpdateAppSetting = isManager;
+		canViewAppSetting = canAddAppSetting = isTeacher;
+
+        if (User.Identity != null)
+        {
+            try
+            {
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+
+            await Search();
+        }
+    }
+
+	async Task Search()
+	{
+		if (User.Identity.IsAuthenticated)
+        {
+            // Make a call to get the appSettings
+            // we don't pass the user because the server
+            // side code will determine who the user is
+            // from the authentication cookie
+
+            try
+            {
+                appSettings = await ApiSvc.GetAsync<AppSettingDto[]>(apiRootUrl + "/AppSettings");
+
+				//
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+        }
+	}
+
+    public void SelectionChangedEvent(object row)
+    {
+        if (row != null)
+        {
+            var selectedAppSetting = (AppSettingDto)row;
+			EditAppSetting(selectedAppSetting);
+        }
+		this.StateHasChanged();
+    }
+
+    void AddNewAppSetting()
+    {
+        // Make new appSetting
+        formData = new AppSettingDto {
+						// Set Id to 0 so we know it is a new record
+						Id = 0
+					};
+
+        OpenDialog();
+
+        // this.StateHasChanged();
+    }
+
+    void EditAppSetting(AppSettingDto appSetting)
+    {
+        // Set the selected appSetting
+        // as the current appSetting
+        formData = appSetting;
+        // Open the Popup
+        OpenDialog();
+    }
+
+    async Task SaveAppSetting()
+    {
+		error = null;
+        
+		// Close the Popup
+        CloseDialog();
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new appSetting will have the Id set to 0
+        if (formData.Id == 0)
+        {
+			try
+			{
+				// Create new appSetting
+				// AppSetting objNewAppSetting = AppSettingDto.AsAppSettingFunc(formData);
+
+				// Save the result
+				var resp = await ApiSvc.AddAsync(apiRootUrl + "/AppSettings", formData);
+
+				isAdded = true;
+				snackBarAdded.Show();
+
+				toastMessage = ($"AppSetting '{formData.Id}' added successfully");
+				Toaster.Add(toastMessage, MatToastType.Info);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                appSettingOverlay.Show();
+            }
+        }
+        else
+        {
+			try
+			{
+				// This is an update
+				var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/AppSettings/" + Convert.ToInt32(formData.Id), formData);
+
+				isUpdated = true;
+				snackBarUpdated.Show();
+
+				toastMessage = ($"AppSetting '{formData.Id}' updated successfully");
+				Toaster.Add(toastMessage, MatToastType.Success);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                appSettingOverlay.Show();
+            }
+        }
+
+        // Get the appSettings for the current user
+        await Search();
+
+        toastMessage = ($"AppSettings record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+    async Task DeleteAppSetting()
+    {
+		error = null;
+		try
+		{
+			// Close the Popup
+			CloseDialog();
+			// Delete the appSetting
+			var resp = await ApiSvc.DeleteAsync<AppSetting>(apiRootUrl + "/AppSettings/" + Convert.ToInt32(formData.Id));
+
+			isDeleted = true;
+			snackBarDeleted.Show();
+
+
+			// Get the appSettings for the current user
+			await Search();
+
+			toastMessage = ($"AppSetting '{formData.Id}' deleted successfully");
+			Toaster.Add(toastMessage, MatToastType.Danger);
+		}
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            appSettingOverlay.Show();
+        }
+    }
+
+    void CancelAppSetting()
+    {
+        CloseDialog();
+    }
+
+    void OpenDialog()
+    {
+        // Open the Popup
+        showPopup = true;
+        dialogData = null;
+        dialogIsOpen = true;
+    }
+
+    void CloseDialog()
+    {
+        // close the Popup
+        showPopup = false;
+        dialogIsOpen = false;
+    }
+
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+<div id="cards-cmpt">
+	<Overlay @ref="cardOverlay">
+	@if (!string.IsNullOrWhiteSpace(error))
+	{        
+		<div class="overlay-error">@error</div>
+	}
+	</Overlay>
+
+	<!-- AuthorizeView allows us to only show sections of the page -->
+	<!-- based on the security on the current user -->
+	<AuthorizeView>
+		<!-- Show this section if the user is logged in -->
+		<Authorized>
+
+			<MatFAB Class="app-fab--absolute" Icon="@MatIconNames.Favorite"></MatFAB>
+
+			@if (cards == null)
+			{
+				<Busy />
+			}
+			else
+			{
+				if (canAddCard)
+				{
+					<div class="new-area">
+						<!-- Add a new card -->
+						<MatButton Unelevated="true" @onclick="AddNewCard" title="@(Localize["Add New Card"])">@Localize["Add New Card"]</MatButton>
+					</div>
+				}
+
+				if (canViewCard && cards.Count() > 0)
+				{
+					<CardList Cards=@cards 
+							IsAdmin=@isAdmin 
+							CanUpdate=@canUpdateCard 
+							OnSelectionChanged=@SelectionChangedEvent 
+							OnEdit=@EditCard 
+					/>
+				}
+			}
+
+			@if (showPopup)
+			{
+				<div>
+					<CardEditDialog FormData=@formData 
+							DialogIsOpen=@dialogIsOpen 
+							OnSave=@SaveCard 
+							OnDelete=@DeleteCard
+							OnCancel=@CancelCard
+							CanView=@canViewCard 
+							CanAdd=@canAddCard 
+							CanUpdate=@canUpdateCard 
+							CanDelete=@canDeleteCard
+					/>
+				</div>
+			}
+	
+		<!-- +navigations -->
+		<!-- -navigations -->
+
+		</Authorized>
+		<!-- Show this section if the user is not logged in -->
+		<NotAuthorized>
+			<p>You're not signed in.</p>
+		</NotAuthorized>
+	</AuthorizeView>
+
+	<SnackBarMessage @ref="snackBarAdded" IsOpen="isAdded" Message="@(Localize["Congratualtions New Card Added Successfully"])" />
+	<SnackBarMessage @ref="snackBarUpdated" IsOpen="isUpdated" Message="@(Localize["Wow! a Card Updated Successfully"])" />
+	<SnackBarMessage @ref="snackBarDeleted" IsOpen="isDeleted" Message="@(Localize["Eh! you deleted a Card"])" />
+</div>
+
+@code {
+    string apiRootUrl = "/api1";
+
+	Overlay cardOverlay;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private System.Security.Claims.ClaimsPrincipal User;
+
+    bool isOwner;
+    bool isAdmin;
+	bool isManager;
+    bool isTeacher;
+    bool canViewCard, canAddCard, canUpdateCard, canDeleteCard;
+
+    bool isAdded, isUpdated, isDeleted;
+	bool showTracker;
+
+    bool dialogIsOpen = false;
+    CardDto dialogData = null;
+
+    string toastMessage;
+	string error;
+
+    SnackBarMessage snackBarAdded;
+    SnackBarMessage snackBarUpdated;
+    SnackBarMessage snackBarDeleted;
+
+    // Stores the cards displayed in a list
+    private CardDto[] cards;
+    // Stores a single card
+    CardDto formData = new CardDto();
+    // Controls if the popup is displayed
+    bool showPopup = false;
+    
+    public string ReturnUrl
+    {
+        get
+        {
+            return NavigationManager.Uri.Replace(NavigationManager.BaseUri, "/");
+        }
+    }
+
+	
+    // First method to run when user navicates to this control
+    protected override async Task OnInitializedAsync()
+    {
+		// Get the current user
+        var authState = await authenticationStateTask;
+        User = authState.User;
+
+        var username = User.Identity.IsAuthenticated ? User.Identity.Name : "Anoymous";
+
+		isOwner = username == "a1@ark.com";
+
+		isAdmin = User.IsInRole("Administrators") || isOwner;
+        isManager = User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+        isTeacher = User.IsInRole("Teachers") || User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+                    
+
+		canViewCard = canAddCard = canUpdateCard = canDeleteCard = isAdmin;
+		canViewCard = canAddCard = canUpdateCard = isManager;
+		canViewCard = canAddCard = isTeacher;
+
+        if (User.Identity != null)
+        {
+            try
+            {
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+
+            await Search();
+        }
+    }
+
+	async Task Search()
+	{
+		if (User.Identity.IsAuthenticated)
+        {
+            // Make a call to get the cards
+            // we don't pass the user because the server
+            // side code will determine who the user is
+            // from the authentication cookie
+
+            try
+            {
+                cards = await ApiSvc.GetAsync<CardDto[]>(apiRootUrl + "/Cards");
+
+				//
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+        }
+	}
+
+    public void SelectionChangedEvent(object row)
+    {
+        if (row != null)
+        {
+            var selectedCard = (CardDto)row;
+			EditCard(selectedCard);
+        }
+		this.StateHasChanged();
+    }
+
+    void AddNewCard()
+    {
+        // Make new card
+        formData = new CardDto {
+						// Set Id to 0 so we know it is a new record
+						Id = 0
+					};
+
+        OpenDialog();
+
+        // this.StateHasChanged();
+    }
+
+    void EditCard(CardDto card)
+    {
+        // Set the selected card
+        // as the current card
+        formData = card;
+        // Open the Popup
+        OpenDialog();
+    }
+
+    async Task SaveCard()
+    {
+		error = null;
+        
+		// Close the Popup
+        CloseDialog();
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new card will have the Id set to 0
+        if (formData.Id == 0)
+        {
+			try
+			{
+				// Create new card
+				// Card objNewCard = CardDto.AsCardFunc(formData);
+
+				// Save the result
+				var resp = await ApiSvc.AddAsync(apiRootUrl + "/Cards", formData);
+
+				isAdded = true;
+				snackBarAdded.Show();
+
+				toastMessage = ($"Card '{formData.Id}' added successfully");
+				Toaster.Add(toastMessage, MatToastType.Info);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                cardOverlay.Show();
+            }
+        }
+        else
+        {
+			try
+			{
+				// This is an update
+				var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/Cards/" + Convert.ToInt32(formData.Id), formData);
+
+				isUpdated = true;
+				snackBarUpdated.Show();
+
+				toastMessage = ($"Card '{formData.Id}' updated successfully");
+				Toaster.Add(toastMessage, MatToastType.Success);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                cardOverlay.Show();
+            }
+        }
+
+        // Get the cards for the current user
+        await Search();
+
+        toastMessage = ($"Cards record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+    async Task DeleteCard()
+    {
+		error = null;
+		try
+		{
+			// Close the Popup
+			CloseDialog();
+			// Delete the card
+			var resp = await ApiSvc.DeleteAsync<Card>(apiRootUrl + "/Cards/" + Convert.ToInt32(formData.Id));
+
+			isDeleted = true;
+			snackBarDeleted.Show();
+
+
+			// Get the cards for the current user
+			await Search();
+
+			toastMessage = ($"Card '{formData.Id}' deleted successfully");
+			Toaster.Add(toastMessage, MatToastType.Danger);
+		}
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            cardOverlay.Show();
+        }
+    }
+
+    void CancelCard()
+    {
+        CloseDialog();
+    }
+
+    void OpenDialog()
+    {
+        // Open the Popup
+        showPopup = true;
+        dialogData = null;
+        dialogIsOpen = true;
+    }
+
+    void CloseDialog()
+    {
+        // close the Popup
+        showPopup = false;
+        dialogIsOpen = false;
+    }
+
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+<div id="courses-cmpt">
+	<Overlay @ref="courseOverlay">
+	@if (!string.IsNullOrWhiteSpace(error))
+	{        
+		<div class="overlay-error">@error</div>
+	}
+	</Overlay>
+
+	<!-- AuthorizeView allows us to only show sections of the page -->
+	<!-- based on the security on the current user -->
+	<AuthorizeView>
+		<!-- Show this section if the user is logged in -->
+		<Authorized>
+
+			<MatFAB Class="app-fab--absolute" Icon="@MatIconNames.Favorite"></MatFAB>
+
+			@if (courses == null)
+			{
+				<Busy />
+			}
+			else
+			{
+				if (canAddCourse)
+				{
+					<div class="new-area">
+						<!-- Add a new course -->
+						<MatButton Unelevated="true" @onclick="AddNewCourse" title="@(Localize["Add New Course"])">@Localize["Add New Course"]</MatButton>
+					</div>
+				}
+
+				if (canViewCourse && courses.Count() > 0)
+				{
+					<CourseList Courses=@courses 
+							IsAdmin=@isAdmin 
+							CanUpdate=@canUpdateCourse 
+							OnSelectionChanged=@SelectionChangedEvent 
+							OnEdit=@EditCourse 
+					/>
+				}
+			}
+
+			@if (showPopup)
+			{
+				<div>
+					<CourseEditDialog FormData=@formData 
+							DialogIsOpen=@dialogIsOpen 
+							OnSave=@SaveCourse 
+							OnDelete=@DeleteCourse
+							OnCancel=@CancelCourse
+							CanView=@canViewCourse 
+							CanAdd=@canAddCourse 
+							CanUpdate=@canUpdateCourse 
+							CanDelete=@canDeleteCourse
+
+					/>
+				</div>
+			}
+	
+		<!-- +navigations -->
+		<!-- -navigations -->
+
+		</Authorized>
+		<!-- Show this section if the user is not logged in -->
+		<NotAuthorized>
+			<p>You're not signed in.</p>
+		</NotAuthorized>
+	</AuthorizeView>
+
+	<SnackBarMessage @ref="snackBarAdded" IsOpen="isAdded" Message="@(Localize["Congratualtions New Course Added Successfully"])" />
+	<SnackBarMessage @ref="snackBarUpdated" IsOpen="isUpdated" Message="@(Localize["Wow! a Course Updated Successfully"])" />
+	<SnackBarMessage @ref="snackBarDeleted" IsOpen="isDeleted" Message="@(Localize["Eh! you deleted a Course"])" />
+</div>
+
+@code {
+    string apiRootUrl = "/api1";
+
+	Overlay courseOverlay;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private System.Security.Claims.ClaimsPrincipal User;
+
+    bool isOwner;
+    bool isAdmin;
+	bool isManager;
+    bool isTeacher;
+    bool canViewCourse, canAddCourse, canUpdateCourse, canDeleteCourse;
+
+    bool isAdded, isUpdated, isDeleted;
+	bool showTracker;
+
+    bool dialogIsOpen = false;
+    CourseDto dialogData = null;
+
+    string toastMessage;
+	string error;
+
+    SnackBarMessage snackBarAdded;
+    SnackBarMessage snackBarUpdated;
+    SnackBarMessage snackBarDeleted;
+
+    // Stores the courses displayed in a list
+    private CourseDto[] courses;
+    // Stores a single course
+    CourseDto formData = new CourseDto();
+    // Controls if the popup is displayed
+    bool showPopup = false;
+    
+    public string ReturnUrl
+    {
+        get
+        {
+            return NavigationManager.Uri.Replace(NavigationManager.BaseUri, "/");
+        }
+    }
+
+    //<!-- StudentCourses | StudentCourse | Collectiion -->
+
+	
+    // First method to run when user navicates to this control
+    protected override async Task OnInitializedAsync()
+    {
+		// Get the current user
+        var authState = await authenticationStateTask;
+        User = authState.User;
+
+        var username = User.Identity.IsAuthenticated ? User.Identity.Name : "Anoymous";
+
+		isOwner = username == "a1@ark.com";
+
+		isAdmin = User.IsInRole("Administrators") || isOwner;
+        isManager = User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+        isTeacher = User.IsInRole("Teachers") || User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+                    
+
+		canViewCourse = canAddCourse = canUpdateCourse = canDeleteCourse = isAdmin;
+		canViewCourse = canAddCourse = canUpdateCourse = isManager;
+		canViewCourse = canAddCourse = isTeacher;
+
+        if (User.Identity != null)
+        {
+            try
+            {
+				// <!-- StudentCourses | StudentCourse | Collectiion -->
+
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+
+            await Search();
+        }
+    }
+
+	async Task Search()
+	{
+		if (User.Identity.IsAuthenticated)
+        {
+            // Make a call to get the courses
+            // we don't pass the user because the server
+            // side code will determine who the user is
+            // from the authentication cookie
+
+            try
+            {
+                courses = await ApiSvc.GetAsync<CourseDto[]>(apiRootUrl + "/Courses");
+
+				//
+				//<!-- StudentCourses | StudentCourse | Collectiion -->
+
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+        }
+	}
+
+    public void SelectionChangedEvent(object row)
+    {
+        if (row != null)
+        {
+            var selectedCourse = (CourseDto)row;
+			EditCourse(selectedCourse);
+        }
+		this.StateHasChanged();
+    }
+
+    void AddNewCourse()
+    {
+        // Make new course
+        formData = new CourseDto {
+						// Set Id to 0 so we know it is a new record
+						Id = 0
+					};
+
+        OpenDialog();
+
+        // this.StateHasChanged();
+    }
+
+    void EditCourse(CourseDto course)
+    {
+        // Set the selected course
+        // as the current course
+        formData = course;
+        // Open the Popup
+        OpenDialog();
+    }
+
+    async Task SaveCourse()
+    {
+		error = null;
+        
+		// Close the Popup
+        CloseDialog();
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new course will have the Id set to 0
+        if (formData.Id == 0)
+        {
+			try
+			{
+				// Create new course
+				// Course objNewCourse = CourseDto.AsCourseFunc(formData);
+
+				// Save the result
+				var resp = await ApiSvc.AddAsync(apiRootUrl + "/Courses", formData);
+
+				isAdded = true;
+				snackBarAdded.Show();
+
+				toastMessage = ($"Course '{formData.Id}' added successfully");
+				Toaster.Add(toastMessage, MatToastType.Info);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                courseOverlay.Show();
+            }
+        }
+        else
+        {
+			try
+			{
+				// This is an update
+				var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/Courses/" + Convert.ToInt32(formData.Id), formData);
+
+				isUpdated = true;
+				snackBarUpdated.Show();
+
+				toastMessage = ($"Course '{formData.Id}' updated successfully");
+				Toaster.Add(toastMessage, MatToastType.Success);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                courseOverlay.Show();
+            }
+        }
+
+        // Get the courses for the current user
+        await Search();
+
+        toastMessage = ($"Courses record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+    async Task DeleteCourse()
+    {
+		error = null;
+		try
+		{
+			// Close the Popup
+			CloseDialog();
+			// Delete the course
+			var resp = await ApiSvc.DeleteAsync<Course>(apiRootUrl + "/Courses/" + Convert.ToInt32(formData.Id));
+
+			isDeleted = true;
+			snackBarDeleted.Show();
+
+
+			// Get the courses for the current user
+			await Search();
+
+			toastMessage = ($"Course '{formData.Id}' deleted successfully");
+			Toaster.Add(toastMessage, MatToastType.Danger);
+		}
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            courseOverlay.Show();
+        }
+    }
+
+    void CancelCourse()
+    {
+        CloseDialog();
+    }
+
+    void OpenDialog()
+    {
+        // Open the Popup
+        showPopup = true;
+        dialogData = null;
+        dialogIsOpen = true;
+    }
+
+    void CloseDialog()
+    {
+        // close the Popup
+        showPopup = false;
+        dialogIsOpen = false;
+    }
+
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+<div id="grades-cmpt">
+	<Overlay @ref="gradeOverlay">
+	@if (!string.IsNullOrWhiteSpace(error))
+	{        
+		<div class="overlay-error">@error</div>
+	}
+	</Overlay>
+
+	<!-- AuthorizeView allows us to only show sections of the page -->
+	<!-- based on the security on the current user -->
+	<AuthorizeView>
+		<!-- Show this section if the user is logged in -->
+		<Authorized>
+
+			<MatFAB Class="app-fab--absolute" Icon="@MatIconNames.Favorite"></MatFAB>
+
+			@if (grades == null)
+			{
+				<Busy />
+			}
+			else
+			{
+				if (canAddGrade)
+				{
+					<div class="new-area">
+						<!-- Add a new grade -->
+						<MatButton Unelevated="true" @onclick="AddNewGrade" title="@(Localize["Add New Grade"])">@Localize["Add New Grade"]</MatButton>
+					</div>
+				}
+
+				if (canViewGrade && grades.Count() > 0)
+				{
+					<GradeList Grades=@grades 
+							IsAdmin=@isAdmin 
+							CanUpdate=@canUpdateGrade 
+							OnSelectionChanged=@SelectionChangedEvent 
+							OnEdit=@EditGrade 
+					/>
+				}
+			}
+
+			@if (showPopup)
+			{
+				<div>
+					<GradeEditDialog FormData=@formData 
+							DialogIsOpen=@dialogIsOpen 
+							OnSave=@SaveGrade 
+							OnDelete=@DeleteGrade
+							OnCancel=@CancelGrade
+							CanView=@canViewGrade 
+							CanAdd=@canAddGrade 
+							CanUpdate=@canUpdateGrade 
+							CanDelete=@canDeleteGrade
+					/>
+				</div>
+			}
+	
+		<!-- +navigations -->
+		<!-- -navigations -->
+
+		</Authorized>
+		<!-- Show this section if the user is not logged in -->
+		<NotAuthorized>
+			<p>You're not signed in.</p>
+		</NotAuthorized>
+	</AuthorizeView>
+
+	<SnackBarMessage @ref="snackBarAdded" IsOpen="isAdded" Message="@(Localize["Congratualtions New Grade Added Successfully"])" />
+	<SnackBarMessage @ref="snackBarUpdated" IsOpen="isUpdated" Message="@(Localize["Wow! a Grade Updated Successfully"])" />
+	<SnackBarMessage @ref="snackBarDeleted" IsOpen="isDeleted" Message="@(Localize["Eh! you deleted a Grade"])" />
+</div>
+
+@code {
+    string apiRootUrl = "/api1";
+
+	Overlay gradeOverlay;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private System.Security.Claims.ClaimsPrincipal User;
+
+    bool isOwner;
+    bool isAdmin;
+	bool isManager;
+    bool isTeacher;
+    bool canViewGrade, canAddGrade, canUpdateGrade, canDeleteGrade;
+
+    bool isAdded, isUpdated, isDeleted;
+	bool showTracker;
+
+    bool dialogIsOpen = false;
+    GradeDto dialogData = null;
+
+    string toastMessage;
+	string error;
+
+    SnackBarMessage snackBarAdded;
+    SnackBarMessage snackBarUpdated;
+    SnackBarMessage snackBarDeleted;
+
+    // Stores the grades displayed in a list
+    private GradeDto[] grades;
+    // Stores a single grade
+    GradeDto formData = new GradeDto();
+    // Controls if the popup is displayed
+    bool showPopup = false;
+    
+    public string ReturnUrl
+    {
+        get
+        {
+            return NavigationManager.Uri.Replace(NavigationManager.BaseUri, "/");
+        }
+    }
+
+	
+    // First method to run when user navicates to this control
+    protected override async Task OnInitializedAsync()
+    {
+		// Get the current user
+        var authState = await authenticationStateTask;
+        User = authState.User;
+
+        var username = User.Identity.IsAuthenticated ? User.Identity.Name : "Anoymous";
+
+		isOwner = username == "a1@ark.com";
+
+		isAdmin = User.IsInRole("Administrators") || isOwner;
+        isManager = User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+        isTeacher = User.IsInRole("Teachers") || User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+                    
+
+		canViewGrade = canAddGrade = canUpdateGrade = canDeleteGrade = isAdmin;
+		canViewGrade = canAddGrade = canUpdateGrade = isManager;
+		canViewGrade = canAddGrade = isTeacher;
+
+        if (User.Identity != null)
+        {
+            try
+            {
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+
+            await Search();
+        }
+    }
+
+	async Task Search()
+	{
+		if (User.Identity.IsAuthenticated)
+        {
+            // Make a call to get the grades
+            // we don't pass the user because the server
+            // side code will determine who the user is
+            // from the authentication cookie
+
+            try
+            {
+                grades = await ApiSvc.GetAsync<GradeDto[]>(apiRootUrl + "/Grades");
+
+				//
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+        }
+	}
+
+    public void SelectionChangedEvent(object row)
+    {
+        if (row != null)
+        {
+            var selectedGrade = (GradeDto)row;
+			EditGrade(selectedGrade);
+        }
+		this.StateHasChanged();
+    }
+
+    void AddNewGrade()
+    {
+        // Make new grade
+        formData = new GradeDto {
+						// Set Id to 0 so we know it is a new record
+						Id = 0
+					};
+
+        OpenDialog();
+
+        // this.StateHasChanged();
+    }
+
+    void EditGrade(GradeDto grade)
+    {
+        // Set the selected grade
+        // as the current grade
+        formData = grade;
+        // Open the Popup
+        OpenDialog();
+    }
+
+    async Task SaveGrade()
+    {
+		error = null;
+        
+		// Close the Popup
+        CloseDialog();
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new grade will have the Id set to 0
+        if (formData.Id == 0)
+        {
+			try
+			{
+				// Create new grade
+				// Grade objNewGrade = GradeDto.AsGradeFunc(formData);
+
+				// Save the result
+				var resp = await ApiSvc.AddAsync(apiRootUrl + "/Grades", formData);
+
+				isAdded = true;
+				snackBarAdded.Show();
+
+				toastMessage = ($"Grade '{formData.Id}' added successfully");
+				Toaster.Add(toastMessage, MatToastType.Info);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                gradeOverlay.Show();
+            }
+        }
+        else
+        {
+			try
+			{
+				// This is an update
+				var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/Grades/" + Convert.ToInt32(formData.Id), formData);
+
+				isUpdated = true;
+				snackBarUpdated.Show();
+
+				toastMessage = ($"Grade '{formData.Id}' updated successfully");
+				Toaster.Add(toastMessage, MatToastType.Success);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                gradeOverlay.Show();
+            }
+        }
+
+        // Get the grades for the current user
+        await Search();
+
+        toastMessage = ($"Grades record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+    async Task DeleteGrade()
+    {
+		error = null;
+		try
+		{
+			// Close the Popup
+			CloseDialog();
+			// Delete the grade
+			var resp = await ApiSvc.DeleteAsync<Grade>(apiRootUrl + "/Grades/" + Convert.ToInt32(formData.Id));
+
+			isDeleted = true;
+			snackBarDeleted.Show();
+
+
+			// Get the grades for the current user
+			await Search();
+
+			toastMessage = ($"Grade '{formData.Id}' deleted successfully");
+			Toaster.Add(toastMessage, MatToastType.Danger);
+		}
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            gradeOverlay.Show();
+        }
+    }
+
+    void CancelGrade()
+    {
+        CloseDialog();
+    }
+
+    void OpenDialog()
+    {
+        // Open the Popup
+        showPopup = true;
+        dialogData = null;
+        dialogIsOpen = true;
+    }
+
+    void CloseDialog()
+    {
+        // close the Popup
+        showPopup = false;
+        dialogIsOpen = false;
+    }
+
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+<div id="semesters-cmpt">
+	<Overlay @ref="semesterOverlay">
+	@if (!string.IsNullOrWhiteSpace(error))
+	{        
+		<div class="overlay-error">@error</div>
+	}
+	</Overlay>
+
+	<!-- AuthorizeView allows us to only show sections of the page -->
+	<!-- based on the security on the current user -->
+	<AuthorizeView>
+		<!-- Show this section if the user is logged in -->
+		<Authorized>
+
+			<MatFAB Class="app-fab--absolute" Icon="@MatIconNames.Favorite"></MatFAB>
+
+			@if (semesters == null)
+			{
+				<Busy />
+			}
+			else
+			{
+				if (canAddSemester)
+				{
+					<div class="new-area">
+						<!-- Add a new semester -->
+						<MatButton Unelevated="true" @onclick="AddNewSemester" title="@(Localize["Add New Semester"])">@Localize["Add New Semester"]</MatButton>
+					</div>
+				}
+
+				if (canViewSemester && semesters.Count() > 0)
+				{
+					<SemesterList Semesters=@semesters 
+							IsAdmin=@isAdmin 
+							CanUpdate=@canUpdateSemester 
+							OnSelectionChanged=@SelectionChangedEvent 
+							OnEdit=@EditSemester 
+					/>
+				}
+			}
+
+			@if (showPopup)
+			{
+				<div>
+					<SemesterEditDialog FormData=@formData 
+							DialogIsOpen=@dialogIsOpen 
+							OnSave=@SaveSemester 
+							OnDelete=@DeleteSemester
+							OnCancel=@CancelSemester
+							CanView=@canViewSemester 
+							CanAdd=@canAddSemester 
+							CanUpdate=@canUpdateSemester 
+							CanDelete=@canDeleteSemester
+
+					/>
+				</div>
+			}
+	
+		<!-- +navigations -->
+		<!-- -navigations -->
+
+		</Authorized>
+		<!-- Show this section if the user is not logged in -->
+		<NotAuthorized>
+			<p>You're not signed in.</p>
+		</NotAuthorized>
+	</AuthorizeView>
+
+	<SnackBarMessage @ref="snackBarAdded" IsOpen="isAdded" Message="@(Localize["Congratualtions New Semester Added Successfully"])" />
+	<SnackBarMessage @ref="snackBarUpdated" IsOpen="isUpdated" Message="@(Localize["Wow! a Semester Updated Successfully"])" />
+	<SnackBarMessage @ref="snackBarDeleted" IsOpen="isDeleted" Message="@(Localize["Eh! you deleted a Semester"])" />
+</div>
+
+@code {
+    string apiRootUrl = "/api1";
+
+	Overlay semesterOverlay;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private System.Security.Claims.ClaimsPrincipal User;
+
+    bool isOwner;
+    bool isAdmin;
+	bool isManager;
+    bool isTeacher;
+    bool canViewSemester, canAddSemester, canUpdateSemester, canDeleteSemester;
+
+    bool isAdded, isUpdated, isDeleted;
+	bool showTracker;
+
+    bool dialogIsOpen = false;
+    SemesterDto dialogData = null;
+
+    string toastMessage;
+	string error;
+
+    SnackBarMessage snackBarAdded;
+    SnackBarMessage snackBarUpdated;
+    SnackBarMessage snackBarDeleted;
+
+    // Stores the semesters displayed in a list
+    private SemesterDto[] semesters;
+    // Stores a single semester
+    SemesterDto formData = new SemesterDto();
+    // Controls if the popup is displayed
+    bool showPopup = false;
+    
+    public string ReturnUrl
+    {
+        get
+        {
+            return NavigationManager.Uri.Replace(NavigationManager.BaseUri, "/");
+        }
+    }
+
+    //<!-- StudentCourses | StudentCourse | Collectiion -->
+
+	
+    // First method to run when user navicates to this control
+    protected override async Task OnInitializedAsync()
+    {
+		// Get the current user
+        var authState = await authenticationStateTask;
+        User = authState.User;
+
+        var username = User.Identity.IsAuthenticated ? User.Identity.Name : "Anoymous";
+
+		isOwner = username == "a1@ark.com";
+
+		isAdmin = User.IsInRole("Administrators") || isOwner;
+        isManager = User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+        isTeacher = User.IsInRole("Teachers") || User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+                    
+
+		canViewSemester = canAddSemester = canUpdateSemester = canDeleteSemester = isAdmin;
+		canViewSemester = canAddSemester = canUpdateSemester = isManager;
+		canViewSemester = canAddSemester = isTeacher;
+
+        if (User.Identity != null)
+        {
+            try
+            {
+				// <!-- StudentCourses | StudentCourse | Collectiion -->
+
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+
+            await Search();
+        }
+    }
+
+	async Task Search()
+	{
+		if (User.Identity.IsAuthenticated)
+        {
+            // Make a call to get the semesters
+            // we don't pass the user because the server
+            // side code will determine who the user is
+            // from the authentication cookie
+
+            try
+            {
+                semesters = await ApiSvc.GetAsync<SemesterDto[]>(apiRootUrl + "/Semesters");
+
+				//
+				//<!-- StudentCourses | StudentCourse | Collectiion -->
+
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+        }
+	}
+
+    public void SelectionChangedEvent(object row)
+    {
+        if (row != null)
+        {
+            var selectedSemester = (SemesterDto)row;
+			EditSemester(selectedSemester);
+        }
+		this.StateHasChanged();
+    }
+
+    void AddNewSemester()
+    {
+        // Make new semester
+        formData = new SemesterDto {
+						// Set Id to 0 so we know it is a new record
+						Id = 0
+					};
+
+        OpenDialog();
+
+        // this.StateHasChanged();
+    }
+
+    void EditSemester(SemesterDto semester)
+    {
+        // Set the selected semester
+        // as the current semester
+        formData = semester;
+        // Open the Popup
+        OpenDialog();
+    }
+
+    async Task SaveSemester()
+    {
+		error = null;
+        
+		// Close the Popup
+        CloseDialog();
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new semester will have the Id set to 0
+        if (formData.Id == 0)
+        {
+			try
+			{
+				// Create new semester
+				// Semester objNewSemester = SemesterDto.AsSemesterFunc(formData);
+
+				// Save the result
+				var resp = await ApiSvc.AddAsync(apiRootUrl + "/Semesters", formData);
+
+				isAdded = true;
+				snackBarAdded.Show();
+
+				toastMessage = ($"Semester '{formData.Id}' added successfully");
+				Toaster.Add(toastMessage, MatToastType.Info);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                semesterOverlay.Show();
+            }
+        }
+        else
+        {
+			try
+			{
+				// This is an update
+				var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/Semesters/" + Convert.ToInt32(formData.Id), formData);
+
+				isUpdated = true;
+				snackBarUpdated.Show();
+
+				toastMessage = ($"Semester '{formData.Id}' updated successfully");
+				Toaster.Add(toastMessage, MatToastType.Success);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                semesterOverlay.Show();
+            }
+        }
+
+        // Get the semesters for the current user
+        await Search();
+
+        toastMessage = ($"Semesters record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+    async Task DeleteSemester()
+    {
+		error = null;
+		try
+		{
+			// Close the Popup
+			CloseDialog();
+			// Delete the semester
+			var resp = await ApiSvc.DeleteAsync<Semester>(apiRootUrl + "/Semesters/" + Convert.ToInt32(formData.Id));
+
+			isDeleted = true;
+			snackBarDeleted.Show();
+
+
+			// Get the semesters for the current user
+			await Search();
+
+			toastMessage = ($"Semester '{formData.Id}' deleted successfully");
+			Toaster.Add(toastMessage, MatToastType.Danger);
+		}
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            semesterOverlay.Show();
+        }
+    }
+
+    void CancelSemester()
+    {
+        CloseDialog();
+    }
+
+    void OpenDialog()
+    {
+        // Open the Popup
+        showPopup = true;
+        dialogData = null;
+        dialogIsOpen = true;
+    }
+
+    void CloseDialog()
+    {
+        // close the Popup
+        showPopup = false;
+        dialogIsOpen = false;
+    }
+
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+<div id="sessions-cmpt">
+	<Overlay @ref="sessionOverlay">
+	@if (!string.IsNullOrWhiteSpace(error))
+	{        
+		<div class="overlay-error">@error</div>
+	}
+	</Overlay>
+
+	<!-- AuthorizeView allows us to only show sections of the page -->
+	<!-- based on the security on the current user -->
+	<AuthorizeView>
+		<!-- Show this section if the user is logged in -->
+		<Authorized>
+
+			<MatFAB Class="app-fab--absolute" Icon="@MatIconNames.Favorite"></MatFAB>
+
+			@if (sessions == null)
+			{
+				<Busy />
+			}
+			else
+			{
+				if (canAddSession)
+				{
+					<div class="new-area">
+						<!-- Add a new session -->
+						<MatButton Unelevated="true" @onclick="AddNewSession" title="@(Localize["Add New Session"])">@Localize["Add New Session"]</MatButton>
+					</div>
+				}
+
+				if (canViewSession && sessions.Count() > 0)
+				{
+					<SessionList Sessions=@sessions 
+							IsAdmin=@isAdmin 
+							CanUpdate=@canUpdateSession 
+							OnSelectionChanged=@SelectionChangedEvent 
+							OnEdit=@EditSession 
+					/>
+				}
+			}
+
+			@if (showPopup)
+			{
+				<div>
+					<SessionEditDialog FormData=@formData 
+							DialogIsOpen=@dialogIsOpen 
+							OnSave=@SaveSession 
+							OnDelete=@DeleteSession
+							OnCancel=@CancelSession
+							CanView=@canViewSession 
+							CanAdd=@canAddSession 
+							CanUpdate=@canUpdateSession 
+							CanDelete=@canDeleteSession
+
+					/>
+				</div>
+			}
+	
+		<!-- +navigations -->
+		<!-- -navigations -->
+
+		</Authorized>
+		<!-- Show this section if the user is not logged in -->
+		<NotAuthorized>
+			<p>You're not signed in.</p>
+		</NotAuthorized>
+	</AuthorizeView>
+
+	<SnackBarMessage @ref="snackBarAdded" IsOpen="isAdded" Message="@(Localize["Congratualtions New Session Added Successfully"])" />
+	<SnackBarMessage @ref="snackBarUpdated" IsOpen="isUpdated" Message="@(Localize["Wow! a Session Updated Successfully"])" />
+	<SnackBarMessage @ref="snackBarDeleted" IsOpen="isDeleted" Message="@(Localize["Eh! you deleted a Session"])" />
+</div>
+
+@code {
+    string apiRootUrl = "/api1";
+
+	Overlay sessionOverlay;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private System.Security.Claims.ClaimsPrincipal User;
+
+    bool isOwner;
+    bool isAdmin;
+	bool isManager;
+    bool isTeacher;
+    bool canViewSession, canAddSession, canUpdateSession, canDeleteSession;
+
+    bool isAdded, isUpdated, isDeleted;
+	bool showTracker;
+
+    bool dialogIsOpen = false;
+    SessionDto dialogData = null;
+
+    string toastMessage;
+	string error;
+
+    SnackBarMessage snackBarAdded;
+    SnackBarMessage snackBarUpdated;
+    SnackBarMessage snackBarDeleted;
+
+    // Stores the sessions displayed in a list
+    private SessionDto[] sessions;
+    // Stores a single session
+    SessionDto formData = new SessionDto();
+    // Controls if the popup is displayed
+    bool showPopup = false;
+    
+    public string ReturnUrl
+    {
+        get
+        {
+            return NavigationManager.Uri.Replace(NavigationManager.BaseUri, "/");
+        }
+    }
+
+    //<!-- StudentCourses | StudentCourse | Collectiion -->
+
+	
+    // First method to run when user navicates to this control
+    protected override async Task OnInitializedAsync()
+    {
+		// Get the current user
+        var authState = await authenticationStateTask;
+        User = authState.User;
+
+        var username = User.Identity.IsAuthenticated ? User.Identity.Name : "Anoymous";
+
+		isOwner = username == "a1@ark.com";
+
+		isAdmin = User.IsInRole("Administrators") || isOwner;
+        isManager = User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+        isTeacher = User.IsInRole("Teachers") || User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+                    
+
+		canViewSession = canAddSession = canUpdateSession = canDeleteSession = isAdmin;
+		canViewSession = canAddSession = canUpdateSession = isManager;
+		canViewSession = canAddSession = isTeacher;
+
+        if (User.Identity != null)
+        {
+            try
+            {
+				// <!-- StudentCourses | StudentCourse | Collectiion -->
+
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+
+            await Search();
+        }
+    }
+
+	async Task Search()
+	{
+		if (User.Identity.IsAuthenticated)
+        {
+            // Make a call to get the sessions
+            // we don't pass the user because the server
+            // side code will determine who the user is
+            // from the authentication cookie
+
+            try
+            {
+                sessions = await ApiSvc.GetAsync<SessionDto[]>(apiRootUrl + "/Sessions");
+
+				//
+				//<!-- StudentCourses | StudentCourse | Collectiion -->
+
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+        }
+	}
+
+    public void SelectionChangedEvent(object row)
+    {
+        if (row != null)
+        {
+            var selectedSession = (SessionDto)row;
+			EditSession(selectedSession);
+        }
+		this.StateHasChanged();
+    }
+
+    void AddNewSession()
+    {
+        // Make new session
+        formData = new SessionDto {
+						// Set Id to 0 so we know it is a new record
+						Id = 0
+					};
+
+        OpenDialog();
+
+        // this.StateHasChanged();
+    }
+
+    void EditSession(SessionDto session)
+    {
+        // Set the selected session
+        // as the current session
+        formData = session;
+        // Open the Popup
+        OpenDialog();
+    }
+
+    async Task SaveSession()
+    {
+		error = null;
+        
+		// Close the Popup
+        CloseDialog();
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new session will have the Id set to 0
+        if (formData.Id == 0)
+        {
+			try
+			{
+				// Create new session
+				// Session objNewSession = SessionDto.AsSessionFunc(formData);
+
+				// Save the result
+				var resp = await ApiSvc.AddAsync(apiRootUrl + "/Sessions", formData);
+
+				isAdded = true;
+				snackBarAdded.Show();
+
+				toastMessage = ($"Session '{formData.Id}' added successfully");
+				Toaster.Add(toastMessage, MatToastType.Info);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                sessionOverlay.Show();
+            }
+        }
+        else
+        {
+			try
+			{
+				// This is an update
+				var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/Sessions/" + Convert.ToInt32(formData.Id), formData);
+
+				isUpdated = true;
+				snackBarUpdated.Show();
+
+				toastMessage = ($"Session '{formData.Id}' updated successfully");
+				Toaster.Add(toastMessage, MatToastType.Success);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                sessionOverlay.Show();
+            }
+        }
+
+        // Get the sessions for the current user
+        await Search();
+
+        toastMessage = ($"Sessions record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+    async Task DeleteSession()
+    {
+		error = null;
+		try
+		{
+			// Close the Popup
+			CloseDialog();
+			// Delete the session
+			var resp = await ApiSvc.DeleteAsync<Session>(apiRootUrl + "/Sessions/" + Convert.ToInt32(formData.Id));
+
+			isDeleted = true;
+			snackBarDeleted.Show();
+
+
+			// Get the sessions for the current user
+			await Search();
+
+			toastMessage = ($"Session '{formData.Id}' deleted successfully");
+			Toaster.Add(toastMessage, MatToastType.Danger);
+		}
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            sessionOverlay.Show();
+        }
+    }
+
+    void CancelSession()
+    {
+        CloseDialog();
+    }
+
+    void OpenDialog()
+    {
+        // Open the Popup
+        showPopup = true;
+        dialogData = null;
+        dialogIsOpen = true;
+    }
+
+    void CloseDialog()
+    {
+        // close the Popup
+        showPopup = false;
+        dialogIsOpen = false;
+    }
+
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+<div id="students-cmpt">
+	<Overlay @ref="studentOverlay">
+	@if (!string.IsNullOrWhiteSpace(error))
+	{        
+		<div class="overlay-error">@error</div>
+	}
+	</Overlay>
+
+	<!-- AuthorizeView allows us to only show sections of the page -->
+	<!-- based on the security on the current user -->
+	<AuthorizeView>
+		<!-- Show this section if the user is logged in -->
+		<Authorized>
+
+			<MatFAB Class="app-fab--absolute" Icon="@MatIconNames.Favorite"></MatFAB>
+
+			@if (students == null)
+			{
+				<Busy />
+			}
+			else
+			{
+				if (canAddStudent)
+				{
+					<div class="new-area">
+						<!-- Add a new student -->
+						<MatButton Unelevated="true" @onclick="AddNewStudent" title="@(Localize["Add New Student"])">@Localize["Add New Student"]</MatButton>
+					</div>
+				}
+
+				if (canViewStudent && students.Count() > 0)
+				{
+					<StudentList Students=@students 
+							IsAdmin=@isAdmin 
+							CanUpdate=@canUpdateStudent 
+							OnSelectionChanged=@SelectionChangedEvent 
+							OnEdit=@EditStudent 
+					/>
+				}
+			}
+
+			@if (showPopup)
+			{
+				<div>
+					<StudentEditDialog FormData=@formData 
+							DialogIsOpen=@dialogIsOpen 
+							OnSave=@SaveStudent 
+							OnDelete=@DeleteStudent
+							OnCancel=@CancelStudent
+							CanView=@canViewStudent 
+							CanAdd=@canAddStudent 
+							CanUpdate=@canUpdateStudent 
+							CanDelete=@canDeleteStudent
+
+					/>
+				</div>
+			}
+	
+		<!-- +navigations -->
+		<!-- -navigations -->
+
+		</Authorized>
+		<!-- Show this section if the user is not logged in -->
+		<NotAuthorized>
+			<p>You're not signed in.</p>
+		</NotAuthorized>
+	</AuthorizeView>
+
+	<SnackBarMessage @ref="snackBarAdded" IsOpen="isAdded" Message="@(Localize["Congratualtions New Student Added Successfully"])" />
+	<SnackBarMessage @ref="snackBarUpdated" IsOpen="isUpdated" Message="@(Localize["Wow! a Student Updated Successfully"])" />
+	<SnackBarMessage @ref="snackBarDeleted" IsOpen="isDeleted" Message="@(Localize["Eh! you deleted a Student"])" />
+</div>
+
+@code {
+    string apiRootUrl = "/api1";
+
+	Overlay studentOverlay;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private System.Security.Claims.ClaimsPrincipal User;
+
+    bool isOwner;
+    bool isAdmin;
+	bool isManager;
+    bool isTeacher;
+    bool canViewStudent, canAddStudent, canUpdateStudent, canDeleteStudent;
+
+    bool isAdded, isUpdated, isDeleted;
+	bool showTracker;
+
+    bool dialogIsOpen = false;
+    StudentDto dialogData = null;
+
+    string toastMessage;
+	string error;
+
+    SnackBarMessage snackBarAdded;
+    SnackBarMessage snackBarUpdated;
+    SnackBarMessage snackBarDeleted;
+
+    // Stores the students displayed in a list
+    private StudentDto[] students;
+    // Stores a single student
+    StudentDto formData = new StudentDto();
+    // Controls if the popup is displayed
+    bool showPopup = false;
+    
+    public string ReturnUrl
+    {
+        get
+        {
+            return NavigationManager.Uri.Replace(NavigationManager.BaseUri, "/");
+        }
+    }
+
+    //<!-- StudentCourses | StudentCourse | Collectiion -->
+
+	
+    // First method to run when user navicates to this control
+    protected override async Task OnInitializedAsync()
+    {
+		// Get the current user
+        var authState = await authenticationStateTask;
+        User = authState.User;
+
+        var username = User.Identity.IsAuthenticated ? User.Identity.Name : "Anoymous";
+
+		isOwner = username == "a1@ark.com";
+
+		isAdmin = User.IsInRole("Administrators") || isOwner;
+        isManager = User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+        isTeacher = User.IsInRole("Teachers") || User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+                    
+
+		canViewStudent = canAddStudent = canUpdateStudent = canDeleteStudent = isAdmin;
+		canViewStudent = canAddStudent = canUpdateStudent = isManager;
+		canViewStudent = canAddStudent = isTeacher;
+
+        if (User.Identity != null)
+        {
+            try
+            {
+				// <!-- StudentCourses | StudentCourse | Collectiion -->
+
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+
+            await Search();
+        }
+    }
+
+	async Task Search()
+	{
+		if (User.Identity.IsAuthenticated)
+        {
+            // Make a call to get the students
+            // we don't pass the user because the server
+            // side code will determine who the user is
+            // from the authentication cookie
+
+            try
+            {
+                students = await ApiSvc.GetAsync<StudentDto[]>(apiRootUrl + "/Students");
+
+				//
+				//<!-- StudentCourses | StudentCourse | Collectiion -->
+
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+        }
+	}
+
+    public void SelectionChangedEvent(object row)
+    {
+        if (row != null)
+        {
+            var selectedStudent = (StudentDto)row;
+			EditStudent(selectedStudent);
+        }
+		this.StateHasChanged();
+    }
+
+    void AddNewStudent()
+    {
+        // Make new student
+        formData = new StudentDto {
+						// Set Id to 0 so we know it is a new record
+						Id = 0
+					};
+
+        OpenDialog();
+
+        // this.StateHasChanged();
+    }
+
+    void EditStudent(StudentDto student)
+    {
+        // Set the selected student
+        // as the current student
+        formData = student;
+        // Open the Popup
+        OpenDialog();
+    }
+
+    async Task SaveStudent()
+    {
+		error = null;
+        
+		// Close the Popup
+        CloseDialog();
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new student will have the Id set to 0
+        if (formData.Id == 0)
+        {
+			try
+			{
+				// Create new student
+				// Student objNewStudent = StudentDto.AsStudentFunc(formData);
+
+				// Save the result
+				var resp = await ApiSvc.AddAsync(apiRootUrl + "/Students", formData);
+
+				isAdded = true;
+				snackBarAdded.Show();
+
+				toastMessage = ($"Student '{formData.Id}' added successfully");
+				Toaster.Add(toastMessage, MatToastType.Info);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                studentOverlay.Show();
+            }
+        }
+        else
+        {
+			try
+			{
+				// This is an update
+				var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/Students/" + Convert.ToInt32(formData.Id), formData);
+
+				isUpdated = true;
+				snackBarUpdated.Show();
+
+				toastMessage = ($"Student '{formData.Id}' updated successfully");
+				Toaster.Add(toastMessage, MatToastType.Success);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                studentOverlay.Show();
+            }
+        }
+
+        // Get the students for the current user
+        await Search();
+
+        toastMessage = ($"Students record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+    async Task DeleteStudent()
+    {
+		error = null;
+		try
+		{
+			// Close the Popup
+			CloseDialog();
+			// Delete the student
+			var resp = await ApiSvc.DeleteAsync<Student>(apiRootUrl + "/Students/" + Convert.ToInt32(formData.Id));
+
+			isDeleted = true;
+			snackBarDeleted.Show();
+
+
+			// Get the students for the current user
+			await Search();
+
+			toastMessage = ($"Student '{formData.Id}' deleted successfully");
+			Toaster.Add(toastMessage, MatToastType.Danger);
+		}
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            studentOverlay.Show();
+        }
+    }
+
+    void CancelStudent()
+    {
+        CloseDialog();
+    }
+
+    void OpenDialog()
+    {
+        // Open the Popup
+        showPopup = true;
+        dialogData = null;
+        dialogIsOpen = true;
+    }
+
+    void CloseDialog()
+    {
+        // close the Popup
+        showPopup = false;
+        dialogIsOpen = false;
+    }
+
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+<div id="student-courses-cmpt">
+	<Overlay @ref="studentCourseOverlay">
+	@if (!string.IsNullOrWhiteSpace(error))
+	{        
+		<div class="overlay-error">@error</div>
+	}
+	</Overlay>
+
+	<!-- AuthorizeView allows us to only show sections of the page -->
+	<!-- based on the security on the current user -->
+	<AuthorizeView>
+		<!-- Show this section if the user is logged in -->
+		<Authorized>
+
+			<MatFAB Class="app-fab--absolute" Icon="@MatIconNames.Favorite"></MatFAB>
+
+			@if (studentCourses == null)
+			{
+				<Busy />
+			}
+			else
+			{
+				if (canAddStudentCourse)
+				{
+					<div class="new-area">
+						<!-- Add a new studentCourse -->
+						<MatButton Unelevated="true" @onclick="AddNewStudentCourse" title="@(Localize["Add New Student Course"])">@Localize["Add New Student Course"]</MatButton>
+					</div>
+				}
+
+				if (canViewStudentCourse && studentCourses.Count() > 0)
+				{
+					<StudentCourseList StudentCourses=@studentCourses 
+							IsAdmin=@isAdmin 
+							CanUpdate=@canUpdateStudentCourse 
+							OnSelectionChanged=@SelectionChangedEvent 
+							OnEdit=@EditStudentCourse 
+					/>
+				}
+			}
+
+			@if (showPopup)
+			{
+				<div>
+					<StudentCourseEditDialog FormData=@formData 
+							DialogIsOpen=@dialogIsOpen 
+							OnSave=@SaveStudentCourse 
+							OnDelete=@DeleteStudentCourse
+							OnCancel=@CancelStudentCourse
+							CanView=@canViewStudentCourse 
+							CanAdd=@canAddStudentCourse 
+							CanUpdate=@canUpdateStudentCourse 
+							CanDelete=@canDeleteStudentCourse
+							SessionCaches=@sessionCaches 
+							OnAddNewSession=@AddNewSession 
+							CanAddSession=@canAddSession 
+							SemesterCaches=@semesterCaches 
+							OnAddNewSemester=@AddNewSemester 
+							CanAddSemester=@canAddSemester 
+							StudentCaches=@studentCaches 
+							OnAddNewStudent=@AddNewStudent 
+							CanAddStudent=@canAddStudent 
+							CourseCaches=@courseCaches 
+							OnAddNewCourse=@AddNewCourse 
+							CanAddCourse=@canAddCourse 
+
+					/>
+				</div>
+			}
+	
+		<!-- +navigations -->
+
+			<!-- +nav Student -->
+			@if (showPopupStudent)
+			{
+				<div>
+					<StudentEditDialog FormData=@formDataStudent 
+							DialogIsOpen=@dialogIsOpenStudent 
+							OnSave=@SaveStudent 
+							OnCancel=@CancelStudent
+							CanView=@canViewStudentCourse 
+							CanAdd=@canAddStudentCourse 
+							CanUpdate=@canUpdateStudentCourse
+					/>
+				</div>
+			}
+			<SnackBarMessage @ref="snackBarAddedStudent" IsOpen="isAddedStudent" Message="@(Localize["Congratualtions New Student Added Successfully"])" />
+			<SnackBarMessage @ref="snackBarUpdatedStudent" IsOpen="isUpdatedStudent" Message="@(Localize["Wow! a Student Updated Successfully"])" />
+			<!-- -nav Student -->
+
+			<!-- +nav Course -->
+			@if (showPopupCourse)
+			{
+				<div>
+					<CourseEditDialog FormData=@formDataCourse 
+							DialogIsOpen=@dialogIsOpenCourse 
+							OnSave=@SaveCourse 
+							OnCancel=@CancelCourse
+							CanView=@canViewStudentCourse 
+							CanAdd=@canAddStudentCourse 
+							CanUpdate=@canUpdateStudentCourse
+					/>
+				</div>
+			}
+			<SnackBarMessage @ref="snackBarAddedCourse" IsOpen="isAddedCourse" Message="@(Localize["Congratualtions New Course Added Successfully"])" />
+			<SnackBarMessage @ref="snackBarUpdatedCourse" IsOpen="isUpdatedCourse" Message="@(Localize["Wow! a Course Updated Successfully"])" />
+			<!-- -nav Course -->
+
+			<!-- +nav Session -->
+			@if (showPopupSession)
+			{
+				<div>
+					<SessionEditDialog FormData=@formDataSession 
+							DialogIsOpen=@dialogIsOpenSession 
+							OnSave=@SaveSession 
+							OnCancel=@CancelSession
+							CanView=@canViewStudentCourse 
+							CanAdd=@canAddStudentCourse 
+							CanUpdate=@canUpdateStudentCourse
+					/>
+				</div>
+			}
+			<SnackBarMessage @ref="snackBarAddedSession" IsOpen="isAddedSession" Message="@(Localize["Congratualtions New Session Added Successfully"])" />
+			<SnackBarMessage @ref="snackBarUpdatedSession" IsOpen="isUpdatedSession" Message="@(Localize["Wow! a Session Updated Successfully"])" />
+			<!-- -nav Session -->
+
+			<!-- +nav Semester -->
+			@if (showPopupSemester)
+			{
+				<div>
+					<SemesterEditDialog FormData=@formDataSemester 
+							DialogIsOpen=@dialogIsOpenSemester 
+							OnSave=@SaveSemester 
+							OnCancel=@CancelSemester
+							CanView=@canViewStudentCourse 
+							CanAdd=@canAddStudentCourse 
+							CanUpdate=@canUpdateStudentCourse
+					/>
+				</div>
+			}
+			<SnackBarMessage @ref="snackBarAddedSemester" IsOpen="isAddedSemester" Message="@(Localize["Congratualtions New Semester Added Successfully"])" />
+			<SnackBarMessage @ref="snackBarUpdatedSemester" IsOpen="isUpdatedSemester" Message="@(Localize["Wow! a Semester Updated Successfully"])" />
+			<!-- -nav Semester -->
+		<!-- -navigations -->
+
+		</Authorized>
+		<!-- Show this section if the user is not logged in -->
+		<NotAuthorized>
+			<p>You're not signed in.</p>
+		</NotAuthorized>
+	</AuthorizeView>
+
+	<SnackBarMessage @ref="snackBarAdded" IsOpen="isAdded" Message="@(Localize["Congratualtions New Student Course Added Successfully"])" />
+	<SnackBarMessage @ref="snackBarUpdated" IsOpen="isUpdated" Message="@(Localize["Wow! a Student Course Updated Successfully"])" />
+	<SnackBarMessage @ref="snackBarDeleted" IsOpen="isDeleted" Message="@(Localize["Eh! you deleted a Student Course"])" />
+</div>
+
+@code {
+    string apiRootUrl = "/api1";
+
+	Overlay studentCourseOverlay;
+
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    private System.Security.Claims.ClaimsPrincipal User;
+
+    bool isOwner;
+    bool isAdmin;
+	bool isManager;
+    bool isTeacher;
+    bool canViewStudentCourse, canAddStudentCourse, canUpdateStudentCourse, canDeleteStudentCourse;
+
+    bool isAdded, isUpdated, isDeleted;
+	bool showTracker;
+
+    bool dialogIsOpen = false;
+    StudentCourseDto dialogData = null;
+
+    string toastMessage;
+	string error;
+
+    SnackBarMessage snackBarAdded;
+    SnackBarMessage snackBarUpdated;
+    SnackBarMessage snackBarDeleted;
+
+    // Stores the studentCourses displayed in a list
+    private StudentCourseDto[] studentCourses;
+    // Stores a single studentCourse
+    StudentCourseDto formData = new StudentCourseDto();
+    // Controls if the popup is displayed
+    bool showPopup = false;
+    
+    public string ReturnUrl
+    {
+        get
+        {
+            return NavigationManager.Uri.Replace(NavigationManager.BaseUri, "/");
+        }
+    }
+
+	// <!-- ForeignKey StudentId | @int -->
+	// <!-- Student | Student |  -->
+	private StudentCache[] studentCaches { get; set; }
+
+	// <!-- ForeignKey CourseId | @int -->
+	// <!-- Course | Course |  -->
+	private CourseCache[] courseCaches { get; set; }
+
+	// <!-- ForeignKey SessionId | Nullable<int> -->
+	// <!-- Session | Session | Nullable -->
+	private SessionCache[] sessionCaches { get; set; }
+
+	// <!-- ForeignKey SemesterId | Nullable<int> -->
+	// <!-- Semester | Semester | Nullable -->
+	private SemesterCache[] semesterCaches { get; set; }
+
+	
+    // First method to run when user navicates to this control
+    protected override async Task OnInitializedAsync()
+    {
+		// Get the current user
+        var authState = await authenticationStateTask;
+        User = authState.User;
+
+        var username = User.Identity.IsAuthenticated ? User.Identity.Name : "Anoymous";
+
+		isOwner = username == "a1@ark.com";
+
+		isAdmin = User.IsInRole("Administrators") || isOwner;
+        isManager = User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+        isTeacher = User.IsInRole("Teachers") || User.IsInRole("Managers") || User.IsInRole("Administrators")  || isOwner;
+                    
+
+		canViewStudentCourse = canAddStudentCourse = canUpdateStudentCourse = canDeleteStudentCourse = isAdmin;
+		canViewStudentCourse = canAddStudentCourse = canUpdateStudentCourse = isManager;
+		canViewStudentCourse = canAddStudentCourse = isTeacher;
+
+        if (User.Identity != null)
+        {
+            try
+            {
+				// <!-- ForeignKey StudentId | @int -->
+				// <!-- Student | Student -->
+				studentCaches = await ApiSvc.GetAsync<StudentCache[]>(apiRootUrl + "/Caches/Students");
+				// <!-- ForeignKey CourseId | @int -->
+				// <!-- Course | Course -->
+				courseCaches = await ApiSvc.GetAsync<CourseCache[]>(apiRootUrl + "/Caches/Courses");
+				// <!-- ForeignKey SessionId | Nullable<int> -->
+				// <!-- Session | Session -->
+				sessionCaches = await ApiSvc.GetAsync<SessionCache[]>(apiRootUrl + "/Caches/Sessions");
+				// <!-- ForeignKey SemesterId | Nullable<int> -->
+				// <!-- Semester | Semester -->
+				semesterCaches = await ApiSvc.GetAsync<SemesterCache[]>(apiRootUrl + "/Caches/Semesters");
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+
+            await Search();
+        }
+    }
+
+	async Task Search()
+	{
+		if (User.Identity.IsAuthenticated)
+        {
+            // Make a call to get the studentCourses
+            // we don't pass the user because the server
+            // side code will determine who the user is
+            // from the authentication cookie
+
+            try
+            {
+                studentCourses = await ApiSvc.GetAsync<StudentCourseDto[]>(apiRootUrl + "/StudentCourses");
+
+				//
+				// <!-- ForeignKey StudentId | @int -->
+				// <!-- Student | Student -->
+				InitializeStudent();
+				// <!-- ForeignKey CourseId | @int -->
+				// <!-- Course | Course -->
+				InitializeCourse();
+				// <!-- ForeignKey SessionId | Nullable<int> -->
+				// <!-- Session | Session -->
+				InitializeSession();
+				// <!-- ForeignKey SemesterId | Nullable<int> -->
+				// <!-- Semester | Semester -->
+				InitializeSemester();
+            }
+            catch (AccessTokenNotAvailableException exception)
+            {
+                exception.Redirect();
+            }
+        }
+	}
+
+    public void SelectionChangedEvent(object row)
+    {
+        if (row != null)
+        {
+            var selectedStudentCourse = (StudentCourseDto)row;
+			EditStudentCourse(selectedStudentCourse);
+        }
+		this.StateHasChanged();
+    }
+
+    void AddNewStudentCourse()
+    {
+        // Make new studentCourse
+        formData = new StudentCourseDto {
+						// Set Id to 0 so we know it is a new record
+						Id = 0
+					};
+
+        OpenDialog();
+
+        // this.StateHasChanged();
+    }
+
+    void EditStudentCourse(StudentCourseDto studentCourse)
+    {
+        // Set the selected studentCourse
+        // as the current studentCourse
+        formData = studentCourse;
+        // Open the Popup
+        OpenDialog();
+    }
+
+    async Task SaveStudentCourse()
+    {
+		error = null;
+        
+		// Close the Popup
+        CloseDialog();
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new studentCourse will have the Id set to 0
+        if (formData.Id == 0)
+        {
+			try
+			{
+				// Create new studentCourse
+				// StudentCourse objNewStudentCourse = StudentCourseDto.AsStudentCourseFunc(formData);
+
+				// Save the result
+				var resp = await ApiSvc.AddAsync(apiRootUrl + "/StudentCourses", formData);
+
+				isAdded = true;
+				snackBarAdded.Show();
+
+				toastMessage = ($"StudentCourse '{formData.Id}' added successfully");
+				Toaster.Add(toastMessage, MatToastType.Info);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                studentCourseOverlay.Show();
+            }
+        }
+        else
+        {
+			try
+			{
+				// This is an update
+				var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/StudentCourses/" + Convert.ToInt32(formData.Id), formData);
+
+				isUpdated = true;
+				snackBarUpdated.Show();
+
+				toastMessage = ($"StudentCourse '{formData.Id}' updated successfully");
+				Toaster.Add(toastMessage, MatToastType.Success);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                studentCourseOverlay.Show();
+            }
+        }
+
+        // Get the studentCourses for the current user
+        await Search();
+
+        toastMessage = ($"StudentCourses record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+    async Task DeleteStudentCourse()
+    {
+		error = null;
+		try
+		{
+			// Close the Popup
+			CloseDialog();
+			// Delete the studentCourse
+			var resp = await ApiSvc.DeleteAsync<StudentCourse>(apiRootUrl + "/StudentCourses/" + Convert.ToInt32(formData.Id));
+
+			isDeleted = true;
+			snackBarDeleted.Show();
+
+
+			// Get the studentCourses for the current user
+			await Search();
+
+			toastMessage = ($"StudentCourse '{formData.Id}' deleted successfully");
+			Toaster.Add(toastMessage, MatToastType.Danger);
+		}
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            studentCourseOverlay.Show();
+        }
+    }
+
+    void CancelStudentCourse()
+    {
+        CloseDialog();
+    }
+
+    void OpenDialog()
+    {
+        // Open the Popup
+        showPopup = true;
+        dialogData = null;
+        dialogIsOpen = true;
+    }
+
+    void CloseDialog()
+    {
+        // close the Popup
+        showPopup = false;
+        dialogIsOpen = false;
+    }
+
+
+	// <!-- ForeignKey StudentId | @int -->
+	// <!-- Student | Student -->
+	StudentDto formDataStudent;
+    bool showPopupStudent;
+	bool dialogIsOpenStudent;
+    StudentDto dialogDataStudent = null;
+	bool isAddedStudent;
+	bool canAddStudent;
+	SnackBarMessage snackBarAddedStudent;
+	bool isUpdatedStudent;
+	SnackBarMessage snackBarUpdatedStudent;
+
+	void InitializeStudent()
+    {
+		canAddStudent = isAdmin;
+	}
+
+	void AddNewStudent()
+    {
+		// Close the Popup
+        CloseDialog();
+		CloseDialogStudent();
+
+        // Make new studentCourse
+        formDataStudent = new StudentDto { Id=0 };
+        // Set Id to 0 so we know it is a new record
+        // formDataStudent.Id = 0;
+
+        OpenDialogStudent();
+    }
+
+	void EditStudent(StudentCourseDto dto)
+    {
+		// Close the Popup
+        CloseDialog();
+		CloseDialogStudent();
+
+		// query for object
+		StudentDto student = null;
+
+        // Make new studentCourse
+        formDataStudent = student;
+
+        OpenDialogStudent();
+    }
+
+    async Task SaveStudent()
+    {
+		error = null;
+        
+		// Close the Popup
+        CloseDialogStudent();
+
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new student will have the Id set to 0
+        if (formDataStudent.Id == 0)
+        {
+			try
+			{
+				// Create new student
+				// Student objNewStudent = StudentDto.AsStudentFunc(formDataStudent);
+
+				// Save the result
+				var resp = await ApiSvc.AddAsync(apiRootUrl + "/Students", formDataStudent);
+
+				isAddedStudent = true;
+				snackBarAddedStudent.Show();
+
+				toastMessage = ($"Student '{formDataStudent.Id}' added successfully");
+				Toaster.Add(toastMessage, MatToastType.Info);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                studentCourseOverlay.Show();
+            }
+        }
+        else
+        {
+			try
+			{
+				// This is an update
+				var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/Students/" + Convert.ToInt32(formDataStudent.Id), formDataStudent);
+
+				isUpdated = true;
+				snackBarUpdatedStudent.Show();
+
+				toastMessage = ($"Learn '{formDataStudent.Id}' updated successfully");
+				Toaster.Add(toastMessage, MatToastType.Success);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                studentCourseOverlay.Show();
+            }
+        }
+
+        // Get the students for the current user
+        studentCaches = await ApiSvc.GetAsync<StudentCache[]>(apiRootUrl + "/Caches/Students");
+
+        toastMessage = ($"Students record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+	void CancelStudent()
+    {
+        CloseDialogStudent();
+    }
+
+    void OpenDialogStudent()
+    {
+        // Open the Popup
+        showPopupStudent = true;
+        dialogDataStudent = null;
+        dialogIsOpenStudent = true;
+    }
+
+    void CloseDialogStudent()
+    {
+        // close the Popup
+        showPopupStudent = false;
+        dialogIsOpenStudent = false;
+    }
+
+	// <!-- ForeignKey CourseId | @int -->
+	// <!-- Course | Course -->
+	CourseDto formDataCourse;
+    bool showPopupCourse;
+	bool dialogIsOpenCourse;
+    CourseDto dialogDataCourse = null;
+	bool isAddedCourse;
+	bool canAddCourse;
+	SnackBarMessage snackBarAddedCourse;
+	bool isUpdatedCourse;
+	SnackBarMessage snackBarUpdatedCourse;
+
+	void InitializeCourse()
+    {
+		canAddCourse = isAdmin;
+	}
+
+	void AddNewCourse()
+    {
+		// Close the Popup
+        CloseDialog();
+		CloseDialogCourse();
+
+        // Make new studentCourse
+        formDataCourse = new CourseDto { Id=0 };
+        // Set Id to 0 so we know it is a new record
+        // formDataCourse.Id = 0;
+
+        OpenDialogCourse();
+    }
+
+	void EditCourse(StudentCourseDto dto)
+    {
+		// Close the Popup
+        CloseDialog();
+		CloseDialogCourse();
+
+		// query for object
+		CourseDto course = null;
+
+        // Make new studentCourse
+        formDataCourse = course;
+
+        OpenDialogCourse();
+    }
+
+    async Task SaveCourse()
+    {
+		error = null;
+        
+		// Close the Popup
+        CloseDialogCourse();
+
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new course will have the Id set to 0
+        if (formDataCourse.Id == 0)
+        {
+			try
+			{
+				// Create new course
+				// Course objNewCourse = CourseDto.AsCourseFunc(formDataCourse);
+
+				// Save the result
+				var resp = await ApiSvc.AddAsync(apiRootUrl + "/Courses", formDataCourse);
+
+				isAddedCourse = true;
+				snackBarAddedCourse.Show();
+
+				toastMessage = ($"Course '{formDataCourse.Id}' added successfully");
+				Toaster.Add(toastMessage, MatToastType.Info);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                studentCourseOverlay.Show();
+            }
+        }
+        else
+        {
+			try
+			{
+				// This is an update
+				var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/Courses/" + Convert.ToInt32(formDataCourse.Id), formDataCourse);
+
+				isUpdated = true;
+				snackBarUpdatedCourse.Show();
+
+				toastMessage = ($"Learn '{formDataCourse.Id}' updated successfully");
+				Toaster.Add(toastMessage, MatToastType.Success);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                studentCourseOverlay.Show();
+            }
+        }
+
+        // Get the courses for the current user
+        courseCaches = await ApiSvc.GetAsync<CourseCache[]>(apiRootUrl + "/Caches/Courses");
+
+        toastMessage = ($"Courses record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+	void CancelCourse()
+    {
+        CloseDialogCourse();
+    }
+
+    void OpenDialogCourse()
+    {
+        // Open the Popup
+        showPopupCourse = true;
+        dialogDataCourse = null;
+        dialogIsOpenCourse = true;
+    }
+
+    void CloseDialogCourse()
+    {
+        // close the Popup
+        showPopupCourse = false;
+        dialogIsOpenCourse = false;
+    }
+
+	// <!-- ForeignKey SessionId | Nullable<int> -->
+	// <!-- Session | Session -->
+	SessionDto formDataSession;
+    bool showPopupSession;
+	bool dialogIsOpenSession;
+    SessionDto dialogDataSession = null;
+	bool isAddedSession;
+	bool canAddSession;
+	SnackBarMessage snackBarAddedSession;
+	bool isUpdatedSession;
+	SnackBarMessage snackBarUpdatedSession;
+
+	void InitializeSession()
+    {
+		canAddSession = isAdmin;
+	}
+
+	void AddNewSession()
+    {
+		// Close the Popup
+        CloseDialog();
+		CloseDialogSession();
+
+        // Make new studentCourse
+        formDataSession = new SessionDto { Id=0 };
+        // Set Id to 0 so we know it is a new record
+        // formDataSession.Id = 0;
+
+        OpenDialogSession();
+    }
+
+	void EditSession(StudentCourseDto dto)
+    {
+		// Close the Popup
+        CloseDialog();
+		CloseDialogSession();
+
+		// query for object
+		SessionDto session = null;
+
+        // Make new studentCourse
+        formDataSession = session;
+
+        OpenDialogSession();
+    }
+
+    async Task SaveSession()
+    {
+		error = null;
+        
+		// Close the Popup
+        CloseDialogSession();
+
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new session will have the Id set to 0
+        if (formDataSession.Id == 0)
+        {
+			try
+			{
+				// Create new session
+				// Session objNewSession = SessionDto.AsSessionFunc(formDataSession);
+
+				// Save the result
+				var resp = await ApiSvc.AddAsync(apiRootUrl + "/Sessions", formDataSession);
+
+				isAddedSession = true;
+				snackBarAddedSession.Show();
+
+				toastMessage = ($"Session '{formDataSession.Id}' added successfully");
+				Toaster.Add(toastMessage, MatToastType.Info);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                studentCourseOverlay.Show();
+            }
+        }
+        else
+        {
+			try
+			{
+				// This is an update
+				var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/Sessions/" + Convert.ToInt32(formDataSession.Id), formDataSession);
+
+				isUpdated = true;
+				snackBarUpdatedSession.Show();
+
+				toastMessage = ($"Learn '{formDataSession.Id}' updated successfully");
+				Toaster.Add(toastMessage, MatToastType.Success);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                studentCourseOverlay.Show();
+            }
+        }
+
+        // Get the sessions for the current user
+        sessionCaches = await ApiSvc.GetAsync<SessionCache[]>(apiRootUrl + "/Caches/Sessions");
+
+        toastMessage = ($"Sessions record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+	void CancelSession()
+    {
+        CloseDialogSession();
+    }
+
+    void OpenDialogSession()
+    {
+        // Open the Popup
+        showPopupSession = true;
+        dialogDataSession = null;
+        dialogIsOpenSession = true;
+    }
+
+    void CloseDialogSession()
+    {
+        // close the Popup
+        showPopupSession = false;
+        dialogIsOpenSession = false;
+    }
+
+	// <!-- ForeignKey SemesterId | Nullable<int> -->
+	// <!-- Semester | Semester -->
+	SemesterDto formDataSemester;
+    bool showPopupSemester;
+	bool dialogIsOpenSemester;
+    SemesterDto dialogDataSemester = null;
+	bool isAddedSemester;
+	bool canAddSemester;
+	SnackBarMessage snackBarAddedSemester;
+	bool isUpdatedSemester;
+	SnackBarMessage snackBarUpdatedSemester;
+
+	void InitializeSemester()
+    {
+		canAddSemester = isAdmin;
+	}
+
+	void AddNewSemester()
+    {
+		// Close the Popup
+        CloseDialog();
+		CloseDialogSemester();
+
+        // Make new studentCourse
+        formDataSemester = new SemesterDto { Id=0 };
+        // Set Id to 0 so we know it is a new record
+        // formDataSemester.Id = 0;
+
+        OpenDialogSemester();
+    }
+
+	void EditSemester(StudentCourseDto dto)
+    {
+		// Close the Popup
+        CloseDialog();
+		CloseDialogSemester();
+
+		// query for object
+		SemesterDto semester = null;
+
+        // Make new studentCourse
+        formDataSemester = semester;
+
+        OpenDialogSemester();
+    }
+
+    async Task SaveSemester()
+    {
+		error = null;
+        
+		// Close the Popup
+        CloseDialogSemester();
+
+        // Get the current user
+        var user = (await authenticationStateTask).User;
+        // A new semester will have the Id set to 0
+        if (formDataSemester.Id == 0)
+        {
+			try
+			{
+				// Create new semester
+				// Semester objNewSemester = SemesterDto.AsSemesterFunc(formDataSemester);
+
+				// Save the result
+				var resp = await ApiSvc.AddAsync(apiRootUrl + "/Semesters", formDataSemester);
+
+				isAddedSemester = true;
+				snackBarAddedSemester.Show();
+
+				toastMessage = ($"Semester '{formDataSemester.Id}' added successfully");
+				Toaster.Add(toastMessage, MatToastType.Info);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                studentCourseOverlay.Show();
+            }
+        }
+        else
+        {
+			try
+			{
+				// This is an update
+				var resp = await ApiSvc.UpdateAsync(apiRootUrl + "/Semesters/" + Convert.ToInt32(formDataSemester.Id), formDataSemester);
+
+				isUpdated = true;
+				snackBarUpdatedSemester.Show();
+
+				toastMessage = ($"Learn '{formDataSemester.Id}' updated successfully");
+				Toaster.Add(toastMessage, MatToastType.Success);
+			}
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                studentCourseOverlay.Show();
+            }
+        }
+
+        // Get the semesters for the current user
+        semesterCaches = await ApiSvc.GetAsync<SemesterCache[]>(apiRootUrl + "/Caches/Semesters");
+
+        toastMessage = ($"Semesters record refreshed");
+        Toaster.Add(toastMessage, MatToastType.Info);
+    }
+
+	void CancelSemester()
+    {
+        CloseDialogSemester();
+    }
+
+    void OpenDialogSemester()
+    {
+        // Open the Popup
+        showPopupSemester = true;
+        dialogDataSemester = null;
+        dialogIsOpenSemester = true;
+    }
+
+    void CloseDialogSemester()
+    {
+        // close the Popup
+        showPopupSemester = false;
+        dialogIsOpenSemester = false;
+    }
+
+
+
+}
+

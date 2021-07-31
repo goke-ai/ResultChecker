@@ -9,3 +9,841 @@
 //------------------------------------------------------------------------------
 -->
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+	<div>
+		<EditForm Model="@FormData" OnValidSubmit="@SaveAppSetting" Context="AppSettingEditContext">
+			        <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mat-layout-grid">
+                        <div class="mat-layout-grid-inner">
+				<!-- Key | isForeignKey(False) | @string | 100 -->
+					<div class="mat-layout-grid-cell-span-12">
+							
+						<MatTextField Label="@(Localize["Key"])" @bind-Value="FormData.Key" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Key)" />
+					</div>
+				<!-- Value | isForeignKey(False) | @string | 100 -->
+					<div class="mat-layout-grid-cell-span-12">
+							
+						<MatTextField Label="@(Localize["Value"])" @bind-Value="FormData.Value" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Value)" />
+					</div>
+						<div class="mat-layout-grid-cell-span-12">
+							<MatSlideToggle Label="Tracker"  @bind-Value="@showTracker"></MatSlideToggle>
+							@if (showTracker)
+							{
+								<fieldset disabled>
+									<TrackerDto Model="FormData" />
+								</fieldset>
+							}
+						</div>
+					</div>
+				</div>
+
+				<MatDivider></MatDivider>
+
+			    <MatButton Type="button" OnClick="@(e => { DialogIsOpen = false; })">@Localize["CANCEL"]</MatButton>
+                @if(CanAdd || CanUpdate)
+				{
+				<!-- Button to save the product -->
+                <MatButton Type="submit" title="@(Localize["Save App Setting"])">@Localize["SAVE"]</MatButton>
+                }
+				<!-- Only show button if not a new record -->
+                @if (FormData.Id > 0 && CanDelete)
+                {
+                    <!-- Button to delete the product -->
+                    <MatButton Type="button" OnClick="DeleteAppSetting" Icon="@MatIconNames.Restore_from_trash" title="Delete App Setting">DELETE</MatButton>
+                }
+
+		</EditForm>
+				
+	</div>
+
+@code {
+    
+    
+    [Parameter] public AppSettingDto FormData { get; set; } = new AppSettingDto();
+    [Parameter] public bool DialogIsOpen { get; set; }
+    [Parameter] public bool CanView { get; set; } = true;
+    [Parameter] public bool CanAdd { get; set; }
+    [Parameter] public bool CanUpdate { get; set; }
+    [Parameter] public bool CanDelete { get; set; }
+
+    bool showTracker;
+
+	
+    [Parameter] public EventCallback<AppSettingDto> OnSaveAppSetting { get; set; }
+    [Parameter] public EventCallback<AppSettingDto> OnDeleteAppSetting { get; set; }
+
+
+    void SaveAppSetting()
+    {
+        OnSaveAppSetting.InvokeAsync(FormData);
+    }
+
+    void DeleteAppSetting()
+    {
+        OnDeleteAppSetting.InvokeAsync(FormData);
+    }
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+	<div>
+		<EditForm Model="@FormData" OnValidSubmit="@SaveCard" Context="CardEditContext">
+			        <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mat-layout-grid">
+                        <div class="mat-layout-grid-inner">
+				<!-- Pin | isForeignKey(False) | @string | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatTextField TextArea="true" Label="@(Localize["Pin"])" @bind-Value="FormData.Pin" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Pin)" />
+					</div>
+				<!-- Owner | isForeignKey(False) | @string | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatTextField TextArea="true" Label="@(Localize["Owner"])" @bind-Value="FormData.Owner" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Owner)" />
+					</div>
+				<!-- Role | isForeignKey(False) | @string | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatTextField TextArea="true" Label="@(Localize["Role"])" @bind-Value="FormData.Role" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Role)" />
+					</div>
+						<div class="mat-layout-grid-cell-span-12">
+							<MatSlideToggle Label="Tracker"  @bind-Value="@showTracker"></MatSlideToggle>
+							@if (showTracker)
+							{
+								<fieldset disabled>
+									<TrackerDto Model="FormData" />
+								</fieldset>
+							}
+						</div>
+					</div>
+				</div>
+
+				<MatDivider></MatDivider>
+
+			    <MatButton Type="button" OnClick="@(e => { DialogIsOpen = false; })">@Localize["CANCEL"]</MatButton>
+                @if(CanAdd || CanUpdate)
+				{
+				<!-- Button to save the product -->
+                <MatButton Type="submit" title="@(Localize["Save Card"])">@Localize["SAVE"]</MatButton>
+                }
+				<!-- Only show button if not a new record -->
+                @if (FormData.Id > 0 && CanDelete)
+                {
+                    <!-- Button to delete the product -->
+                    <MatButton Type="button" OnClick="DeleteCard" Icon="@MatIconNames.Restore_from_trash" title="Delete Card">DELETE</MatButton>
+                }
+
+		</EditForm>
+				
+	</div>
+
+@code {
+    
+    
+    [Parameter] public CardDto FormData { get; set; } = new CardDto();
+    [Parameter] public bool DialogIsOpen { get; set; }
+    [Parameter] public bool CanView { get; set; } = true;
+    [Parameter] public bool CanAdd { get; set; }
+    [Parameter] public bool CanUpdate { get; set; }
+    [Parameter] public bool CanDelete { get; set; }
+
+    bool showTracker;
+
+	
+    [Parameter] public EventCallback<CardDto> OnSaveCard { get; set; }
+    [Parameter] public EventCallback<CardDto> OnDeleteCard { get; set; }
+
+
+    void SaveCard()
+    {
+        OnSaveCard.InvokeAsync(FormData);
+    }
+
+    void DeleteCard()
+    {
+        OnDeleteCard.InvokeAsync(FormData);
+    }
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+	<div>
+		<EditForm Model="@FormData" OnValidSubmit="@SaveCourse" Context="CourseEditContext">
+			        <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mat-layout-grid">
+                        <div class="mat-layout-grid-inner">
+				<!-- Code | isForeignKey(False) | @string | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatTextField TextArea="true" Label="@(Localize["Code"])" @bind-Value="FormData.Code" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Code)" />
+					</div>
+				<!-- Title | isForeignKey(False) | @string | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatTextField TextArea="true" Label="@(Localize["Title"])" @bind-Value="FormData.Title" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Title)" />
+					</div>
+				<!-- Unit | isForeignKey(False) | @double | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatNumericUpDownField  Label="@(Localize["Unit"])" @bind-Value="FormData.Unit" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Unit)" />
+					</div>
+
+		<!-- StudentCourses | StudentCourse | Collection -->
+						<div class="mat-layout-grid-cell-span-12">
+							<MatSlideToggle Label="Tracker"  @bind-Value="@showTracker"></MatSlideToggle>
+							@if (showTracker)
+							{
+								<fieldset disabled>
+									<TrackerDto Model="FormData" />
+								</fieldset>
+							}
+						</div>
+					</div>
+				</div>
+
+				<MatDivider></MatDivider>
+
+			    <MatButton Type="button" OnClick="@(e => { DialogIsOpen = false; })">@Localize["CANCEL"]</MatButton>
+                @if(CanAdd || CanUpdate)
+				{
+				<!-- Button to save the product -->
+                <MatButton Type="submit" title="@(Localize["Save Course"])">@Localize["SAVE"]</MatButton>
+                }
+				<!-- Only show button if not a new record -->
+                @if (FormData.Id > 0 && CanDelete)
+                {
+                    <!-- Button to delete the product -->
+                    <MatButton Type="button" OnClick="DeleteCourse" Icon="@MatIconNames.Restore_from_trash" title="Delete Course">DELETE</MatButton>
+                }
+
+		</EditForm>
+				
+	</div>
+
+@code {
+    
+    
+    [Parameter] public CourseDto FormData { get; set; } = new CourseDto();
+    [Parameter] public bool DialogIsOpen { get; set; }
+    [Parameter] public bool CanView { get; set; } = true;
+    [Parameter] public bool CanAdd { get; set; }
+    [Parameter] public bool CanUpdate { get; set; }
+    [Parameter] public bool CanDelete { get; set; }
+
+    bool showTracker;
+
+    //<!-- StudentCourses | StudentCourse | Collectiion -->
+
+	
+    [Parameter] public EventCallback<CourseDto> OnSaveCourse { get; set; }
+    [Parameter] public EventCallback<CourseDto> OnDeleteCourse { get; set; }
+
+
+    void SaveCourse()
+    {
+        OnSaveCourse.InvokeAsync(FormData);
+    }
+
+    void DeleteCourse()
+    {
+        OnDeleteCourse.InvokeAsync(FormData);
+    }
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+	<div>
+		<EditForm Model="@FormData" OnValidSubmit="@SaveGrade" Context="GradeEditContext">
+			        <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mat-layout-grid">
+                        <div class="mat-layout-grid-inner">
+                            <div class="mat-layout-grid-cell-span-12">
+								<MatTextField Label="Name" @bind-Value="FormData.Name" FullWidth="true" />
+							</div>
+				<!-- BeginMark | isForeignKey(False) | @double | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatNumericUpDownField  Label="@(Localize["Begin Mark"])" @bind-Value="FormData.BeginMark" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.BeginMark)" />
+					</div>
+				<!-- NextBeginMark | isForeignKey(False) | @double | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatNumericUpDownField  Label="@(Localize["Next Begin Mark"])" @bind-Value="FormData.NextBeginMark" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.NextBeginMark)" />
+					</div>
+				<!-- Point | isForeignKey(False) | @double | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatNumericUpDownField  Label="@(Localize["Point"])" @bind-Value="FormData.Point" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Point)" />
+					</div>
+						<div class="mat-layout-grid-cell-span-12">
+							<MatSlideToggle Label="Tracker"  @bind-Value="@showTracker"></MatSlideToggle>
+							@if (showTracker)
+							{
+								<fieldset disabled>
+									<TrackerDto Model="FormData" />
+								</fieldset>
+							}
+						</div>
+					</div>
+				</div>
+
+				<MatDivider></MatDivider>
+
+			    <MatButton Type="button" OnClick="@(e => { DialogIsOpen = false; })">@Localize["CANCEL"]</MatButton>
+                @if(CanAdd || CanUpdate)
+				{
+				<!-- Button to save the product -->
+                <MatButton Type="submit" title="@(Localize["Save Grade"])">@Localize["SAVE"]</MatButton>
+                }
+				<!-- Only show button if not a new record -->
+                @if (FormData.Id > 0 && CanDelete)
+                {
+                    <!-- Button to delete the product -->
+                    <MatButton Type="button" OnClick="DeleteGrade" Icon="@MatIconNames.Restore_from_trash" title="Delete Grade">DELETE</MatButton>
+                }
+
+		</EditForm>
+				
+	</div>
+
+@code {
+    
+    
+    [Parameter] public GradeDto FormData { get; set; } = new GradeDto();
+    [Parameter] public bool DialogIsOpen { get; set; }
+    [Parameter] public bool CanView { get; set; } = true;
+    [Parameter] public bool CanAdd { get; set; }
+    [Parameter] public bool CanUpdate { get; set; }
+    [Parameter] public bool CanDelete { get; set; }
+
+    bool showTracker;
+
+	
+    [Parameter] public EventCallback<GradeDto> OnSaveGrade { get; set; }
+    [Parameter] public EventCallback<GradeDto> OnDeleteGrade { get; set; }
+
+
+    void SaveGrade()
+    {
+        OnSaveGrade.InvokeAsync(FormData);
+    }
+
+    void DeleteGrade()
+    {
+        OnDeleteGrade.InvokeAsync(FormData);
+    }
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+	<div>
+		<EditForm Model="@FormData" OnValidSubmit="@SaveSemester" Context="SemesterEditContext">
+			        <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mat-layout-grid">
+                        <div class="mat-layout-grid-inner">
+                            <div class="mat-layout-grid-cell-span-12">
+								<MatTextField Label="Name" @bind-Value="FormData.Name" FullWidth="true" />
+							</div>
+
+		<!-- StudentCourses | StudentCourse | Collection -->
+						<div class="mat-layout-grid-cell-span-12">
+							<MatSlideToggle Label="Tracker"  @bind-Value="@showTracker"></MatSlideToggle>
+							@if (showTracker)
+							{
+								<fieldset disabled>
+									<TrackerDto Model="FormData" />
+								</fieldset>
+							}
+						</div>
+					</div>
+				</div>
+
+				<MatDivider></MatDivider>
+
+			    <MatButton Type="button" OnClick="@(e => { DialogIsOpen = false; })">@Localize["CANCEL"]</MatButton>
+                @if(CanAdd || CanUpdate)
+				{
+				<!-- Button to save the product -->
+                <MatButton Type="submit" title="@(Localize["Save Semester"])">@Localize["SAVE"]</MatButton>
+                }
+				<!-- Only show button if not a new record -->
+                @if (FormData.Id > 0 && CanDelete)
+                {
+                    <!-- Button to delete the product -->
+                    <MatButton Type="button" OnClick="DeleteSemester" Icon="@MatIconNames.Restore_from_trash" title="Delete Semester">DELETE</MatButton>
+                }
+
+		</EditForm>
+				
+	</div>
+
+@code {
+    
+    
+    [Parameter] public SemesterDto FormData { get; set; } = new SemesterDto();
+    [Parameter] public bool DialogIsOpen { get; set; }
+    [Parameter] public bool CanView { get; set; } = true;
+    [Parameter] public bool CanAdd { get; set; }
+    [Parameter] public bool CanUpdate { get; set; }
+    [Parameter] public bool CanDelete { get; set; }
+
+    bool showTracker;
+
+    //<!-- StudentCourses | StudentCourse | Collectiion -->
+
+	
+    [Parameter] public EventCallback<SemesterDto> OnSaveSemester { get; set; }
+    [Parameter] public EventCallback<SemesterDto> OnDeleteSemester { get; set; }
+
+
+    void SaveSemester()
+    {
+        OnSaveSemester.InvokeAsync(FormData);
+    }
+
+    void DeleteSemester()
+    {
+        OnDeleteSemester.InvokeAsync(FormData);
+    }
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+	<div>
+		<EditForm Model="@FormData" OnValidSubmit="@SaveSession" Context="SessionEditContext">
+			        <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mat-layout-grid">
+                        <div class="mat-layout-grid-inner">
+                            <div class="mat-layout-grid-cell-span-12">
+								<MatTextField Label="Name" @bind-Value="FormData.Name" FullWidth="true" />
+							</div>
+
+		<!-- StudentCourses | StudentCourse | Collection -->
+						<div class="mat-layout-grid-cell-span-12">
+							<MatSlideToggle Label="Tracker"  @bind-Value="@showTracker"></MatSlideToggle>
+							@if (showTracker)
+							{
+								<fieldset disabled>
+									<TrackerDto Model="FormData" />
+								</fieldset>
+							}
+						</div>
+					</div>
+				</div>
+
+				<MatDivider></MatDivider>
+
+			    <MatButton Type="button" OnClick="@(e => { DialogIsOpen = false; })">@Localize["CANCEL"]</MatButton>
+                @if(CanAdd || CanUpdate)
+				{
+				<!-- Button to save the product -->
+                <MatButton Type="submit" title="@(Localize["Save Session"])">@Localize["SAVE"]</MatButton>
+                }
+				<!-- Only show button if not a new record -->
+                @if (FormData.Id > 0 && CanDelete)
+                {
+                    <!-- Button to delete the product -->
+                    <MatButton Type="button" OnClick="DeleteSession" Icon="@MatIconNames.Restore_from_trash" title="Delete Session">DELETE</MatButton>
+                }
+
+		</EditForm>
+				
+	</div>
+
+@code {
+    
+    
+    [Parameter] public SessionDto FormData { get; set; } = new SessionDto();
+    [Parameter] public bool DialogIsOpen { get; set; }
+    [Parameter] public bool CanView { get; set; } = true;
+    [Parameter] public bool CanAdd { get; set; }
+    [Parameter] public bool CanUpdate { get; set; }
+    [Parameter] public bool CanDelete { get; set; }
+
+    bool showTracker;
+
+    //<!-- StudentCourses | StudentCourse | Collectiion -->
+
+	
+    [Parameter] public EventCallback<SessionDto> OnSaveSession { get; set; }
+    [Parameter] public EventCallback<SessionDto> OnDeleteSession { get; set; }
+
+
+    void SaveSession()
+    {
+        OnSaveSession.InvokeAsync(FormData);
+    }
+
+    void DeleteSession()
+    {
+        OnDeleteSession.InvokeAsync(FormData);
+    }
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+	<div>
+		<EditForm Model="@FormData" OnValidSubmit="@SaveStudent" Context="StudentEditContext">
+			        <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mat-layout-grid">
+                        <div class="mat-layout-grid-inner">
+				<!-- MatricNo | isForeignKey(False) | @string | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatTextField TextArea="true" Label="@(Localize["Matric No"])" @bind-Value="FormData.MatricNo" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.MatricNo)" />
+					</div>
+				<!-- Lastname | isForeignKey(False) | @string | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatTextField TextArea="true" Label="@(Localize["Lastname"])" @bind-Value="FormData.Lastname" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Lastname)" />
+					</div>
+				<!-- Firstname | isForeignKey(False) | @string | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatTextField TextArea="true" Label="@(Localize["Firstname"])" @bind-Value="FormData.Firstname" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Firstname)" />
+					</div>
+				<!-- Middlename | isForeignKey(False) | @string | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatTextField TextArea="true" Label="@(Localize["Middlename"])" @bind-Value="FormData.Middlename" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Middlename)" />
+					</div>
+
+		<!-- StudentCourses | StudentCourse | Collection -->
+						<div class="mat-layout-grid-cell-span-12">
+							<MatSlideToggle Label="Tracker"  @bind-Value="@showTracker"></MatSlideToggle>
+							@if (showTracker)
+							{
+								<fieldset disabled>
+									<TrackerDto Model="FormData" />
+								</fieldset>
+							}
+						</div>
+					</div>
+				</div>
+
+				<MatDivider></MatDivider>
+
+			    <MatButton Type="button" OnClick="@(e => { DialogIsOpen = false; })">@Localize["CANCEL"]</MatButton>
+                @if(CanAdd || CanUpdate)
+				{
+				<!-- Button to save the product -->
+                <MatButton Type="submit" title="@(Localize["Save Student"])">@Localize["SAVE"]</MatButton>
+                }
+				<!-- Only show button if not a new record -->
+                @if (FormData.Id > 0 && CanDelete)
+                {
+                    <!-- Button to delete the product -->
+                    <MatButton Type="button" OnClick="DeleteStudent" Icon="@MatIconNames.Restore_from_trash" title="Delete Student">DELETE</MatButton>
+                }
+
+		</EditForm>
+				
+	</div>
+
+@code {
+    
+    
+    [Parameter] public StudentDto FormData { get; set; } = new StudentDto();
+    [Parameter] public bool DialogIsOpen { get; set; }
+    [Parameter] public bool CanView { get; set; } = true;
+    [Parameter] public bool CanAdd { get; set; }
+    [Parameter] public bool CanUpdate { get; set; }
+    [Parameter] public bool CanDelete { get; set; }
+
+    bool showTracker;
+
+    //<!-- StudentCourses | StudentCourse | Collectiion -->
+
+	
+    [Parameter] public EventCallback<StudentDto> OnSaveStudent { get; set; }
+    [Parameter] public EventCallback<StudentDto> OnDeleteStudent { get; set; }
+
+
+    void SaveStudent()
+    {
+        OnSaveStudent.InvokeAsync(FormData);
+    }
+
+    void DeleteStudent()
+    {
+        OnDeleteStudent.InvokeAsync(FormData);
+    }
+
+
+
+}
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IApiService ApiSvc
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
+@inject IStringLocalizer<App> Localize
+@inject IMatToaster Toaster
+
+
+	<div>
+		<EditForm Model="@FormData" OnValidSubmit="@SaveStudentCourse" Context="StudentCourseEditContext">
+			        <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="mat-layout-grid">
+                        <div class="mat-layout-grid-inner">
+				<!-- SessionId | isForeignKey(True) | Nullable<int> | 00 -->
+				<!-- Foreign Key Session -->
+					<div class="mat-layout-grid-cell-span-12">
+						<MatSelectValue Label="@(Localize["Session"])" @bind-Value="FormData.SessionId" Items="@SessionCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
+							<ItemTemplate Context="session">
+								<span>@session?.Name</span>
+							</ItemTemplate>
+						</MatSelectValue>
+						<ValidationMessage For="@(() => FormData.SessionId)" />
+					</div>
+				<!-- SemesterId | isForeignKey(True) | Nullable<int> | 00 -->
+				<!-- Foreign Key Semester -->
+					<div class="mat-layout-grid-cell-span-12">
+						<MatSelectValue Label="@(Localize["Semester"])" @bind-Value="FormData.SemesterId" Items="@SemesterCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
+							<ItemTemplate Context="semester">
+								<span>@semester?.Name</span>
+							</ItemTemplate>
+						</MatSelectValue>
+						<ValidationMessage For="@(() => FormData.SemesterId)" />
+					</div>
+				<!-- StudentId | isForeignKey(True) | @int | 00 -->
+				<!-- Foreign Key Student -->
+					<div class="mat-layout-grid-cell-span-12">
+						<MatSelectValue Label="@(Localize["Student"])" @bind-Value="FormData.StudentId" Items="@StudentCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
+							<ItemTemplate Context="student">
+								<span>@student?.Name</span>
+							</ItemTemplate>
+						</MatSelectValue>
+						<ValidationMessage For="@(() => FormData.StudentId)" />
+					</div>
+				<!-- CourseId | isForeignKey(True) | @int | 00 -->
+				<!-- Foreign Key Course -->
+					<div class="mat-layout-grid-cell-span-12">
+						<MatSelectValue Label="@(Localize["Course"])" @bind-Value="FormData.CourseId" Items="@CourseCaches" ValueSelector="@(i=>i.Id)" FullWidth="true">
+							<ItemTemplate Context="course">
+								<span>@course?.Name</span>
+							</ItemTemplate>
+						</MatSelectValue>
+						<ValidationMessage For="@(() => FormData.CourseId)" />
+					</div>
+				<!-- Score | isForeignKey(False) | @double | 00 -->
+							
+					<div class="mat-layout-grid-cell-span-12">
+						<MatNumericUpDownField  Label="@(Localize["Score"])" @bind-Value="FormData.Score" FullWidth="true" />
+						<ValidationMessage For="@(() => FormData.Score)" />
+					</div>
+
+		<!-- ForeignKey StudentId | @int -->
+		<!-- Student | Student | StudentId-->
+		<!-- ForeignKey CourseId | @int -->
+		<!-- Course | Course | CourseId-->
+		<!-- ForeignKey SessionId | Nullable<int> -->
+		<!-- Session | Session | SessionId-->
+		<!-- ForeignKey SemesterId | Nullable<int> -->
+		<!-- Semester | Semester | SemesterId-->
+						<div class="mat-layout-grid-cell-span-12">
+							<MatSlideToggle Label="Tracker"  @bind-Value="@showTracker"></MatSlideToggle>
+							@if (showTracker)
+							{
+								<fieldset disabled>
+									<TrackerDto Model="FormData" />
+								</fieldset>
+							}
+						</div>
+					</div>
+				</div>
+
+				<MatDivider></MatDivider>
+
+			    <MatButton Type="button" OnClick="@(e => { DialogIsOpen = false; })">@Localize["CANCEL"]</MatButton>
+                @if(CanAdd || CanUpdate)
+				{
+				<!-- Button to save the product -->
+                <MatButton Type="submit" title="@(Localize["Save Student Course"])">@Localize["SAVE"]</MatButton>
+                }
+				<!-- Only show button if not a new record -->
+                @if (FormData.Id > 0 && CanDelete)
+                {
+                    <!-- Button to delete the product -->
+                    <MatButton Type="button" OnClick="DeleteStudentCourse" Icon="@MatIconNames.Restore_from_trash" title="Delete Student Course">DELETE</MatButton>
+                }
+
+		</EditForm>
+				
+	</div>
+
+@code {
+    
+    
+    [Parameter] public StudentCourseDto FormData { get; set; } = new StudentCourseDto();
+    [Parameter] public bool DialogIsOpen { get; set; }
+    [Parameter] public bool CanView { get; set; } = true;
+    [Parameter] public bool CanAdd { get; set; }
+    [Parameter] public bool CanUpdate { get; set; }
+    [Parameter] public bool CanDelete { get; set; }
+
+    bool showTracker;
+
+	// <!-- ForeignKey StudentId | @int -->
+	// <!-- Student | Student |  -->
+	[Parameter] public StudentCache[] StudentCaches { get; set; }
+
+	// <!-- ForeignKey CourseId | @int -->
+	// <!-- Course | Course |  -->
+	[Parameter] public CourseCache[] CourseCaches { get; set; }
+
+	// <!-- ForeignKey SessionId | Nullable<int> -->
+	// <!-- Session | Session | Nullable -->
+	[Parameter] public SessionCache[] SessionCaches { get; set; }
+
+	// <!-- ForeignKey SemesterId | Nullable<int> -->
+	// <!-- Semester | Semester | Nullable -->
+	[Parameter] public SemesterCache[] SemesterCaches { get; set; }
+
+	
+    [Parameter] public EventCallback<StudentCourseDto> OnSaveStudentCourse { get; set; }
+    [Parameter] public EventCallback<StudentCourseDto> OnDeleteStudentCourse { get; set; }
+
+
+    void SaveStudentCourse()
+    {
+        OnSaveStudentCourse.InvokeAsync(FormData);
+    }
+
+    void DeleteStudentCourse()
+    {
+        OnDeleteStudentCourse.InvokeAsync(FormData);
+    }
+
+
+
+}
+

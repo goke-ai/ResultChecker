@@ -7,22 +7,19 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ark.ResultCheckers.Data.Services
+using Microsoft.Extensions.DependencyInjection;
+
+public static class DataServiceExtension
 {
-    using Microsoft.Extensions.DependencyInjection;
-    
-    public static class DataServiceExtension
+    public static void ConfigureServices(IServiceCollection services)
     {
-        public static void ConfigureServices(IServiceCollection services)
-        {
-            services.AddTransient<AppSettingService>();
-            services.AddTransient<CardService>();
-            services.AddTransient<CourseService>();
-            services.AddTransient<GradeService>();
-            services.AddTransient<SemesterService>();
-            services.AddTransient<SessionService>();
-            services.AddTransient<StudentService>();
-            services.AddTransient<StudentCourseService>();
-        }
+        services.AddTransient<AppSettingService>();
+        services.AddTransient<CardService>();
+        services.AddTransient<CourseService>();
+        services.AddTransient<GradeService>();
+        services.AddTransient<SemesterService>();
+        services.AddTransient<SessionService>();
+        services.AddTransient<StudentService>();
+        services.AddTransient<StudentCourseService>();
     }
 }

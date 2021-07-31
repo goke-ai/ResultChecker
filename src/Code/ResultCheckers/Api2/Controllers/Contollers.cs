@@ -26,7 +26,7 @@ using .Entities;
 using .Dtos;
 using .Dtos.Caches;
 
-[Route("api1/[controller]")]    
+[Route("api2/[controller]")]    
 [ApiController]
 // [Produces("application/json")]
 // [Route("api/AppSettings")]    
@@ -44,8 +44,8 @@ public partial class AppSettingsController : ApiController
     // GET: api/AppSettings
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AppSettingDto>>> GetAppSettings(string searchText = null
-        , string key  = null
-        , string value  = null
+			, string keyText = null
+			, string valueText = null
 		/*, int pageNumber=1, int pageSize=7*/)
     {
 
@@ -53,10 +53,9 @@ public partial class AppSettingsController : ApiController
         List<Expression<Func<AppSettingDto, bool>>> filters = null; 
 
         if (String.IsNullOrEmpty(searchText)
-            && (String.IsNullOrEmpty(key))
-            && (String.IsNullOrEmpty(value))
-		
-        )
+			&& String.IsNullOrEmpty(keyText)
+			&& String.IsNullOrEmpty(valueText)
+		)
         {
             // return null;
         }
@@ -71,17 +70,14 @@ public partial class AppSettingsController : ApiController
 				    filters.Add(x => x.Id.ToString().Contains(searchText));
 			    }
             }
-            
-            if(!String.IsNullOrEmpty(key))
-            { 
-                filters.Add(x => x.Key == key);  
-            }
-            
-            if(!String.IsNullOrEmpty(value))
-            { 
-                filters.Add(x => x.Value == value);  
-            }
-		
+		    if (!String.IsNullOrEmpty(keyText))
+		    {
+			    filters.Add(x => x.Key == keyText);
+		    }
+		    if (!String.IsNullOrEmpty(valueText))
+		    {
+			    filters.Add(x => x.Value == valueText);
+		    }
         }
 
         //sort
@@ -257,7 +253,7 @@ public partial class AppSettingsController : ApiController
     
 }
 
-[Route("api1/[controller]")]    
+[Route("api2/[controller]")]    
 [ApiController]
 // [Produces("application/json")]
 // [Route("api/Cards")]    
@@ -275,9 +271,9 @@ public partial class CardsController : ApiController
     // GET: api/Cards
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CardDto>>> GetCards(string searchText = null
-        , string pin  = null
-        , string owner  = null
-        , string role  = null
+			, string pinText = null
+			, string ownerText = null
+			, string roleText = null
 		/*, int pageNumber=1, int pageSize=7*/)
     {
 
@@ -285,11 +281,10 @@ public partial class CardsController : ApiController
         List<Expression<Func<CardDto, bool>>> filters = null; 
 
         if (String.IsNullOrEmpty(searchText)
-            && (String.IsNullOrEmpty(pin))
-            && (String.IsNullOrEmpty(owner))
-            && (String.IsNullOrEmpty(role))
-		
-        )
+			&& String.IsNullOrEmpty(pinText)
+			&& String.IsNullOrEmpty(ownerText)
+			&& String.IsNullOrEmpty(roleText)
+		)
         {
             // return null;
         }
@@ -304,22 +299,18 @@ public partial class CardsController : ApiController
 				    filters.Add(x => x.Id.ToString().Contains(searchText));
 			    }
             }
-            
-            if(!String.IsNullOrEmpty(pin))
-            { 
-                filters.Add(x => x.Pin == pin);  
-            }
-            
-            if(!String.IsNullOrEmpty(owner))
-            { 
-                filters.Add(x => x.Owner == owner);  
-            }
-            
-            if(!String.IsNullOrEmpty(role))
-            { 
-                filters.Add(x => x.Role == role);  
-            }
-		
+		    if (!String.IsNullOrEmpty(pinText))
+		    {
+			    filters.Add(x => x.Pin == pinText);
+		    }
+		    if (!String.IsNullOrEmpty(ownerText))
+		    {
+			    filters.Add(x => x.Owner == ownerText);
+		    }
+		    if (!String.IsNullOrEmpty(roleText))
+		    {
+			    filters.Add(x => x.Role == roleText);
+		    }
         }
 
         //sort
@@ -495,7 +486,7 @@ public partial class CardsController : ApiController
     
 }
 
-[Route("api1/[controller]")]    
+[Route("api2/[controller]")]    
 [ApiController]
 // [Produces("application/json")]
 // [Route("api/Courses")]    
@@ -513,9 +504,9 @@ public partial class CoursesController : ApiController
     // GET: api/Courses
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CourseDto>>> GetCourses(string searchText = null
-        , string code  = null
-        , string title  = null
-        , double? unit  = null
+			, string codeText = null
+			, string titleText = null
+			, double? unitText = null
 		/*, int pageNumber=1, int pageSize=7*/)
     {
 
@@ -523,11 +514,10 @@ public partial class CoursesController : ApiController
         List<Expression<Func<CourseDto, bool>>> filters = null; 
 
         if (String.IsNullOrEmpty(searchText)
-            && (String.IsNullOrEmpty(code))
-            && (String.IsNullOrEmpty(title))
-            && (unit == null)
-		
-        )
+			&& String.IsNullOrEmpty(codeText)
+			&& String.IsNullOrEmpty(titleText)
+			&& unitText == null
+		)
         {
             // return null;
         }
@@ -542,22 +532,18 @@ public partial class CoursesController : ApiController
 				    filters.Add(x => x.Id.ToString().Contains(searchText));
 			    }
             }
-            
-            if(!String.IsNullOrEmpty(code))
-            { 
-                filters.Add(x => x.Code == code);  
-            }
-            
-            if(!String.IsNullOrEmpty(title))
-            { 
-                filters.Add(x => x.Title == title);  
-            }
-            
-            if(unit != null)
-            { 
-                filters.Add(x => x.Unit == unit);  
-            }
-		
+		    if (!String.IsNullOrEmpty(codeText))
+		    {
+			    filters.Add(x => x.Code == codeText);
+		    }
+		    if (!String.IsNullOrEmpty(titleText))
+		    {
+			    filters.Add(x => x.Title == titleText);
+		    }
+		    if (unitText != null)
+		    {
+			    filters.Add(x => x.Unit == unitText);
+		    }
         }
 
         //sort
@@ -733,7 +719,7 @@ public partial class CoursesController : ApiController
     
 }
 
-[Route("api1/[controller]")]    
+[Route("api2/[controller]")]    
 [ApiController]
 // [Produces("application/json")]
 // [Route("api/Grades")]    
@@ -751,9 +737,9 @@ public partial class GradesController : ApiController
     // GET: api/Grades
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GradeDto>>> GetGrades(string searchText = null
-        , double? beginMark  = null
-        , double? nextBeginMark  = null
-        , double? point  = null
+			, double? beginMarkText = null
+			, double? nextBeginMarkText = null
+			, double? pointText = null
 		/*, int pageNumber=1, int pageSize=7*/)
     {
 
@@ -761,11 +747,10 @@ public partial class GradesController : ApiController
         List<Expression<Func<GradeDto, bool>>> filters = null; 
 
         if (String.IsNullOrEmpty(searchText)
-            && (beginMark == null)
-            && (nextBeginMark == null)
-            && (point == null)
-		
-        )
+			&& beginMarkText == null
+			&& nextBeginMarkText == null
+			&& pointText == null
+		)
         {
             // return null;
         }
@@ -780,22 +765,18 @@ public partial class GradesController : ApiController
 				    filters.Add(x => x.Id.ToString().Contains(searchText));
 			    }
             }
-            
-            if(beginMark != null)
-            { 
-                filters.Add(x => x.BeginMark == beginMark);  
-            }
-            
-            if(nextBeginMark != null)
-            { 
-                filters.Add(x => x.NextBeginMark == nextBeginMark);  
-            }
-            
-            if(point != null)
-            { 
-                filters.Add(x => x.Point == point);  
-            }
-		
+		    if (beginMarkText != null)
+		    {
+			    filters.Add(x => x.BeginMark == beginMarkText);
+		    }
+		    if (nextBeginMarkText != null)
+		    {
+			    filters.Add(x => x.NextBeginMark == nextBeginMarkText);
+		    }
+		    if (pointText != null)
+		    {
+			    filters.Add(x => x.Point == pointText);
+		    }
         }
 
         //sort
@@ -971,7 +952,7 @@ public partial class GradesController : ApiController
     
 }
 
-[Route("api1/[controller]")]    
+[Route("api2/[controller]")]    
 [ApiController]
 // [Produces("application/json")]
 // [Route("api/Semesters")]    
@@ -996,8 +977,7 @@ public partial class SemestersController : ApiController
         List<Expression<Func<SemesterDto, bool>>> filters = null; 
 
         if (String.IsNullOrEmpty(searchText)
-		
-        )
+		)
         {
             // return null;
         }
@@ -1012,7 +992,6 @@ public partial class SemestersController : ApiController
 				    filters.Add(x => x.Id.ToString().Contains(searchText));
 			    }
             }
-		
         }
 
         //sort
@@ -1188,7 +1167,7 @@ public partial class SemestersController : ApiController
     
 }
 
-[Route("api1/[controller]")]    
+[Route("api2/[controller]")]    
 [ApiController]
 // [Produces("application/json")]
 // [Route("api/Sessions")]    
@@ -1213,8 +1192,7 @@ public partial class SessionsController : ApiController
         List<Expression<Func<SessionDto, bool>>> filters = null; 
 
         if (String.IsNullOrEmpty(searchText)
-		
-        )
+		)
         {
             // return null;
         }
@@ -1229,7 +1207,6 @@ public partial class SessionsController : ApiController
 				    filters.Add(x => x.Id.ToString().Contains(searchText));
 			    }
             }
-		
         }
 
         //sort
@@ -1405,7 +1382,7 @@ public partial class SessionsController : ApiController
     
 }
 
-[Route("api1/[controller]")]    
+[Route("api2/[controller]")]    
 [ApiController]
 // [Produces("application/json")]
 // [Route("api/Students")]    
@@ -1423,10 +1400,10 @@ public partial class StudentsController : ApiController
     // GET: api/Students
     [HttpGet]
     public async Task<ActionResult<IEnumerable<StudentDto>>> GetStudents(string searchText = null
-        , string matricNo  = null
-        , string lastname  = null
-        , string firstname  = null
-        , string middlename  = null
+			, string matricNoText = null
+			, string lastnameText = null
+			, string firstnameText = null
+			, string middlenameText = null
 		/*, int pageNumber=1, int pageSize=7*/)
     {
 
@@ -1434,12 +1411,11 @@ public partial class StudentsController : ApiController
         List<Expression<Func<StudentDto, bool>>> filters = null; 
 
         if (String.IsNullOrEmpty(searchText)
-            && (String.IsNullOrEmpty(matricNo))
-            && (String.IsNullOrEmpty(lastname))
-            && (String.IsNullOrEmpty(firstname))
-            && (String.IsNullOrEmpty(middlename))
-		
-        )
+			&& String.IsNullOrEmpty(matricNoText)
+			&& String.IsNullOrEmpty(lastnameText)
+			&& String.IsNullOrEmpty(firstnameText)
+			&& String.IsNullOrEmpty(middlenameText)
+		)
         {
             // return null;
         }
@@ -1454,27 +1430,22 @@ public partial class StudentsController : ApiController
 				    filters.Add(x => x.Id.ToString().Contains(searchText));
 			    }
             }
-            
-            if(!String.IsNullOrEmpty(matricNo))
-            { 
-                filters.Add(x => x.MatricNo == matricNo);  
-            }
-            
-            if(!String.IsNullOrEmpty(lastname))
-            { 
-                filters.Add(x => x.Lastname == lastname);  
-            }
-            
-            if(!String.IsNullOrEmpty(firstname))
-            { 
-                filters.Add(x => x.Firstname == firstname);  
-            }
-            
-            if(!String.IsNullOrEmpty(middlename))
-            { 
-                filters.Add(x => x.Middlename == middlename);  
-            }
-		
+		    if (!String.IsNullOrEmpty(matricNoText))
+		    {
+			    filters.Add(x => x.MatricNo == matricNoText);
+		    }
+		    if (!String.IsNullOrEmpty(lastnameText))
+		    {
+			    filters.Add(x => x.Lastname == lastnameText);
+		    }
+		    if (!String.IsNullOrEmpty(firstnameText))
+		    {
+			    filters.Add(x => x.Firstname == firstnameText);
+		    }
+		    if (!String.IsNullOrEmpty(middlenameText))
+		    {
+			    filters.Add(x => x.Middlename == middlenameText);
+		    }
         }
 
         //sort
@@ -1650,7 +1621,7 @@ public partial class StudentsController : ApiController
     
 }
 
-[Route("api1/[controller]")]    
+[Route("api2/[controller]")]    
 [ApiController]
 // [Produces("application/json")]
 // [Route("api/StudentCourses")]    
@@ -1668,27 +1639,27 @@ public partial class StudentCoursesController : ApiController
     // GET: api/StudentCourses
     [HttpGet]
     public async Task<ActionResult<IEnumerable<StudentCourseDto>>> GetStudentCourses(string searchText = null
-        , int? sessionId  = null
-        , int? semesterId  = null
-        , int? studentId  = null
-        , int? courseId  = null
-        , double? score  = null
-	// +navigation
-        // +Student
-	, string studentMatricNo = null
-	, string studentDescription = null //Basic-Nav-Property
-	// -Student
-        // +Course
-	, string courseCode = null
-	, string courseDescription = null //Basic-Nav-Property
-	// -Course
-        // +Session
-	, string sessionName = null
-	// -Session
-        // +Semester
-	, string semesterName = null
-	// -Semester
-	// -navigation
+            // +
+			, int? sessionId = null
+			, string sessionText = null
+           
+            // -
+            // +
+			, int? semesterId = null
+			, string semesterText = null
+           
+            // -
+            // +
+			, int? studentId = null
+			, string studentText = null
+           
+            // -
+            // +
+			, int? courseId = null
+			, string courseText = null
+           
+            // -
+			, double? scoreText = null
 		/*, int pageNumber=1, int pageSize=7*/)
     {
 
@@ -1696,29 +1667,24 @@ public partial class StudentCoursesController : ApiController
         List<Expression<Func<StudentCourseDto, bool>>> filters = null; 
 
         if (String.IsNullOrEmpty(searchText)
-            && (sessionId == null)
-            && (semesterId == null)
-            && (studentId == null)
-            && (courseId == null)
-            && (score == null)
-	        // +navigation
-            // +Student
-	&& (String.IsNullOrEmpty(studentMatricNo))
-	&& (String.IsNullOrEmpty(studentDescription)) //Basic-Nav-Property
-	// -Student
-            // +Course
-	&& (String.IsNullOrEmpty(courseCode))
-	&& (String.IsNullOrEmpty(courseDescription)) //Basic-Nav-Property
-	// -Course
-            // +Session
-	&& (String.IsNullOrEmpty(sessionName))
-	// -Session
-            // +Semester
-	&& (String.IsNullOrEmpty(semesterName))
-	// -Semester
-	        // -navigation
-		
-        )
+            // +
+			&& (sessionId is null)
+			&& String.IsNullOrEmpty(sessionText)
+            // -
+            // +
+			&& (semesterId is null)
+			&& String.IsNullOrEmpty(semesterText)
+            // -
+            // +
+			&& (studentId is null)
+			&& String.IsNullOrEmpty(studentText)
+            // -
+            // +
+			&& (courseId is null)
+			&& String.IsNullOrEmpty(courseText)
+            // -
+			&& scoreText == null
+		)
         {
             // return null;
         }
@@ -1733,72 +1699,54 @@ public partial class StudentCoursesController : ApiController
 				    filters.Add(x => x.Id.ToString().Contains(searchText));
 			    }
             }
+            // +
+		    if (!(sessionId is null))
+		    {
+			    filters.Add(x => x.SessionId == sessionId);
+		    }
+		    if (!String.IsNullOrEmpty(sessionText))
+		    {
+			    filters.Add(x => x.SessionName == sessionText);
+		    }
             
-            if(sessionId != null)
-            { 
-                filters.Add(x => x.SessionId == sessionId);  
-            }
+            // -
+            // +
+		    if (!(semesterId is null))
+		    {
+			    filters.Add(x => x.SemesterId == semesterId);
+		    }
+		    if (!String.IsNullOrEmpty(semesterText))
+		    {
+			    filters.Add(x => x.SemesterName == semesterText);
+		    }
             
-            if(semesterId != null)
-            { 
-                filters.Add(x => x.SemesterId == semesterId);  
-            }
+            // -
+            // +
+		    if (!(studentId is null))
+		    {
+			    filters.Add(x => x.StudentId == studentId);
+		    }
+		    if (!String.IsNullOrEmpty(studentText))
+		    {
+			    filters.Add(x => x.StudentMatricNo == studentText);
+		    }
             
-            if(studentId != null)
-            { 
-                filters.Add(x => x.StudentId == studentId);  
-            }
+            // -
+            // +
+		    if (!(courseId is null))
+		    {
+			    filters.Add(x => x.CourseId == courseId);
+		    }
+		    if (!String.IsNullOrEmpty(courseText))
+		    {
+			    filters.Add(x => x.CourseCode == courseText);
+		    }
             
-            if(courseId != null)
-            { 
-                filters.Add(x => x.CourseId == courseId);  
-            }
-            
-            if(score != null)
-            { 
-                filters.Add(x => x.Score == score);  
-            }
-	        // +navigation
-            // +Student
-	
-            if(!String.IsNullOrEmpty(studentMatricNo))
-            { 
-                filters.Add(x => x.StudentMatricNo == studentMatricNo);  
-            }
-	
-            if(!String.IsNullOrEmpty(studentDescription))
-            { 
-                filters.Add(x => x.StudentDescription == studentDescription);  
-            } //Basic-Nav-Property
-	// -Student
-            // +Course
-	
-            if(!String.IsNullOrEmpty(courseCode))
-            { 
-                filters.Add(x => x.CourseCode == courseCode);  
-            }
-	
-            if(!String.IsNullOrEmpty(courseDescription))
-            { 
-                filters.Add(x => x.CourseDescription == courseDescription);  
-            } //Basic-Nav-Property
-	// -Course
-            // +Session
-	
-            if(!String.IsNullOrEmpty(sessionName))
-            { 
-                filters.Add(x => x.SessionName == sessionName);  
-            }
-	// -Session
-            // +Semester
-	
-            if(!String.IsNullOrEmpty(semesterName))
-            { 
-                filters.Add(x => x.SemesterName == semesterName);  
-            }
-	// -Semester
-	        // -navigation
-		
+            // -
+		    if (scoreText != null)
+		    {
+			    filters.Add(x => x.Score == scoreText);
+		    }
         }
 
         //sort

@@ -7,32 +7,29 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ark.ResultCheckers.Dtos.Caches
+
+public static partial class CacheKeys
 {
-    
-    public static partial class CacheKeys
-    {
-    
-    	#region Keys
-    
-    	
-    	public const string AppSetting = "CacheAppSettings";
-    	
-    	public const string Card = "CacheCards";
-    	
-    	public const string Course = "CacheCourses";
-    	
-    	public const string Grade = "CacheGrades";
-    	
-    	public const string Semester = "CacheSemesters";
-    	
-    	public const string Session = "CacheSessions";
-    	
-    	public const string Student = "CacheStudents";
-    	
-    	public const string StudentCourse = "CacheStudentCourses";
-        #endregion
-    
-    	
-    }
+
+	#region Keys
+
+	
+	public const string AppSetting = "CacheAppSettings";
+	
+	public const string Card = "CacheCards";
+	
+	public const string Course = "CacheCourses";
+	
+	public const string Grade = "CacheGrades";
+	
+	public const string Semester = "CacheSemesters";
+	
+	public const string Session = "CacheSessions";
+	
+	public const string Student = "CacheStudents";
+	
+	public const string StudentCourse = "CacheStudentCourses";
+    #endregion
+
+	
 }

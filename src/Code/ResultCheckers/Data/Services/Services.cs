@@ -7,3 +7,2394 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
+using .Data;
+using .Entities;
+using .Dtos;
+using .Dtos.Caches;
+
+public partial class AppSettingService : BaseService
+{
+
+    public AppSettingService(AppDbContext context)
+    : base(context)
+    {
+       
+    }
+
+    // +EntityQuery
+    public static IQueryable<AppSetting> EntityQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<AppSetting, bool>>[] filters)
+    {
+        var query = context.AppSettings.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query = query.Where(filter);
+            }
+        }
+
+        return query;
+    }
+
+    protected IQueryable<AppSettingDto> AppSettingQuery(String[] includeNavigations, params Expression<Func<AppSetting, bool>>[] filters)
+    {
+        var query = EntityQuery(_context, includeNavigations, filters);
+
+        return query.Select(AppSettingDto.AsAppSettingDto);
+    }        
+
+    public async Task<List<AppSettingDto>> GetAppSettingsAsync(String[] includeNavigations, params Expression<Func<AppSetting, bool>>[] filters)
+    {
+        IQueryable<AppSettingDto> query = AppSettingQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<AppSettingDto> GetAppSettingAsync(String[] includeNavigations, params Expression<Func<AppSetting, bool>>[] filters)
+    {
+        // Get AppSetting  
+        IQueryable<AppSettingDto> query = AppSettingQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<AppSettingDto> GetAppSettingAsync(int id, String[] includeNavigations, params Expression<Func<AppSetting, bool>>[] filters)
+    {
+        // Get AppSetting  
+        IQueryable<AppSettingDto> query = AppSettingQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -EntityQuery
+
+    // +DtoQuery
+    public static IQueryable<AppSettingDto> DtoQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<AppSettingDto, bool>>[] filters)
+    {
+        var query = context.AppSettings.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        var query2 = query.Select(AppSettingDto.AsAppSettingDto);
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query2 = query2.Where(filter);
+            }
+        }
+
+        return query2;
+    }
+
+    protected IQueryable<AppSettingDto> AppSettingDtoQuery(String[] includeNavigations, params Expression<Func<AppSettingDto, bool>>[] filters)
+    {
+        var query = DtoQuery(_context, includeNavigations, filters);
+
+        return query;
+    }        
+
+    public async Task<List<AppSettingDto>> GetAppSettingDtoesAsync(String[] includeNavigations, params Expression<Func<AppSettingDto, bool>>[] filters)
+    {
+
+        IQueryable<AppSettingDto> query = AppSettingDtoQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<AppSettingDto> GetAppSettingDtoAsync(String[] includeNavigations, params Expression<Func<AppSettingDto, bool>>[] filters)
+    {
+        // Get AppSetting  
+        IQueryable<AppSettingDto> query = AppSettingDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<AppSettingDto> GetAppSettingDtoAsync(int id, String[] includeNavigations, params Expression<Func<AppSettingDto, bool>>[] filters)
+    {
+        // Get AppSetting  
+        IQueryable<AppSettingDto> query = AppSettingDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -DtoQuery
+
+    public async Task<AppSettingDto> CreateAppSettingAsync(AppSettingDto appSettingDto, string username)
+    {
+
+
+        OnCreate(appSettingDto, username);
+
+        var entity = AppSettingDto.AsAppSettingFunc(appSettingDto);
+        
+        ToEntity(ref entity, appSettingDto);
+        //entity.InsertUser = entity.LastActivityUser = username;
+        //entity.InsertDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+        entity.AddTracker(username);
+
+        _context.AppSettings.Add(entity);
+
+        OnBeforeCreate(entity, username);
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch(Exception ex)
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+            throw new Exception("Add error", ex);
+        }
+        finally
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+        }
+        OnAfterCreate(entity, username);
+
+        // appSettingDto = AppSettingDto.AsAppSettingDtoFunc(entity);
+        appSettingDto = await GetAppSettingDtoAsync(entity.Id, AppSettingDto.IncludeNavigations());
+    
+        return appSettingDto;
+    }
+    partial void OnCreate(AppSettingDto appSettingDto, string username);
+    partial void OnBeforeCreate(AppSetting entity, string username);
+    partial void OnAfterCreate(AppSetting entity, string username);
+
+    public async Task<bool> UpdateAppSettingAsync(AppSettingDto appSettingDto, string username/*, String[] includeNavigations, params Expression<Func<AppSetting, bool>>[] filters*/)
+    {
+        OnUpdate(appSettingDto, username);
+        
+        // Get AppSetting  
+        var entity = EntityQuery(_context, AppSettingDto.IncludeNavigations())
+                                .FirstOrDefault(x => x.Id == appSettingDto.Id);
+
+        if (entity != null)
+        {
+            entity = AppSettingDto.ToAppSettingFunc(entity, appSettingDto);
+
+            ToEntity(ref entity, appSettingDto);
+            //entity.UpdateUser = entity.LastActivityUser = username;
+            //entity.UpdateDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+            entity.EditTracker(username);
+
+            OnBeforeUpdate(entity, username);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+                throw new Exception("Update error", ex);
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterUpdate(entity, username);        
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnUpdate(AppSettingDto appSettingDto, string username);
+    partial void OnBeforeUpdate(AppSetting entity, string username);
+    partial void OnAfterUpdate(AppSetting entity, string username);
+
+    public async Task<bool> DeleteAppSettingAsync(AppSettingDto appSettingDto)
+    {
+        OnDelete(appSettingDto);
+
+        var entity = _context.AppSettings
+                            .Where(x => x.Id == appSettingDto.Id)
+                            .FirstOrDefault();
+
+        if (entity != null)
+        {
+            _context.AppSettings.Remove(entity);
+
+            OnBeforeDelete(entity);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+
+                var sqlException = ex.GetBaseException() as SqlException;
+
+                if (sqlException != null)
+                {
+                    var errorMessage = "deleting error";
+
+                    var number = sqlException.Number;
+    
+                    if (number == 547)
+                    {
+                        string table = GetErrorTable(sqlException) ?? "descendant";
+                        errorMessage = $"Must delete {table} records before deleting App Setting";
+                    }
+
+                    throw new Exception(errorMessage, ex);
+                }
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterDelete(entity);    
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnDelete(AppSettingDto appSettingDto);
+    partial void OnBeforeDelete(AppSetting entity);
+    partial void OnAfterDelete(AppSetting entity);
+
+    public async Task<List<AppSettingCache>> GetAppSettingCachesAsync()
+    {
+        var list = await _context.AppSettings.Select(AppSettingCache.AsAppSettingCache)
+                    
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+        return list.OrderBy(o => o.Name).ToList();
+    }
+
+    partial void ToEntity(ref AppSetting entity, AppSettingDto appSettingDto);    
+}
+
+public partial class CardService : BaseService
+{
+
+    public CardService(AppDbContext context)
+    : base(context)
+    {
+       
+    }
+
+    // +EntityQuery
+    public static IQueryable<Card> EntityQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<Card, bool>>[] filters)
+    {
+        var query = context.Cards.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query = query.Where(filter);
+            }
+        }
+
+        return query;
+    }
+
+    protected IQueryable<CardDto> CardQuery(String[] includeNavigations, params Expression<Func<Card, bool>>[] filters)
+    {
+        var query = EntityQuery(_context, includeNavigations, filters);
+
+        return query.Select(CardDto.AsCardDto);
+    }        
+
+    public async Task<List<CardDto>> GetCardsAsync(String[] includeNavigations, params Expression<Func<Card, bool>>[] filters)
+    {
+        IQueryable<CardDto> query = CardQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<CardDto> GetCardAsync(String[] includeNavigations, params Expression<Func<Card, bool>>[] filters)
+    {
+        // Get Card  
+        IQueryable<CardDto> query = CardQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<CardDto> GetCardAsync(int id, String[] includeNavigations, params Expression<Func<Card, bool>>[] filters)
+    {
+        // Get Card  
+        IQueryable<CardDto> query = CardQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -EntityQuery
+
+    // +DtoQuery
+    public static IQueryable<CardDto> DtoQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<CardDto, bool>>[] filters)
+    {
+        var query = context.Cards.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        var query2 = query.Select(CardDto.AsCardDto);
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query2 = query2.Where(filter);
+            }
+        }
+
+        return query2;
+    }
+
+    protected IQueryable<CardDto> CardDtoQuery(String[] includeNavigations, params Expression<Func<CardDto, bool>>[] filters)
+    {
+        var query = DtoQuery(_context, includeNavigations, filters);
+
+        return query;
+    }        
+
+    public async Task<List<CardDto>> GetCardDtoesAsync(String[] includeNavigations, params Expression<Func<CardDto, bool>>[] filters)
+    {
+
+        IQueryable<CardDto> query = CardDtoQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<CardDto> GetCardDtoAsync(String[] includeNavigations, params Expression<Func<CardDto, bool>>[] filters)
+    {
+        // Get Card  
+        IQueryable<CardDto> query = CardDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<CardDto> GetCardDtoAsync(int id, String[] includeNavigations, params Expression<Func<CardDto, bool>>[] filters)
+    {
+        // Get Card  
+        IQueryable<CardDto> query = CardDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -DtoQuery
+
+    public async Task<CardDto> CreateCardAsync(CardDto cardDto, string username)
+    {
+
+
+        OnCreate(cardDto, username);
+
+        var entity = CardDto.AsCardFunc(cardDto);
+        
+        ToEntity(ref entity, cardDto);
+        //entity.InsertUser = entity.LastActivityUser = username;
+        //entity.InsertDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+        entity.AddTracker(username);
+
+        _context.Cards.Add(entity);
+
+        OnBeforeCreate(entity, username);
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch(Exception ex)
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+            throw new Exception("Add error", ex);
+        }
+        finally
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+        }
+        OnAfterCreate(entity, username);
+
+        // cardDto = CardDto.AsCardDtoFunc(entity);
+        cardDto = await GetCardDtoAsync(entity.Id, CardDto.IncludeNavigations());
+    
+        return cardDto;
+    }
+    partial void OnCreate(CardDto cardDto, string username);
+    partial void OnBeforeCreate(Card entity, string username);
+    partial void OnAfterCreate(Card entity, string username);
+
+    public async Task<bool> UpdateCardAsync(CardDto cardDto, string username/*, String[] includeNavigations, params Expression<Func<Card, bool>>[] filters*/)
+    {
+        OnUpdate(cardDto, username);
+        
+        // Get Card  
+        var entity = EntityQuery(_context, CardDto.IncludeNavigations())
+                                .FirstOrDefault(x => x.Id == cardDto.Id);
+
+        if (entity != null)
+        {
+            entity = CardDto.ToCardFunc(entity, cardDto);
+
+            ToEntity(ref entity, cardDto);
+            //entity.UpdateUser = entity.LastActivityUser = username;
+            //entity.UpdateDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+            entity.EditTracker(username);
+
+            OnBeforeUpdate(entity, username);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+                throw new Exception("Update error", ex);
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterUpdate(entity, username);        
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnUpdate(CardDto cardDto, string username);
+    partial void OnBeforeUpdate(Card entity, string username);
+    partial void OnAfterUpdate(Card entity, string username);
+
+    public async Task<bool> DeleteCardAsync(CardDto cardDto)
+    {
+        OnDelete(cardDto);
+
+        var entity = _context.Cards
+                            .Where(x => x.Id == cardDto.Id)
+                            .FirstOrDefault();
+
+        if (entity != null)
+        {
+            _context.Cards.Remove(entity);
+
+            OnBeforeDelete(entity);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+
+                var sqlException = ex.GetBaseException() as SqlException;
+
+                if (sqlException != null)
+                {
+                    var errorMessage = "deleting error";
+
+                    var number = sqlException.Number;
+    
+                    if (number == 547)
+                    {
+                        string table = GetErrorTable(sqlException) ?? "descendant";
+                        errorMessage = $"Must delete {table} records before deleting Card";
+                    }
+
+                    throw new Exception(errorMessage, ex);
+                }
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterDelete(entity);    
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnDelete(CardDto cardDto);
+    partial void OnBeforeDelete(Card entity);
+    partial void OnAfterDelete(Card entity);
+
+    public async Task<List<CardCache>> GetCardCachesAsync()
+    {
+        var list = await _context.Cards.Select(CardCache.AsCardCache)
+                    
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+        return list.OrderBy(o => o.Name).ToList();
+    }
+
+    partial void ToEntity(ref Card entity, CardDto cardDto);    
+}
+
+public partial class CourseService : BaseService
+{
+
+    public CourseService(AppDbContext context)
+    : base(context)
+    {
+       
+    }
+
+    // +EntityQuery
+    public static IQueryable<Course> EntityQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<Course, bool>>[] filters)
+    {
+        var query = context.Courses.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query = query.Where(filter);
+            }
+        }
+
+        return query;
+    }
+
+    protected IQueryable<CourseDto> CourseQuery(String[] includeNavigations, params Expression<Func<Course, bool>>[] filters)
+    {
+        var query = EntityQuery(_context, includeNavigations, filters);
+
+        return query.Select(CourseDto.AsCourseDto);
+    }        
+
+    public async Task<List<CourseDto>> GetCoursesAsync(String[] includeNavigations, params Expression<Func<Course, bool>>[] filters)
+    {
+        IQueryable<CourseDto> query = CourseQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<CourseDto> GetCourseAsync(String[] includeNavigations, params Expression<Func<Course, bool>>[] filters)
+    {
+        // Get Course  
+        IQueryable<CourseDto> query = CourseQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<CourseDto> GetCourseAsync(int id, String[] includeNavigations, params Expression<Func<Course, bool>>[] filters)
+    {
+        // Get Course  
+        IQueryable<CourseDto> query = CourseQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -EntityQuery
+
+    // +DtoQuery
+    public static IQueryable<CourseDto> DtoQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<CourseDto, bool>>[] filters)
+    {
+        var query = context.Courses.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        var query2 = query.Select(CourseDto.AsCourseDto);
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query2 = query2.Where(filter);
+            }
+        }
+
+        return query2;
+    }
+
+    protected IQueryable<CourseDto> CourseDtoQuery(String[] includeNavigations, params Expression<Func<CourseDto, bool>>[] filters)
+    {
+        var query = DtoQuery(_context, includeNavigations, filters);
+
+        return query;
+    }        
+
+    public async Task<List<CourseDto>> GetCourseDtoesAsync(String[] includeNavigations, params Expression<Func<CourseDto, bool>>[] filters)
+    {
+
+        IQueryable<CourseDto> query = CourseDtoQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<CourseDto> GetCourseDtoAsync(String[] includeNavigations, params Expression<Func<CourseDto, bool>>[] filters)
+    {
+        // Get Course  
+        IQueryable<CourseDto> query = CourseDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<CourseDto> GetCourseDtoAsync(int id, String[] includeNavigations, params Expression<Func<CourseDto, bool>>[] filters)
+    {
+        // Get Course  
+        IQueryable<CourseDto> query = CourseDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -DtoQuery
+
+    public async Task<CourseDto> CreateCourseAsync(CourseDto courseDto, string username)
+    {
+
+
+        OnCreate(courseDto, username);
+
+        var entity = CourseDto.AsCourseFunc(courseDto);
+        
+        ToEntity(ref entity, courseDto);
+        //entity.InsertUser = entity.LastActivityUser = username;
+        //entity.InsertDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+        entity.AddTracker(username);
+
+        _context.Courses.Add(entity);
+
+        OnBeforeCreate(entity, username);
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch(Exception ex)
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+            throw new Exception("Add error", ex);
+        }
+        finally
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+        }
+        OnAfterCreate(entity, username);
+
+        // courseDto = CourseDto.AsCourseDtoFunc(entity);
+        courseDto = await GetCourseDtoAsync(entity.Id, CourseDto.IncludeNavigations());
+    
+        return courseDto;
+    }
+    partial void OnCreate(CourseDto courseDto, string username);
+    partial void OnBeforeCreate(Course entity, string username);
+    partial void OnAfterCreate(Course entity, string username);
+
+    public async Task<bool> UpdateCourseAsync(CourseDto courseDto, string username/*, String[] includeNavigations, params Expression<Func<Course, bool>>[] filters*/)
+    {
+        OnUpdate(courseDto, username);
+        
+        // Get Course  
+        var entity = EntityQuery(_context, CourseDto.IncludeNavigations())
+                                .FirstOrDefault(x => x.Id == courseDto.Id);
+
+        if (entity != null)
+        {
+            entity = CourseDto.ToCourseFunc(entity, courseDto);
+
+            ToEntity(ref entity, courseDto);
+            //entity.UpdateUser = entity.LastActivityUser = username;
+            //entity.UpdateDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+            entity.EditTracker(username);
+
+            OnBeforeUpdate(entity, username);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+                throw new Exception("Update error", ex);
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterUpdate(entity, username);        
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnUpdate(CourseDto courseDto, string username);
+    partial void OnBeforeUpdate(Course entity, string username);
+    partial void OnAfterUpdate(Course entity, string username);
+
+    public async Task<bool> DeleteCourseAsync(CourseDto courseDto)
+    {
+        OnDelete(courseDto);
+
+        var entity = _context.Courses
+                            .Where(x => x.Id == courseDto.Id)
+                            .FirstOrDefault();
+
+        if (entity != null)
+        {
+            _context.Courses.Remove(entity);
+
+            OnBeforeDelete(entity);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+
+                var sqlException = ex.GetBaseException() as SqlException;
+
+                if (sqlException != null)
+                {
+                    var errorMessage = "deleting error";
+
+                    var number = sqlException.Number;
+    
+                    if (number == 547)
+                    {
+                        string table = GetErrorTable(sqlException) ?? "descendant";
+                        errorMessage = $"Must delete {table} records before deleting Course";
+                    }
+
+                    throw new Exception(errorMessage, ex);
+                }
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterDelete(entity);    
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnDelete(CourseDto courseDto);
+    partial void OnBeforeDelete(Course entity);
+    partial void OnAfterDelete(Course entity);
+
+    public async Task<List<CourseCache>> GetCourseCachesAsync()
+    {
+        var list = await _context.Courses.Select(CourseCache.AsCourseCache)
+                    
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+        return list.OrderBy(o => o.Name).ToList();
+    }
+
+    partial void ToEntity(ref Course entity, CourseDto courseDto);    
+}
+
+public partial class GradeService : BaseService
+{
+
+    public GradeService(AppDbContext context)
+    : base(context)
+    {
+       
+    }
+
+    // +EntityQuery
+    public static IQueryable<Grade> EntityQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<Grade, bool>>[] filters)
+    {
+        var query = context.Grades.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query = query.Where(filter);
+            }
+        }
+
+        return query;
+    }
+
+    protected IQueryable<GradeDto> GradeQuery(String[] includeNavigations, params Expression<Func<Grade, bool>>[] filters)
+    {
+        var query = EntityQuery(_context, includeNavigations, filters);
+
+        return query.Select(GradeDto.AsGradeDto);
+    }        
+
+    public async Task<List<GradeDto>> GetGradesAsync(String[] includeNavigations, params Expression<Func<Grade, bool>>[] filters)
+    {
+        IQueryable<GradeDto> query = GradeQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<GradeDto> GetGradeAsync(String[] includeNavigations, params Expression<Func<Grade, bool>>[] filters)
+    {
+        // Get Grade  
+        IQueryable<GradeDto> query = GradeQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<GradeDto> GetGradeAsync(int id, String[] includeNavigations, params Expression<Func<Grade, bool>>[] filters)
+    {
+        // Get Grade  
+        IQueryable<GradeDto> query = GradeQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -EntityQuery
+
+    // +DtoQuery
+    public static IQueryable<GradeDto> DtoQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<GradeDto, bool>>[] filters)
+    {
+        var query = context.Grades.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        var query2 = query.Select(GradeDto.AsGradeDto);
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query2 = query2.Where(filter);
+            }
+        }
+
+        return query2;
+    }
+
+    protected IQueryable<GradeDto> GradeDtoQuery(String[] includeNavigations, params Expression<Func<GradeDto, bool>>[] filters)
+    {
+        var query = DtoQuery(_context, includeNavigations, filters);
+
+        return query;
+    }        
+
+    public async Task<List<GradeDto>> GetGradeDtoesAsync(String[] includeNavigations, params Expression<Func<GradeDto, bool>>[] filters)
+    {
+
+        IQueryable<GradeDto> query = GradeDtoQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<GradeDto> GetGradeDtoAsync(String[] includeNavigations, params Expression<Func<GradeDto, bool>>[] filters)
+    {
+        // Get Grade  
+        IQueryable<GradeDto> query = GradeDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<GradeDto> GetGradeDtoAsync(int id, String[] includeNavigations, params Expression<Func<GradeDto, bool>>[] filters)
+    {
+        // Get Grade  
+        IQueryable<GradeDto> query = GradeDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -DtoQuery
+
+    public async Task<GradeDto> CreateGradeAsync(GradeDto gradeDto, string username)
+    {
+
+        if (_context.Grades.Any(a => a.Name == gradeDto.Name) == true)
+        {
+            throw new Exception("Record exist and caused a conflict!");
+        }
+
+        OnCreate(gradeDto, username);
+
+        var entity = GradeDto.AsGradeFunc(gradeDto);
+        
+        ToEntity(ref entity, gradeDto);
+        //entity.InsertUser = entity.LastActivityUser = username;
+        //entity.InsertDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+        entity.AddTracker(username);
+
+        _context.Grades.Add(entity);
+
+        OnBeforeCreate(entity, username);
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch(Exception ex)
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+            throw new Exception("Add error", ex);
+        }
+        finally
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+        }
+        OnAfterCreate(entity, username);
+
+        // gradeDto = GradeDto.AsGradeDtoFunc(entity);
+        gradeDto = await GetGradeDtoAsync(entity.Id, GradeDto.IncludeNavigations());
+    
+        return gradeDto;
+    }
+    partial void OnCreate(GradeDto gradeDto, string username);
+    partial void OnBeforeCreate(Grade entity, string username);
+    partial void OnAfterCreate(Grade entity, string username);
+
+    public async Task<bool> UpdateGradeAsync(GradeDto gradeDto, string username/*, String[] includeNavigations, params Expression<Func<Grade, bool>>[] filters*/)
+    {
+        OnUpdate(gradeDto, username);
+        
+        // Get Grade  
+        var entity = EntityQuery(_context, GradeDto.IncludeNavigations())
+                                .FirstOrDefault(x => x.Id == gradeDto.Id);
+
+        if (entity != null)
+        {
+            entity = GradeDto.ToGradeFunc(entity, gradeDto);
+
+            ToEntity(ref entity, gradeDto);
+            //entity.UpdateUser = entity.LastActivityUser = username;
+            //entity.UpdateDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+            entity.EditTracker(username);
+
+            OnBeforeUpdate(entity, username);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+                throw new Exception("Update error", ex);
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterUpdate(entity, username);        
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnUpdate(GradeDto gradeDto, string username);
+    partial void OnBeforeUpdate(Grade entity, string username);
+    partial void OnAfterUpdate(Grade entity, string username);
+
+    public async Task<bool> DeleteGradeAsync(GradeDto gradeDto)
+    {
+        OnDelete(gradeDto);
+
+        var entity = _context.Grades
+                            .Where(x => x.Id == gradeDto.Id)
+                            .FirstOrDefault();
+
+        if (entity != null)
+        {
+            _context.Grades.Remove(entity);
+
+            OnBeforeDelete(entity);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+
+                var sqlException = ex.GetBaseException() as SqlException;
+
+                if (sqlException != null)
+                {
+                    var errorMessage = "deleting error";
+
+                    var number = sqlException.Number;
+    
+                    if (number == 547)
+                    {
+                        string table = GetErrorTable(sqlException) ?? "descendant";
+                        errorMessage = $"Must delete {table} records before deleting Grade";
+                    }
+
+                    throw new Exception(errorMessage, ex);
+                }
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterDelete(entity);    
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnDelete(GradeDto gradeDto);
+    partial void OnBeforeDelete(Grade entity);
+    partial void OnAfterDelete(Grade entity);
+
+    public async Task<List<GradeCache>> GetGradeCachesAsync()
+    {
+        var list = await _context.Grades.Select(GradeCache.AsGradeCache)
+                    
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+        return list.OrderBy(o => o.Name).ToList();
+    }
+
+    partial void ToEntity(ref Grade entity, GradeDto gradeDto);    
+}
+
+public partial class SemesterService : BaseService
+{
+
+    public SemesterService(AppDbContext context)
+    : base(context)
+    {
+       
+    }
+
+    // +EntityQuery
+    public static IQueryable<Semester> EntityQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<Semester, bool>>[] filters)
+    {
+        var query = context.Semesters.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query = query.Where(filter);
+            }
+        }
+
+        return query;
+    }
+
+    protected IQueryable<SemesterDto> SemesterQuery(String[] includeNavigations, params Expression<Func<Semester, bool>>[] filters)
+    {
+        var query = EntityQuery(_context, includeNavigations, filters);
+
+        return query.Select(SemesterDto.AsSemesterDto);
+    }        
+
+    public async Task<List<SemesterDto>> GetSemestersAsync(String[] includeNavigations, params Expression<Func<Semester, bool>>[] filters)
+    {
+        IQueryable<SemesterDto> query = SemesterQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<SemesterDto> GetSemesterAsync(String[] includeNavigations, params Expression<Func<Semester, bool>>[] filters)
+    {
+        // Get Semester  
+        IQueryable<SemesterDto> query = SemesterQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<SemesterDto> GetSemesterAsync(int id, String[] includeNavigations, params Expression<Func<Semester, bool>>[] filters)
+    {
+        // Get Semester  
+        IQueryable<SemesterDto> query = SemesterQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -EntityQuery
+
+    // +DtoQuery
+    public static IQueryable<SemesterDto> DtoQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<SemesterDto, bool>>[] filters)
+    {
+        var query = context.Semesters.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        var query2 = query.Select(SemesterDto.AsSemesterDto);
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query2 = query2.Where(filter);
+            }
+        }
+
+        return query2;
+    }
+
+    protected IQueryable<SemesterDto> SemesterDtoQuery(String[] includeNavigations, params Expression<Func<SemesterDto, bool>>[] filters)
+    {
+        var query = DtoQuery(_context, includeNavigations, filters);
+
+        return query;
+    }        
+
+    public async Task<List<SemesterDto>> GetSemesterDtoesAsync(String[] includeNavigations, params Expression<Func<SemesterDto, bool>>[] filters)
+    {
+
+        IQueryable<SemesterDto> query = SemesterDtoQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<SemesterDto> GetSemesterDtoAsync(String[] includeNavigations, params Expression<Func<SemesterDto, bool>>[] filters)
+    {
+        // Get Semester  
+        IQueryable<SemesterDto> query = SemesterDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<SemesterDto> GetSemesterDtoAsync(int id, String[] includeNavigations, params Expression<Func<SemesterDto, bool>>[] filters)
+    {
+        // Get Semester  
+        IQueryable<SemesterDto> query = SemesterDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -DtoQuery
+
+    public async Task<SemesterDto> CreateSemesterAsync(SemesterDto semesterDto, string username)
+    {
+
+        if (_context.Semesters.Any(a => a.Name == semesterDto.Name) == true)
+        {
+            throw new Exception("Record exist and caused a conflict!");
+        }
+
+        OnCreate(semesterDto, username);
+
+        var entity = SemesterDto.AsSemesterFunc(semesterDto);
+        
+        ToEntity(ref entity, semesterDto);
+        //entity.InsertUser = entity.LastActivityUser = username;
+        //entity.InsertDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+        entity.AddTracker(username);
+
+        _context.Semesters.Add(entity);
+
+        OnBeforeCreate(entity, username);
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch(Exception ex)
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+            throw new Exception("Add error", ex);
+        }
+        finally
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+        }
+        OnAfterCreate(entity, username);
+
+        // semesterDto = SemesterDto.AsSemesterDtoFunc(entity);
+        semesterDto = await GetSemesterDtoAsync(entity.Id, SemesterDto.IncludeNavigations());
+    
+        return semesterDto;
+    }
+    partial void OnCreate(SemesterDto semesterDto, string username);
+    partial void OnBeforeCreate(Semester entity, string username);
+    partial void OnAfterCreate(Semester entity, string username);
+
+    public async Task<bool> UpdateSemesterAsync(SemesterDto semesterDto, string username/*, String[] includeNavigations, params Expression<Func<Semester, bool>>[] filters*/)
+    {
+        OnUpdate(semesterDto, username);
+        
+        // Get Semester  
+        var entity = EntityQuery(_context, SemesterDto.IncludeNavigations())
+                                .FirstOrDefault(x => x.Id == semesterDto.Id);
+
+        if (entity != null)
+        {
+            entity = SemesterDto.ToSemesterFunc(entity, semesterDto);
+
+            ToEntity(ref entity, semesterDto);
+            //entity.UpdateUser = entity.LastActivityUser = username;
+            //entity.UpdateDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+            entity.EditTracker(username);
+
+            OnBeforeUpdate(entity, username);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+                throw new Exception("Update error", ex);
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterUpdate(entity, username);        
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnUpdate(SemesterDto semesterDto, string username);
+    partial void OnBeforeUpdate(Semester entity, string username);
+    partial void OnAfterUpdate(Semester entity, string username);
+
+    public async Task<bool> DeleteSemesterAsync(SemesterDto semesterDto)
+    {
+        OnDelete(semesterDto);
+
+        var entity = _context.Semesters
+                            .Where(x => x.Id == semesterDto.Id)
+                            .FirstOrDefault();
+
+        if (entity != null)
+        {
+            _context.Semesters.Remove(entity);
+
+            OnBeforeDelete(entity);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+
+                var sqlException = ex.GetBaseException() as SqlException;
+
+                if (sqlException != null)
+                {
+                    var errorMessage = "deleting error";
+
+                    var number = sqlException.Number;
+    
+                    if (number == 547)
+                    {
+                        string table = GetErrorTable(sqlException) ?? "descendant";
+                        errorMessage = $"Must delete {table} records before deleting Semester";
+                    }
+
+                    throw new Exception(errorMessage, ex);
+                }
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterDelete(entity);    
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnDelete(SemesterDto semesterDto);
+    partial void OnBeforeDelete(Semester entity);
+    partial void OnAfterDelete(Semester entity);
+
+    public async Task<List<SemesterCache>> GetSemesterCachesAsync()
+    {
+        var list = await _context.Semesters.Select(SemesterCache.AsSemesterCache)
+                    
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+        return list.OrderBy(o => o.Name).ToList();
+    }
+
+    partial void ToEntity(ref Semester entity, SemesterDto semesterDto);    
+}
+
+public partial class SessionService : BaseService
+{
+
+    public SessionService(AppDbContext context)
+    : base(context)
+    {
+       
+    }
+
+    // +EntityQuery
+    public static IQueryable<Session> EntityQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<Session, bool>>[] filters)
+    {
+        var query = context.Sessions.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query = query.Where(filter);
+            }
+        }
+
+        return query;
+    }
+
+    protected IQueryable<SessionDto> SessionQuery(String[] includeNavigations, params Expression<Func<Session, bool>>[] filters)
+    {
+        var query = EntityQuery(_context, includeNavigations, filters);
+
+        return query.Select(SessionDto.AsSessionDto);
+    }        
+
+    public async Task<List<SessionDto>> GetSessionsAsync(String[] includeNavigations, params Expression<Func<Session, bool>>[] filters)
+    {
+        IQueryable<SessionDto> query = SessionQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<SessionDto> GetSessionAsync(String[] includeNavigations, params Expression<Func<Session, bool>>[] filters)
+    {
+        // Get Session  
+        IQueryable<SessionDto> query = SessionQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<SessionDto> GetSessionAsync(int id, String[] includeNavigations, params Expression<Func<Session, bool>>[] filters)
+    {
+        // Get Session  
+        IQueryable<SessionDto> query = SessionQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -EntityQuery
+
+    // +DtoQuery
+    public static IQueryable<SessionDto> DtoQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<SessionDto, bool>>[] filters)
+    {
+        var query = context.Sessions.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        var query2 = query.Select(SessionDto.AsSessionDto);
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query2 = query2.Where(filter);
+            }
+        }
+
+        return query2;
+    }
+
+    protected IQueryable<SessionDto> SessionDtoQuery(String[] includeNavigations, params Expression<Func<SessionDto, bool>>[] filters)
+    {
+        var query = DtoQuery(_context, includeNavigations, filters);
+
+        return query;
+    }        
+
+    public async Task<List<SessionDto>> GetSessionDtoesAsync(String[] includeNavigations, params Expression<Func<SessionDto, bool>>[] filters)
+    {
+
+        IQueryable<SessionDto> query = SessionDtoQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<SessionDto> GetSessionDtoAsync(String[] includeNavigations, params Expression<Func<SessionDto, bool>>[] filters)
+    {
+        // Get Session  
+        IQueryable<SessionDto> query = SessionDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<SessionDto> GetSessionDtoAsync(int id, String[] includeNavigations, params Expression<Func<SessionDto, bool>>[] filters)
+    {
+        // Get Session  
+        IQueryable<SessionDto> query = SessionDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -DtoQuery
+
+    public async Task<SessionDto> CreateSessionAsync(SessionDto sessionDto, string username)
+    {
+
+        if (_context.Sessions.Any(a => a.Name == sessionDto.Name) == true)
+        {
+            throw new Exception("Record exist and caused a conflict!");
+        }
+
+        OnCreate(sessionDto, username);
+
+        var entity = SessionDto.AsSessionFunc(sessionDto);
+        
+        ToEntity(ref entity, sessionDto);
+        //entity.InsertUser = entity.LastActivityUser = username;
+        //entity.InsertDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+        entity.AddTracker(username);
+
+        _context.Sessions.Add(entity);
+
+        OnBeforeCreate(entity, username);
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch(Exception ex)
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+            throw new Exception("Add error", ex);
+        }
+        finally
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+        }
+        OnAfterCreate(entity, username);
+
+        // sessionDto = SessionDto.AsSessionDtoFunc(entity);
+        sessionDto = await GetSessionDtoAsync(entity.Id, SessionDto.IncludeNavigations());
+    
+        return sessionDto;
+    }
+    partial void OnCreate(SessionDto sessionDto, string username);
+    partial void OnBeforeCreate(Session entity, string username);
+    partial void OnAfterCreate(Session entity, string username);
+
+    public async Task<bool> UpdateSessionAsync(SessionDto sessionDto, string username/*, String[] includeNavigations, params Expression<Func<Session, bool>>[] filters*/)
+    {
+        OnUpdate(sessionDto, username);
+        
+        // Get Session  
+        var entity = EntityQuery(_context, SessionDto.IncludeNavigations())
+                                .FirstOrDefault(x => x.Id == sessionDto.Id);
+
+        if (entity != null)
+        {
+            entity = SessionDto.ToSessionFunc(entity, sessionDto);
+
+            ToEntity(ref entity, sessionDto);
+            //entity.UpdateUser = entity.LastActivityUser = username;
+            //entity.UpdateDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+            entity.EditTracker(username);
+
+            OnBeforeUpdate(entity, username);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+                throw new Exception("Update error", ex);
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterUpdate(entity, username);        
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnUpdate(SessionDto sessionDto, string username);
+    partial void OnBeforeUpdate(Session entity, string username);
+    partial void OnAfterUpdate(Session entity, string username);
+
+    public async Task<bool> DeleteSessionAsync(SessionDto sessionDto)
+    {
+        OnDelete(sessionDto);
+
+        var entity = _context.Sessions
+                            .Where(x => x.Id == sessionDto.Id)
+                            .FirstOrDefault();
+
+        if (entity != null)
+        {
+            _context.Sessions.Remove(entity);
+
+            OnBeforeDelete(entity);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+
+                var sqlException = ex.GetBaseException() as SqlException;
+
+                if (sqlException != null)
+                {
+                    var errorMessage = "deleting error";
+
+                    var number = sqlException.Number;
+    
+                    if (number == 547)
+                    {
+                        string table = GetErrorTable(sqlException) ?? "descendant";
+                        errorMessage = $"Must delete {table} records before deleting Session";
+                    }
+
+                    throw new Exception(errorMessage, ex);
+                }
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterDelete(entity);    
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnDelete(SessionDto sessionDto);
+    partial void OnBeforeDelete(Session entity);
+    partial void OnAfterDelete(Session entity);
+
+    public async Task<List<SessionCache>> GetSessionCachesAsync()
+    {
+        var list = await _context.Sessions.Select(SessionCache.AsSessionCache)
+                    
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+        return list.OrderBy(o => o.Name).ToList();
+    }
+
+    partial void ToEntity(ref Session entity, SessionDto sessionDto);    
+}
+
+public partial class StudentService : BaseService
+{
+
+    public StudentService(AppDbContext context)
+    : base(context)
+    {
+       
+    }
+
+    // +EntityQuery
+    public static IQueryable<Student> EntityQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<Student, bool>>[] filters)
+    {
+        var query = context.Students.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query = query.Where(filter);
+            }
+        }
+
+        return query;
+    }
+
+    protected IQueryable<StudentDto> StudentQuery(String[] includeNavigations, params Expression<Func<Student, bool>>[] filters)
+    {
+        var query = EntityQuery(_context, includeNavigations, filters);
+
+        return query.Select(StudentDto.AsStudentDto);
+    }        
+
+    public async Task<List<StudentDto>> GetStudentsAsync(String[] includeNavigations, params Expression<Func<Student, bool>>[] filters)
+    {
+        IQueryable<StudentDto> query = StudentQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<StudentDto> GetStudentAsync(String[] includeNavigations, params Expression<Func<Student, bool>>[] filters)
+    {
+        // Get Student  
+        IQueryable<StudentDto> query = StudentQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<StudentDto> GetStudentAsync(int id, String[] includeNavigations, params Expression<Func<Student, bool>>[] filters)
+    {
+        // Get Student  
+        IQueryable<StudentDto> query = StudentQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -EntityQuery
+
+    // +DtoQuery
+    public static IQueryable<StudentDto> DtoQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<StudentDto, bool>>[] filters)
+    {
+        var query = context.Students.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        var query2 = query.Select(StudentDto.AsStudentDto);
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query2 = query2.Where(filter);
+            }
+        }
+
+        return query2;
+    }
+
+    protected IQueryable<StudentDto> StudentDtoQuery(String[] includeNavigations, params Expression<Func<StudentDto, bool>>[] filters)
+    {
+        var query = DtoQuery(_context, includeNavigations, filters);
+
+        return query;
+    }        
+
+    public async Task<List<StudentDto>> GetStudentDtoesAsync(String[] includeNavigations, params Expression<Func<StudentDto, bool>>[] filters)
+    {
+
+        IQueryable<StudentDto> query = StudentDtoQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<StudentDto> GetStudentDtoAsync(String[] includeNavigations, params Expression<Func<StudentDto, bool>>[] filters)
+    {
+        // Get Student  
+        IQueryable<StudentDto> query = StudentDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<StudentDto> GetStudentDtoAsync(int id, String[] includeNavigations, params Expression<Func<StudentDto, bool>>[] filters)
+    {
+        // Get Student  
+        IQueryable<StudentDto> query = StudentDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -DtoQuery
+
+    public async Task<StudentDto> CreateStudentAsync(StudentDto studentDto, string username)
+    {
+
+
+        OnCreate(studentDto, username);
+
+        var entity = StudentDto.AsStudentFunc(studentDto);
+        
+        ToEntity(ref entity, studentDto);
+        //entity.InsertUser = entity.LastActivityUser = username;
+        //entity.InsertDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+        entity.AddTracker(username);
+
+        _context.Students.Add(entity);
+
+        OnBeforeCreate(entity, username);
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch(Exception ex)
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+            throw new Exception("Add error", ex);
+        }
+        finally
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+        }
+        OnAfterCreate(entity, username);
+
+        // studentDto = StudentDto.AsStudentDtoFunc(entity);
+        studentDto = await GetStudentDtoAsync(entity.Id, StudentDto.IncludeNavigations());
+    
+        return studentDto;
+    }
+    partial void OnCreate(StudentDto studentDto, string username);
+    partial void OnBeforeCreate(Student entity, string username);
+    partial void OnAfterCreate(Student entity, string username);
+
+    public async Task<bool> UpdateStudentAsync(StudentDto studentDto, string username/*, String[] includeNavigations, params Expression<Func<Student, bool>>[] filters*/)
+    {
+        OnUpdate(studentDto, username);
+        
+        // Get Student  
+        var entity = EntityQuery(_context, StudentDto.IncludeNavigations())
+                                .FirstOrDefault(x => x.Id == studentDto.Id);
+
+        if (entity != null)
+        {
+            entity = StudentDto.ToStudentFunc(entity, studentDto);
+
+            ToEntity(ref entity, studentDto);
+            //entity.UpdateUser = entity.LastActivityUser = username;
+            //entity.UpdateDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+            entity.EditTracker(username);
+
+            OnBeforeUpdate(entity, username);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+                throw new Exception("Update error", ex);
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterUpdate(entity, username);        
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnUpdate(StudentDto studentDto, string username);
+    partial void OnBeforeUpdate(Student entity, string username);
+    partial void OnAfterUpdate(Student entity, string username);
+
+    public async Task<bool> DeleteStudentAsync(StudentDto studentDto)
+    {
+        OnDelete(studentDto);
+
+        var entity = _context.Students
+                            .Where(x => x.Id == studentDto.Id)
+                            .FirstOrDefault();
+
+        if (entity != null)
+        {
+            _context.Students.Remove(entity);
+
+            OnBeforeDelete(entity);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+
+                var sqlException = ex.GetBaseException() as SqlException;
+
+                if (sqlException != null)
+                {
+                    var errorMessage = "deleting error";
+
+                    var number = sqlException.Number;
+    
+                    if (number == 547)
+                    {
+                        string table = GetErrorTable(sqlException) ?? "descendant";
+                        errorMessage = $"Must delete {table} records before deleting Student";
+                    }
+
+                    throw new Exception(errorMessage, ex);
+                }
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterDelete(entity);    
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnDelete(StudentDto studentDto);
+    partial void OnBeforeDelete(Student entity);
+    partial void OnAfterDelete(Student entity);
+
+    public async Task<List<StudentCache>> GetStudentCachesAsync()
+    {
+        var list = await _context.Students.Select(StudentCache.AsStudentCache)
+                    
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+        return list.OrderBy(o => o.Name).ToList();
+    }
+
+    partial void ToEntity(ref Student entity, StudentDto studentDto);    
+}
+
+public partial class StudentCourseService : BaseService
+{
+
+    public StudentCourseService(AppDbContext context)
+    : base(context)
+    {
+       
+    }
+
+    // +EntityQuery
+    public static IQueryable<StudentCourse> EntityQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<StudentCourse, bool>>[] filters)
+    {
+        var query = context.StudentCourses.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query = query.Where(filter);
+            }
+        }
+
+        return query;
+    }
+
+    protected IQueryable<StudentCourseDto> StudentCourseQuery(String[] includeNavigations, params Expression<Func<StudentCourse, bool>>[] filters)
+    {
+        var query = EntityQuery(_context, includeNavigations, filters);
+
+        return query.Select(StudentCourseDto.AsStudentCourseDto);
+    }        
+
+    public async Task<List<StudentCourseDto>> GetStudentCoursesAsync(String[] includeNavigations, params Expression<Func<StudentCourse, bool>>[] filters)
+    {
+        IQueryable<StudentCourseDto> query = StudentCourseQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<StudentCourseDto> GetStudentCourseAsync(String[] includeNavigations, params Expression<Func<StudentCourse, bool>>[] filters)
+    {
+        // Get StudentCourse  
+        IQueryable<StudentCourseDto> query = StudentCourseQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<StudentCourseDto> GetStudentCourseAsync(int id, String[] includeNavigations, params Expression<Func<StudentCourse, bool>>[] filters)
+    {
+        // Get StudentCourse  
+        IQueryable<StudentCourseDto> query = StudentCourseQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -EntityQuery
+
+    // +DtoQuery
+    public static IQueryable<StudentCourseDto> DtoQuery(AppDbContext context, string[] includeNavigations, params Expression<Func<StudentCourseDto, bool>>[] filters)
+    {
+        var query = context.StudentCourses.AsQueryable();
+
+        if (includeNavigations != null && includeNavigations.Count() > 0)
+        {
+            // include navigation entity
+            foreach (var navigation in includeNavigations)
+            {
+                query = query.Include(navigation);
+            }
+        }
+
+        var query2 = query.Select(StudentCourseDto.AsStudentCourseDto);
+
+        if (filters != null && filters.Count() > 0)
+        {
+            // filter entity
+            foreach (var filter in filters)
+            {
+                query2 = query2.Where(filter);
+            }
+        }
+
+        return query2;
+    }
+
+    protected IQueryable<StudentCourseDto> StudentCourseDtoQuery(String[] includeNavigations, params Expression<Func<StudentCourseDto, bool>>[] filters)
+    {
+        var query = DtoQuery(_context, includeNavigations, filters);
+
+        return query;
+    }        
+
+    public async Task<List<StudentCourseDto>> GetStudentCourseDtoesAsync(String[] includeNavigations, params Expression<Func<StudentCourseDto, bool>>[] filters)
+    {
+
+        IQueryable<StudentCourseDto> query = StudentCourseDtoQuery(includeNavigations, filters);
+
+        return await query
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+    }
+
+    public async Task<StudentCourseDto> GetStudentCourseDtoAsync(String[] includeNavigations, params Expression<Func<StudentCourseDto, bool>>[] filters)
+    {
+        // Get StudentCourse  
+        IQueryable<StudentCourseDto> query = StudentCourseDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().FirstOrDefaultAsync();
+    }
+
+    public async Task<StudentCourseDto> GetStudentCourseDtoAsync(int id, String[] includeNavigations, params Expression<Func<StudentCourseDto, bool>>[] filters)
+    {
+        // Get StudentCourse  
+        IQueryable<StudentCourseDto> query = StudentCourseDtoQuery(includeNavigations, filters);
+
+        return await query
+                // Use AsNoTracking to disable EF change tracking
+                // Use ToListAsync to avoid blocking a thread
+                .AsNoTracking().SingleOrDefaultAsync(m => m.Id == id);
+    }
+    // -DtoQuery
+
+    public async Task<StudentCourseDto> CreateStudentCourseAsync(StudentCourseDto studentCourseDto, string username)
+    {
+
+
+        OnCreate(studentCourseDto, username);
+
+        var entity = StudentCourseDto.AsStudentCourseFunc(studentCourseDto);
+        
+        ToEntity(ref entity, studentCourseDto);
+        //entity.InsertUser = entity.LastActivityUser = username;
+        //entity.InsertDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+        entity.AddTracker(username);
+
+        _context.StudentCourses.Add(entity);
+
+        OnBeforeCreate(entity, username);
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch(Exception ex)
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+            throw new Exception("Add error", ex);
+        }
+        finally
+        {
+            // _context.Entry(entity).State = EntityState.Detached;
+        }
+        OnAfterCreate(entity, username);
+
+        // studentCourseDto = StudentCourseDto.AsStudentCourseDtoFunc(entity);
+        studentCourseDto = await GetStudentCourseDtoAsync(entity.Id, StudentCourseDto.IncludeNavigations());
+    
+        return studentCourseDto;
+    }
+    partial void OnCreate(StudentCourseDto studentCourseDto, string username);
+    partial void OnBeforeCreate(StudentCourse entity, string username);
+    partial void OnAfterCreate(StudentCourse entity, string username);
+
+    public async Task<bool> UpdateStudentCourseAsync(StudentCourseDto studentCourseDto, string username/*, String[] includeNavigations, params Expression<Func<StudentCourse, bool>>[] filters*/)
+    {
+        OnUpdate(studentCourseDto, username);
+        
+        // Get StudentCourse  
+        var entity = EntityQuery(_context, StudentCourseDto.IncludeNavigations())
+                                .FirstOrDefault(x => x.Id == studentCourseDto.Id);
+
+        if (entity != null)
+        {
+            entity = StudentCourseDto.ToStudentCourseFunc(entity, studentCourseDto);
+
+            ToEntity(ref entity, studentCourseDto);
+            //entity.UpdateUser = entity.LastActivityUser = username;
+            //entity.UpdateDateTime = entity.LastActivityDateTime = DateTime.UtcNow;
+            entity.EditTracker(username);
+
+            OnBeforeUpdate(entity, username);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+                throw new Exception("Update error", ex);
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterUpdate(entity, username);        
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnUpdate(StudentCourseDto studentCourseDto, string username);
+    partial void OnBeforeUpdate(StudentCourse entity, string username);
+    partial void OnAfterUpdate(StudentCourse entity, string username);
+
+    public async Task<bool> DeleteStudentCourseAsync(StudentCourseDto studentCourseDto)
+    {
+        OnDelete(studentCourseDto);
+
+        var entity = _context.StudentCourses
+                            .Where(x => x.Id == studentCourseDto.Id)
+                            .FirstOrDefault();
+
+        if (entity != null)
+        {
+            _context.StudentCourses.Remove(entity);
+
+            OnBeforeDelete(entity);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+
+                var sqlException = ex.GetBaseException() as SqlException;
+
+                if (sqlException != null)
+                {
+                    var errorMessage = "deleting error";
+
+                    var number = sqlException.Number;
+    
+                    if (number == 547)
+                    {
+                        string table = GetErrorTable(sqlException) ?? "descendant";
+                        errorMessage = $"Must delete {table} records before deleting Student Course";
+                    }
+
+                    throw new Exception(errorMessage, ex);
+                }
+            }
+            finally
+            {
+                // _context.Entry(entity).State = EntityState.Detached;
+            }
+            OnAfterDelete(entity);    
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+    partial void OnDelete(StudentCourseDto studentCourseDto);
+    partial void OnBeforeDelete(StudentCourse entity);
+    partial void OnAfterDelete(StudentCourse entity);
+
+    public async Task<List<StudentCourseCache>> GetStudentCourseCachesAsync()
+    {
+        var list = await _context.StudentCourses.Select(StudentCourseCache.AsStudentCourseCache)
+                    
+                    // Use AsNoTracking to disable EF change tracking
+                    // Use ToListAsync to avoid blocking a thread
+                    .AsNoTracking().ToListAsync();
+        return list.OrderBy(o => o.Name).ToList();
+    }
+
+    partial void ToEntity(ref StudentCourse entity, StudentCourseDto studentCourseDto);    
+}

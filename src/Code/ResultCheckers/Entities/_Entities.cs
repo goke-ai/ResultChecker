@@ -7,3 +7,309 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+
+public partial class AppSetting : BaseEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public AppSetting()
+    {
+		Initialize();
+    }
+	partial void Initialize();
+
+    [Required(ErrorMessage = "The Key is a mandatory Field.")]
+	[MaxLength(100), StringLength(100, ErrorMessage = "The Key value cannot exceed 100 characters.")]
+	[Display(Name = "Key")]
+	public string Key { get; set; }
+    [MaxLength(100), StringLength(100, ErrorMessage = "The Value value cannot exceed 100 characters.")]
+	[Display(Name = "Value")]
+	public string Value { get; set; }
+}
+
+public partial class BaseEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public BaseEntity()
+    {
+		Initialize();
+    }
+	partial void Initialize();
+
+    [Key]
+	[Display(Name = "Id")]
+	public int Id { get; set; }
+}
+
+public partial class BaseNameEntity : BaseEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public BaseNameEntity()
+    {
+		Initialize();
+    }
+	partial void Initialize();
+
+    [Required(ErrorMessage = "The Name is a mandatory Field.")]
+	[MaxLength(100), StringLength(100, ErrorMessage = "The Name value cannot exceed 100 characters.")]
+	[Display(Name = "Name")]
+	public string Name { get; set; }
+}
+
+public partial class BulkCard : BulkEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public BulkCard()
+    {
+        this.Role = "\"Users\"";
+		Initialize();
+    }
+	partial void Initialize();
+
+    [Required(ErrorMessage = "The Pin is a mandatory Field.")]
+	[Display(Name = "Pin")]
+	public string Pin { get; set; }
+    [Display(Name = "Owner")]
+	public string Owner { get; set; }
+    [Required(ErrorMessage = "The Role is a mandatory Field.")]
+	[Display(Name = "Role")]
+	public string Role { get; set; }
+    [Required(ErrorMessage = "The Username is a mandatory Field.")]
+	[Display(Name = "Username")]
+	public string Username { get; set; }
+}
+
+public partial class BulkEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public BulkEntity()
+    {
+		Initialize();
+    }
+	partial void Initialize();
+
+    [Key]
+	[Display(Name = "Id")]
+	public int Id { get; set; }
+}
+
+public partial class BulkStudentCourse : BulkEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public BulkStudentCourse()
+    {
+		Initialize();
+    }
+	partial void Initialize();
+
+    [Required(ErrorMessage = "The Session is a mandatory Field.")]
+	[Display(Name = "Session")]
+	public string Session { get; set; }
+    [Required(ErrorMessage = "The Semester is a mandatory Field.")]
+	[Display(Name = "Semester")]
+	public string Semester { get; set; }
+    [Required(ErrorMessage = "The Code is a mandatory Field.")]
+	[Display(Name = "Code")]
+	public string Code { get; set; }
+    [Required(ErrorMessage = "The Matric No is a mandatory Field.")]
+	[Display(Name = "Matric No")]
+	public string MatricNo { get; set; }
+    [Display(Name = "Score")]
+	public double Score { get; set; }
+    [Required(ErrorMessage = "The Username is a mandatory Field.")]
+	[Display(Name = "Username")]
+	public string Username { get; set; }
+}
+
+public partial class Card : BaseEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public Card()
+    {
+        this.Role = "Users";
+		Initialize();
+    }
+	partial void Initialize();
+
+    [Required(ErrorMessage = "The Pin is a mandatory Field.")]
+	[Display(Name = "Pin")]
+	public string Pin { get; set; }
+    [Display(Name = "Owner")]
+	public string Owner { get; set; }
+    [Required(ErrorMessage = "The Role is a mandatory Field.")]
+	[Display(Name = "Role")]
+	public string Role { get; set; }
+}
+
+public partial class Course : BaseEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public Course()
+    {
+        this.StudentCourses = new HashSet<StudentCourse>();
+		Initialize();
+    }
+	partial void Initialize();
+
+    [Required(ErrorMessage = "The Code is a mandatory Field.")]
+	[Display(Name = "Code")]
+	public string Code { get; set; }
+    [Required(ErrorMessage = "The Title is a mandatory Field.")]
+	[Display(Name = "Title")]
+	public string Title { get; set; }
+    [Display(Name = "Unit")]
+	public double Unit { get; set; }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+    public virtual ICollection<StudentCourse> StudentCourses { get; set; }
+}
+
+public partial class Grade : BaseNameEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public Grade()
+    {
+		Initialize();
+    }
+	partial void Initialize();
+
+    [Display(Name = "Begin Mark")]
+	public double BeginMark { get; set; }
+    [Display(Name = "Next Begin Mark")]
+	public double NextBeginMark { get; set; }
+    [Display(Name = "Point")]
+	public double Point { get; set; }
+}
+
+public partial class Semester : BaseNameEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public Semester()
+    {
+        this.StudentCourses = new HashSet<StudentCourse>();
+		Initialize();
+    }
+	partial void Initialize();
+
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+    public virtual ICollection<StudentCourse> StudentCourses { get; set; }
+}
+
+public partial class Session : BaseNameEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public Session()
+    {
+        this.StudentCourses = new HashSet<StudentCourse>();
+		Initialize();
+    }
+	partial void Initialize();
+
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+    public virtual ICollection<StudentCourse> StudentCourses { get; set; }
+}
+
+public partial class Student : BaseEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public Student()
+    {
+        this.StudentCourses = new HashSet<StudentCourse>();
+		Initialize();
+    }
+	partial void Initialize();
+
+    [Required(ErrorMessage = "The Matric No is a mandatory Field.")]
+	[Display(Name = "Matric No")]
+	public string MatricNo { get; set; }
+    [Required(ErrorMessage = "The Lastname is a mandatory Field.")]
+	[Display(Name = "Lastname")]
+	public string Lastname { get; set; }
+    [Required(ErrorMessage = "The Firstname is a mandatory Field.")]
+	[Display(Name = "Firstname")]
+	public string Firstname { get; set; }
+    [Display(Name = "Middlename")]
+	public string Middlename { get; set; }
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+    public virtual ICollection<StudentCourse> StudentCourses { get; set; }
+}
+
+public partial class StudentCourse : BaseEntity
+{
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+    public StudentCourse()
+    {
+		Initialize();
+    }
+	partial void Initialize();
+
+    [ForeignKey("Session")]
+	[Display(Name = "Session")]
+	public Nullable<int> SessionId { get; set; }
+    [ForeignKey("Semester")]
+	[Display(Name = "Semester")]
+	public Nullable<int> SemesterId { get; set; }
+    [ForeignKey("Student")]
+	[Display(Name = "Student")]
+	public int StudentId { get; set; }
+    [ForeignKey("Course")]
+	[Display(Name = "Course")]
+	public int CourseId { get; set; }
+    [Display(Name = "Score")]
+	public double Score { get; set; }
+
+    public virtual Student Student { get; set; }
+    public virtual Course Course { get; set; }
+    public virtual Session Session { get; set; }
+    public virtual Semester Semester { get; set; }
+}
+
+[Owned]
+public partial class Address
+{
+    public string Line1 { get; set; }
+    public string Line2 { get; set; }
+    public string PostCode { get; set; }
+    public string State { get; set; }
+    public string Country { get; set; }
+}
+
+[Owned]
+public partial class File
+{
+    public string Uri { get; set; }
+    public string Extension { get; set; }
+    public string Content { get; set; }
+    // public byte[] Content { get; set; }
+}
+
+public enum CurriculumType : int
+{
+    Learn = 0,
+    Test = 1
+}
+
+public enum Gender : int
+{
+    Male = 0,
+    Female = 1
+}
+
+public enum MediaType : int
+{
+    Text = 0,
+    Image = 1,
+    Video = 2,
+    Audio = 3,
+    Application = 4,
+    Pdf = 5,
+    Csv = 6,
+    Zoom = 7
+}

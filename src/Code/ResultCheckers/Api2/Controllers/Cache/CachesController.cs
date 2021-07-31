@@ -20,7 +20,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Ark.ResultCheckers.Dtos.Caches;
 using Ark.ResultCheckers.Data;
 
-[Route("api1/[controller]")]    
+[Route("api2/[controller]")]    
 [ApiController]
 // [Authorize]
 [AllowAnonymous]

@@ -7,47 +7,44 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Ark.ResultCheckers.Data
+using Microsoft.EntityFrameworkCore;
+using .Entities;
+
+public partial class AppDbContext : DbContext
 {
-    using Microsoft.EntityFrameworkCore;
-    using Ark.ResultCheckers.Entities;
-    
-    public partial class AppDbContext : DbContext
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options)
-            : base(options)
-        {
-        }
-    
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-        }
-    
-        protected override void OnModelCreating(ModelBuilder builder)
-        {
-            base.OnModelCreating(builder);
-            // Customize the ASP.NET Identity model and override the defaults if needed.
-            // For example, you can rename the ASP.NET Identity table names and more.
-            // Add your customizations after calling base.OnModelCreating(builder);
-    
-        }
-    
-        public void Initialize()
-        {
-        }
-    
-        #region DbSet
-        public DbSet<AppSetting> AppSettings { get; set; }
-        public DbSet<BulkCard> BulkCards { get; set; }
-        public DbSet<BulkStudentCourse> BulkStudentCourses { get; set; }
-        public DbSet<Card> Cards { get; set; }
-        public DbSet<Course> Courses { get; set; }
-        public DbSet<Grade> Grades { get; set; }
-        public DbSet<Semester> Semesters { get; set; }
-        public DbSet<Session> Sessions { get; set; }
-        public DbSet<Student> Students { get; set; }
-        public DbSet<StudentCourse> StudentCourses { get; set; }
-        #endregion
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+    }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+        // Customize the ASP.NET Identity model and override the defaults if needed.
+        // For example, you can rename the ASP.NET Identity table names and more.
+        // Add your customizations after calling base.OnModelCreating(builder);
+
+    }
+
+    public void Initialize()
+    {
+    }
+
+    #region DbSet
+    public DbSet<AppSetting> AppSettings { get; set; }
+    public DbSet<BulkCard> BulkCards { get; set; }
+    public DbSet<BulkStudentCourse> BulkStudentCourses { get; set; }
+    public DbSet<Card> Cards { get; set; }
+    public DbSet<Course> Courses { get; set; }
+    public DbSet<Grade> Grades { get; set; }
+    public DbSet<Semester> Semesters { get; set; }
+    public DbSet<Session> Sessions { get; set; }
+    public DbSet<Student> Students { get; set; }
+    public DbSet<StudentCourse> StudentCourses { get; set; }
+    #endregion
 }

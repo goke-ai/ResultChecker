@@ -7,3 +7,2651 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Linq.Expressions;
+using .Entities;
+
+public partial class AppSettingDto : BaseEntityDto
+{
+	public String AppSettingDescription { get; private set; }
+
+    public AppSettingDto()
+    {
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+    [Required(ErrorMessage = "The Key is a mandatory Field.")]
+	[MaxLength(100), StringLength(100, ErrorMessage = "The Key value cannot exceed 100 characters.")]
+	[Display(Name = "Key")]
+	public string Key { get; set; }
+    [MaxLength(100), StringLength(100, ErrorMessage = "The Value value cannot exceed 100 characters.")]
+	[Display(Name = "Value")]
+	public string Value { get; set; }
+	private static Expression<Func<AppSetting, AppSettingDto>> _asAppSettingDto;
+    public static Expression<Func<AppSetting, AppSettingDto>> AsAppSettingDto
+    {
+        get
+        {
+            SetConverters();
+            return _asAppSettingDto;
+        }
+    }
+    
+    private static Func<AppSetting, AppSettingDto> _asAppSettingDtoFunc;
+    public static Func<AppSetting, AppSettingDto> AsAppSettingDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asAppSettingDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<AppSettingDto, AppSetting>> _asAppSetting;
+    public static Expression<Func<AppSettingDto, AppSetting>> AsAppSetting
+    {
+        get
+        {
+            SetConverters();
+            return _asAppSetting;
+        }
+    }
+    
+    private static Func<AppSettingDto, AppSetting> _asAppSettingFunc;
+    public static Func<AppSettingDto, AppSetting> AsAppSettingFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asAppSettingFunc;
+        }
+    }
+
+	private static Func<AppSetting, AppSettingDto, AppSetting> _toAppSettingFunc;
+    public static Func<AppSetting, AppSettingDto, AppSetting> ToAppSettingFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toAppSettingFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<AppSetting, string>> _orderAppSetting;
+    public static Expression<Func<AppSetting, string>> OrderAppSetting
+    {
+        get
+        {
+            SetConverters();
+            return _orderAppSetting;
+        }
+    }
+	*/
+
+	private static Expression<Func<AppSetting, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+			|| w.Key.Contains(searchString) //@string
+			|| w.Value.Contains(searchString) //@string
+			;
+    }
+
+    static IQueryable<AppSetting> _searchQuery;
+    public static IQueryable<AppSetting> Search(IQueryable<AppSetting> query, string searchString)
+    {
+        _searchQuery = query.Where(
+						SearchExpression(searchString)
+					);
+		OnSetSearchQuery(query, searchString);
+		return _searchQuery;
+	}
+
+    static IOrderedQueryable<AppSetting> _orderQuery;
+    public static IOrderedQueryable<AppSetting> OrderBy(IQueryable<AppSetting> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Id);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<AppSettingDto> _orderQueryDto;
+    public static IOrderedQueryable<AppSettingDto> OrderBy(IQueryable<AppSettingDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Id);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+	static string[] _includeNavigations;
+    public static string[] IncludeNavigations()
+    {
+        _includeNavigations = new string[] { 
+		};
+        OnSetIncludeNavigations();
+        return _includeNavigations;
+    }
+
+    static Expression<Func<AppSetting, bool>>[] _filters;
+    public static Expression<Func<AppSetting, bool>>[] Filters(string searchString)
+    {
+        _filters = new Expression<Func<AppSetting, bool>>[]
+					   {
+							SearchExpression(searchString)
+
+					   };
+        OnSetFilters(searchString);
+        return _filters;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asAppSettingDto = x => new AppSettingDto
+        {
+			AppSettingDescription = x.AppSettingDescription,
+            
+            Id = x.Id,
+			// +simplex
+			Key = x.Key,
+			Value = x.Value,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+        };
+
+        _asAppSetting = x => new AppSetting
+        {
+            
+            Id = x.Id,
+			// +simple
+			Key = x.Key,
+			Value = x.Value,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+             
+        };
+
+        _toAppSettingFunc = (y,x) => {
+            
+            y.Id = x.Id;
+			// +simple
+			y.Key = x.Key;
+			y.Value = x.Value;
+            
+            y.IsVisible = x.IsVisible;
+            y.InsertUser = x.InsertUser;
+            y.InsertDateTime = x.InsertDateTime;
+            y.UpdateUser = x.UpdateUser;
+            y.UpdateDateTime = x.UpdateDateTime;
+            y.LastActivityUser = x.LastActivityUser;
+            y.LastActivityDateTime = x.LastActivityDateTime;
+            // y.Version = x.Version;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asAppSettingFunc = _asAppSetting.Compile();
+        _asAppSettingDtoFunc = _asAppSettingDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<AppSetting> query);
+    static partial void OnSetOrderQuery(IQueryable<AppSettingDto> query);
+    static partial void OnSetSearchQuery(IQueryable<AppSetting> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}
+
+public partial class BaseEntityDto
+{
+    public BaseEntityDto()
+    {
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+    [Key]
+	[Display(Name = "Id")]
+	public int Id { get; set; }
+	private static Expression<Func<BaseEntity, BaseEntityDto>> _asBaseEntityDto;
+    public static Expression<Func<BaseEntity, BaseEntityDto>> AsBaseEntityDto
+    {
+        get
+        {
+            SetConverters();
+            return _asBaseEntityDto;
+        }
+    }
+    
+    private static Func<BaseEntity, BaseEntityDto> _asBaseEntityDtoFunc;
+    public static Func<BaseEntity, BaseEntityDto> AsBaseEntityDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asBaseEntityDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<BaseEntityDto, BaseEntity>> _asBaseEntity;
+    public static Expression<Func<BaseEntityDto, BaseEntity>> AsBaseEntity
+    {
+        get
+        {
+            SetConverters();
+            return _asBaseEntity;
+        }
+    }
+    
+    private static Func<BaseEntityDto, BaseEntity> _asBaseEntityFunc;
+    public static Func<BaseEntityDto, BaseEntity> AsBaseEntityFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asBaseEntityFunc;
+        }
+    }
+
+	private static Func<BaseEntity, BaseEntityDto, BaseEntity> _toBaseEntityFunc;
+    public static Func<BaseEntity, BaseEntityDto, BaseEntity> ToBaseEntityFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toBaseEntityFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<BaseEntity, string>> _orderBaseEntity;
+    public static Expression<Func<BaseEntity, string>> OrderBaseEntity
+    {
+        get
+        {
+            SetConverters();
+            return _orderBaseEntity;
+        }
+    }
+	*/
+
+	private static Expression<Func<BaseEntity, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+			;
+    }
+
+    static IOrderedQueryable<BaseEntity> _orderQuery;
+    public static IOrderedQueryable<BaseEntity> OrderBy(IQueryable<BaseEntity> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Id);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<BaseEntityDto> _orderQueryDto;
+    public static IOrderedQueryable<BaseEntityDto> OrderBy(IQueryable<BaseEntityDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Id);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asBaseEntityDto = x => new BaseEntityDto
+        {
+			// +simplex
+			Id = x.Id,
+        };
+
+        _asBaseEntity = x => new BaseEntity
+        {
+			// +simple
+			Id = x.Id,
+             
+        };
+
+        _toBaseEntityFunc = (y,x) => {
+			// +simple
+			y.Id = x.Id;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asBaseEntityFunc = _asBaseEntity.Compile();
+        _asBaseEntityDtoFunc = _asBaseEntityDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<BaseEntity> query);
+    static partial void OnSetOrderQuery(IQueryable<BaseEntityDto> query);
+    static partial void OnSetSearchQuery(IQueryable<BaseEntity> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}
+
+public partial class BaseNameEntityDto : BaseEntityDto
+{
+    public BaseNameEntityDto()
+    {
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+    [Required(ErrorMessage = "The Name is a mandatory Field.")]
+	[MaxLength(100), StringLength(100, ErrorMessage = "The Name value cannot exceed 100 characters.")]
+	[Display(Name = "Name")]
+	public string Name { get; set; }
+	private static Expression<Func<BaseNameEntity, BaseNameEntityDto>> _asBaseNameEntityDto;
+    public static Expression<Func<BaseNameEntity, BaseNameEntityDto>> AsBaseNameEntityDto
+    {
+        get
+        {
+            SetConverters();
+            return _asBaseNameEntityDto;
+        }
+    }
+    
+    private static Func<BaseNameEntity, BaseNameEntityDto> _asBaseNameEntityDtoFunc;
+    public static Func<BaseNameEntity, BaseNameEntityDto> AsBaseNameEntityDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asBaseNameEntityDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<BaseNameEntityDto, BaseNameEntity>> _asBaseNameEntity;
+    public static Expression<Func<BaseNameEntityDto, BaseNameEntity>> AsBaseNameEntity
+    {
+        get
+        {
+            SetConverters();
+            return _asBaseNameEntity;
+        }
+    }
+    
+    private static Func<BaseNameEntityDto, BaseNameEntity> _asBaseNameEntityFunc;
+    public static Func<BaseNameEntityDto, BaseNameEntity> AsBaseNameEntityFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asBaseNameEntityFunc;
+        }
+    }
+
+	private static Func<BaseNameEntity, BaseNameEntityDto, BaseNameEntity> _toBaseNameEntityFunc;
+    public static Func<BaseNameEntity, BaseNameEntityDto, BaseNameEntity> ToBaseNameEntityFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toBaseNameEntityFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<BaseNameEntity, string>> _orderBaseNameEntity;
+    public static Expression<Func<BaseNameEntity, string>> OrderBaseNameEntity
+    {
+        get
+        {
+            SetConverters();
+            return _orderBaseNameEntity;
+        }
+    }
+	*/
+
+	private static Expression<Func<BaseNameEntity, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+			|| w.Name.Contains(searchString) //@string
+			;
+    }
+
+    static IOrderedQueryable<BaseNameEntity> _orderQuery;
+    public static IOrderedQueryable<BaseNameEntity> OrderBy(IQueryable<BaseNameEntity> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Id);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<BaseNameEntityDto> _orderQueryDto;
+    public static IOrderedQueryable<BaseNameEntityDto> OrderBy(IQueryable<BaseNameEntityDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Id);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asBaseNameEntityDto = x => new BaseNameEntityDto
+        {
+            
+            Id = x.Id,
+			// +simplex
+			Name = x.Name,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+        };
+
+        _asBaseNameEntity = x => new BaseNameEntity
+        {
+            
+            Id = x.Id,
+			// +simple
+			Name = x.Name,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+             
+        };
+
+        _toBaseNameEntityFunc = (y,x) => {
+            
+            y.Id = x.Id;
+			// +simple
+			y.Name = x.Name;
+            
+            y.IsVisible = x.IsVisible;
+            y.InsertUser = x.InsertUser;
+            y.InsertDateTime = x.InsertDateTime;
+            y.UpdateUser = x.UpdateUser;
+            y.UpdateDateTime = x.UpdateDateTime;
+            y.LastActivityUser = x.LastActivityUser;
+            y.LastActivityDateTime = x.LastActivityDateTime;
+            // y.Version = x.Version;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asBaseNameEntityFunc = _asBaseNameEntity.Compile();
+        _asBaseNameEntityDtoFunc = _asBaseNameEntityDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<BaseNameEntity> query);
+    static partial void OnSetOrderQuery(IQueryable<BaseNameEntityDto> query);
+    static partial void OnSetSearchQuery(IQueryable<BaseNameEntity> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}
+
+public partial class BulkCardDto : BulkEntityDto
+{
+    public BulkCardDto()
+    {
+        this.Role = "\"Users\"";
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+    [Required(ErrorMessage = "The Pin is a mandatory Field.")]
+	[Display(Name = "Pin")]
+	public string Pin { get; set; }
+    [Display(Name = "Owner")]
+	public string Owner { get; set; }
+    [Required(ErrorMessage = "The Role is a mandatory Field.")]
+	[Display(Name = "Role")]
+	public string Role { get; set; }
+    [Required(ErrorMessage = "The Username is a mandatory Field.")]
+	[Display(Name = "Username")]
+	public string Username { get; set; }
+	private static Expression<Func<BulkCard, BulkCardDto>> _asBulkCardDto;
+    public static Expression<Func<BulkCard, BulkCardDto>> AsBulkCardDto
+    {
+        get
+        {
+            SetConverters();
+            return _asBulkCardDto;
+        }
+    }
+    
+    private static Func<BulkCard, BulkCardDto> _asBulkCardDtoFunc;
+    public static Func<BulkCard, BulkCardDto> AsBulkCardDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asBulkCardDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<BulkCardDto, BulkCard>> _asBulkCard;
+    public static Expression<Func<BulkCardDto, BulkCard>> AsBulkCard
+    {
+        get
+        {
+            SetConverters();
+            return _asBulkCard;
+        }
+    }
+    
+    private static Func<BulkCardDto, BulkCard> _asBulkCardFunc;
+    public static Func<BulkCardDto, BulkCard> AsBulkCardFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asBulkCardFunc;
+        }
+    }
+
+	private static Func<BulkCard, BulkCardDto, BulkCard> _toBulkCardFunc;
+    public static Func<BulkCard, BulkCardDto, BulkCard> ToBulkCardFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toBulkCardFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<BulkCard, string>> _orderBulkCard;
+    public static Expression<Func<BulkCard, string>> OrderBulkCard
+    {
+        get
+        {
+            SetConverters();
+            return _orderBulkCard;
+        }
+    }
+	*/
+
+	private static Expression<Func<BulkCard, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+			|| w.Pin.Contains(searchString) //@string
+			|| w.Owner.Contains(searchString) //@string
+			|| w.Role.Contains(searchString) //@string
+			|| w.Username.Contains(searchString) //@string
+			;
+    }
+
+    static IQueryable<BulkCard> _searchQuery;
+    public static IQueryable<BulkCard> Search(IQueryable<BulkCard> query, string searchString)
+    {
+        _searchQuery = query.Where(
+						SearchExpression(searchString)
+					);
+		OnSetSearchQuery(query, searchString);
+		return _searchQuery;
+	}
+
+    static IOrderedQueryable<BulkCard> _orderQuery;
+    public static IOrderedQueryable<BulkCard> OrderBy(IQueryable<BulkCard> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Id);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<BulkCardDto> _orderQueryDto;
+    public static IOrderedQueryable<BulkCardDto> OrderBy(IQueryable<BulkCardDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Id);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+	static string[] _includeNavigations;
+    public static string[] IncludeNavigations()
+    {
+        _includeNavigations = new string[] { 
+		};
+        OnSetIncludeNavigations();
+        return _includeNavigations;
+    }
+
+    static Expression<Func<BulkCard, bool>>[] _filters;
+    public static Expression<Func<BulkCard, bool>>[] Filters(string searchString)
+    {
+        _filters = new Expression<Func<BulkCard, bool>>[]
+					   {
+							SearchExpression(searchString)
+
+					   };
+        OnSetFilters(searchString);
+        return _filters;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asBulkCardDto = x => new BulkCardDto
+        {
+            
+            Id = x.Id,
+            
+            // UserName = x.UserName,
+			// +simplex
+			Pin = x.Pin,
+			Owner = x.Owner,
+			Role = x.Role,
+			Username = x.Username,
+        };
+
+        _asBulkCard = x => new BulkCard
+        {
+            
+            Id = x.Id,
+            
+            // UserName = x.UserName,
+			// +simple
+			Pin = x.Pin,
+			Owner = x.Owner,
+			Role = x.Role,
+			Username = x.Username,
+             
+        };
+
+        _toBulkCardFunc = (y,x) => {
+            
+            y.Id = x.Id;
+            
+            // y.UserName = x.UserName;
+			// +simple
+			y.Pin = x.Pin;
+			y.Owner = x.Owner;
+			y.Role = x.Role;
+			y.Username = x.Username;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asBulkCardFunc = _asBulkCard.Compile();
+        _asBulkCardDtoFunc = _asBulkCardDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<BulkCard> query);
+    static partial void OnSetOrderQuery(IQueryable<BulkCardDto> query);
+    static partial void OnSetSearchQuery(IQueryable<BulkCard> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}
+
+public partial class BulkEntityDto
+{
+    public BulkEntityDto()
+    {
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+    [Key]
+	[Display(Name = "Id")]
+	public int Id { get; set; }
+	private static Expression<Func<BulkEntity, BulkEntityDto>> _asBulkEntityDto;
+    public static Expression<Func<BulkEntity, BulkEntityDto>> AsBulkEntityDto
+    {
+        get
+        {
+            SetConverters();
+            return _asBulkEntityDto;
+        }
+    }
+    
+    private static Func<BulkEntity, BulkEntityDto> _asBulkEntityDtoFunc;
+    public static Func<BulkEntity, BulkEntityDto> AsBulkEntityDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asBulkEntityDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<BulkEntityDto, BulkEntity>> _asBulkEntity;
+    public static Expression<Func<BulkEntityDto, BulkEntity>> AsBulkEntity
+    {
+        get
+        {
+            SetConverters();
+            return _asBulkEntity;
+        }
+    }
+    
+    private static Func<BulkEntityDto, BulkEntity> _asBulkEntityFunc;
+    public static Func<BulkEntityDto, BulkEntity> AsBulkEntityFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asBulkEntityFunc;
+        }
+    }
+
+	private static Func<BulkEntity, BulkEntityDto, BulkEntity> _toBulkEntityFunc;
+    public static Func<BulkEntity, BulkEntityDto, BulkEntity> ToBulkEntityFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toBulkEntityFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<BulkEntity, string>> _orderBulkEntity;
+    public static Expression<Func<BulkEntity, string>> OrderBulkEntity
+    {
+        get
+        {
+            SetConverters();
+            return _orderBulkEntity;
+        }
+    }
+	*/
+
+	private static Expression<Func<BulkEntity, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+			;
+    }
+
+    static IOrderedQueryable<BulkEntity> _orderQuery;
+    public static IOrderedQueryable<BulkEntity> OrderBy(IQueryable<BulkEntity> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Id);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<BulkEntityDto> _orderQueryDto;
+    public static IOrderedQueryable<BulkEntityDto> OrderBy(IQueryable<BulkEntityDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Id);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asBulkEntityDto = x => new BulkEntityDto
+        {
+			// +simplex
+			Id = x.Id,
+        };
+
+        _asBulkEntity = x => new BulkEntity
+        {
+			// +simple
+			Id = x.Id,
+             
+        };
+
+        _toBulkEntityFunc = (y,x) => {
+			// +simple
+			y.Id = x.Id;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asBulkEntityFunc = _asBulkEntity.Compile();
+        _asBulkEntityDtoFunc = _asBulkEntityDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<BulkEntity> query);
+    static partial void OnSetOrderQuery(IQueryable<BulkEntityDto> query);
+    static partial void OnSetSearchQuery(IQueryable<BulkEntity> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}
+
+public partial class BulkStudentCourseDto : BulkEntityDto
+{
+    public BulkStudentCourseDto()
+    {
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+    [Required(ErrorMessage = "The Session is a mandatory Field.")]
+	[Display(Name = "Session")]
+	public string Session { get; set; }
+    [Required(ErrorMessage = "The Semester is a mandatory Field.")]
+	[Display(Name = "Semester")]
+	public string Semester { get; set; }
+    [Required(ErrorMessage = "The Code is a mandatory Field.")]
+	[Display(Name = "Code")]
+	public string Code { get; set; }
+    [Required(ErrorMessage = "The Matric No is a mandatory Field.")]
+	[Display(Name = "Matric No")]
+	public string MatricNo { get; set; }
+    [Display(Name = "Score")]
+	public double Score { get; set; }
+    [Required(ErrorMessage = "The Username is a mandatory Field.")]
+	[Display(Name = "Username")]
+	public string Username { get; set; }
+	private static Expression<Func<BulkStudentCourse, BulkStudentCourseDto>> _asBulkStudentCourseDto;
+    public static Expression<Func<BulkStudentCourse, BulkStudentCourseDto>> AsBulkStudentCourseDto
+    {
+        get
+        {
+            SetConverters();
+            return _asBulkStudentCourseDto;
+        }
+    }
+    
+    private static Func<BulkStudentCourse, BulkStudentCourseDto> _asBulkStudentCourseDtoFunc;
+    public static Func<BulkStudentCourse, BulkStudentCourseDto> AsBulkStudentCourseDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asBulkStudentCourseDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<BulkStudentCourseDto, BulkStudentCourse>> _asBulkStudentCourse;
+    public static Expression<Func<BulkStudentCourseDto, BulkStudentCourse>> AsBulkStudentCourse
+    {
+        get
+        {
+            SetConverters();
+            return _asBulkStudentCourse;
+        }
+    }
+    
+    private static Func<BulkStudentCourseDto, BulkStudentCourse> _asBulkStudentCourseFunc;
+    public static Func<BulkStudentCourseDto, BulkStudentCourse> AsBulkStudentCourseFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asBulkStudentCourseFunc;
+        }
+    }
+
+	private static Func<BulkStudentCourse, BulkStudentCourseDto, BulkStudentCourse> _toBulkStudentCourseFunc;
+    public static Func<BulkStudentCourse, BulkStudentCourseDto, BulkStudentCourse> ToBulkStudentCourseFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toBulkStudentCourseFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<BulkStudentCourse, string>> _orderBulkStudentCourse;
+    public static Expression<Func<BulkStudentCourse, string>> OrderBulkStudentCourse
+    {
+        get
+        {
+            SetConverters();
+            return _orderBulkStudentCourse;
+        }
+    }
+	*/
+
+	private static Expression<Func<BulkStudentCourse, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+			|| w.Session.Contains(searchString) //@string
+			|| w.Semester.Contains(searchString) //@string
+			|| w.Code.Contains(searchString) //@string
+			|| w.MatricNo.Contains(searchString) //@string
+			|| w.Username.Contains(searchString) //@string
+			;
+    }
+
+    static IQueryable<BulkStudentCourse> _searchQuery;
+    public static IQueryable<BulkStudentCourse> Search(IQueryable<BulkStudentCourse> query, string searchString)
+    {
+        _searchQuery = query.Where(
+						SearchExpression(searchString)
+					);
+		OnSetSearchQuery(query, searchString);
+		return _searchQuery;
+	}
+
+    static IOrderedQueryable<BulkStudentCourse> _orderQuery;
+    public static IOrderedQueryable<BulkStudentCourse> OrderBy(IQueryable<BulkStudentCourse> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Id);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<BulkStudentCourseDto> _orderQueryDto;
+    public static IOrderedQueryable<BulkStudentCourseDto> OrderBy(IQueryable<BulkStudentCourseDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Id);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+	static string[] _includeNavigations;
+    public static string[] IncludeNavigations()
+    {
+        _includeNavigations = new string[] { 
+		};
+        OnSetIncludeNavigations();
+        return _includeNavigations;
+    }
+
+    static Expression<Func<BulkStudentCourse, bool>>[] _filters;
+    public static Expression<Func<BulkStudentCourse, bool>>[] Filters(string searchString)
+    {
+        _filters = new Expression<Func<BulkStudentCourse, bool>>[]
+					   {
+							SearchExpression(searchString)
+
+					   };
+        OnSetFilters(searchString);
+        return _filters;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asBulkStudentCourseDto = x => new BulkStudentCourseDto
+        {
+            
+            Id = x.Id,
+            
+            // UserName = x.UserName,
+			// +simplex
+			Session = x.Session,
+			Semester = x.Semester,
+			Code = x.Code,
+			MatricNo = x.MatricNo,
+			Score = x.Score,
+			Username = x.Username,
+        };
+
+        _asBulkStudentCourse = x => new BulkStudentCourse
+        {
+            
+            Id = x.Id,
+            
+            // UserName = x.UserName,
+			// +simple
+			Session = x.Session,
+			Semester = x.Semester,
+			Code = x.Code,
+			MatricNo = x.MatricNo,
+			Score = x.Score,
+			Username = x.Username,
+             
+        };
+
+        _toBulkStudentCourseFunc = (y,x) => {
+            
+            y.Id = x.Id;
+            
+            // y.UserName = x.UserName;
+			// +simple
+			y.Session = x.Session;
+			y.Semester = x.Semester;
+			y.Code = x.Code;
+			y.MatricNo = x.MatricNo;
+			y.Score = x.Score;
+			y.Username = x.Username;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asBulkStudentCourseFunc = _asBulkStudentCourse.Compile();
+        _asBulkStudentCourseDtoFunc = _asBulkStudentCourseDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<BulkStudentCourse> query);
+    static partial void OnSetOrderQuery(IQueryable<BulkStudentCourseDto> query);
+    static partial void OnSetSearchQuery(IQueryable<BulkStudentCourse> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}
+
+public partial class CardDto : BaseEntityDto
+{
+	public String CardDescription { get; private set; }
+
+    public CardDto()
+    {
+        this.Role = "Users";
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+    [Required(ErrorMessage = "The Pin is a mandatory Field.")]
+	[Display(Name = "Pin")]
+	public string Pin { get; set; }
+    [Display(Name = "Owner")]
+	public string Owner { get; set; }
+    [Required(ErrorMessage = "The Role is a mandatory Field.")]
+	[Display(Name = "Role")]
+	public string Role { get; set; }
+	private static Expression<Func<Card, CardDto>> _asCardDto;
+    public static Expression<Func<Card, CardDto>> AsCardDto
+    {
+        get
+        {
+            SetConverters();
+            return _asCardDto;
+        }
+    }
+    
+    private static Func<Card, CardDto> _asCardDtoFunc;
+    public static Func<Card, CardDto> AsCardDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asCardDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<CardDto, Card>> _asCard;
+    public static Expression<Func<CardDto, Card>> AsCard
+    {
+        get
+        {
+            SetConverters();
+            return _asCard;
+        }
+    }
+    
+    private static Func<CardDto, Card> _asCardFunc;
+    public static Func<CardDto, Card> AsCardFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asCardFunc;
+        }
+    }
+
+	private static Func<Card, CardDto, Card> _toCardFunc;
+    public static Func<Card, CardDto, Card> ToCardFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toCardFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<Card, string>> _orderCard;
+    public static Expression<Func<Card, string>> OrderCard
+    {
+        get
+        {
+            SetConverters();
+            return _orderCard;
+        }
+    }
+	*/
+
+	private static Expression<Func<Card, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+			|| w.Pin.Contains(searchString) //@string
+			|| w.Owner.Contains(searchString) //@string
+			|| w.Role.Contains(searchString) //@string
+			;
+    }
+
+    static IQueryable<Card> _searchQuery;
+    public static IQueryable<Card> Search(IQueryable<Card> query, string searchString)
+    {
+        _searchQuery = query.Where(
+						SearchExpression(searchString)
+					);
+		OnSetSearchQuery(query, searchString);
+		return _searchQuery;
+	}
+
+    static IOrderedQueryable<Card> _orderQuery;
+    public static IOrderedQueryable<Card> OrderBy(IQueryable<Card> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Id);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<CardDto> _orderQueryDto;
+    public static IOrderedQueryable<CardDto> OrderBy(IQueryable<CardDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Id);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+	static string[] _includeNavigations;
+    public static string[] IncludeNavigations()
+    {
+        _includeNavigations = new string[] { 
+		};
+        OnSetIncludeNavigations();
+        return _includeNavigations;
+    }
+
+    static Expression<Func<Card, bool>>[] _filters;
+    public static Expression<Func<Card, bool>>[] Filters(string searchString)
+    {
+        _filters = new Expression<Func<Card, bool>>[]
+					   {
+							SearchExpression(searchString)
+
+					   };
+        OnSetFilters(searchString);
+        return _filters;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asCardDto = x => new CardDto
+        {
+			CardDescription = x.CardDescription,
+            
+            Id = x.Id,
+			// +simplex
+			Pin = x.Pin,
+			Owner = x.Owner,
+			Role = x.Role,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+        };
+
+        _asCard = x => new Card
+        {
+            
+            Id = x.Id,
+			// +simple
+			Pin = x.Pin,
+			Owner = x.Owner,
+			Role = x.Role,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+             
+        };
+
+        _toCardFunc = (y,x) => {
+            
+            y.Id = x.Id;
+			// +simple
+			y.Pin = x.Pin;
+			y.Owner = x.Owner;
+			y.Role = x.Role;
+            
+            y.IsVisible = x.IsVisible;
+            y.InsertUser = x.InsertUser;
+            y.InsertDateTime = x.InsertDateTime;
+            y.UpdateUser = x.UpdateUser;
+            y.UpdateDateTime = x.UpdateDateTime;
+            y.LastActivityUser = x.LastActivityUser;
+            y.LastActivityDateTime = x.LastActivityDateTime;
+            // y.Version = x.Version;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asCardFunc = _asCard.Compile();
+        _asCardDtoFunc = _asCardDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<Card> query);
+    static partial void OnSetOrderQuery(IQueryable<CardDto> query);
+    static partial void OnSetSearchQuery(IQueryable<Card> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}
+
+public partial class CourseDto : BaseEntityDto
+{
+	public String CourseDescription { get; private set; }
+
+    public CourseDto()
+    {
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+    [Required(ErrorMessage = "The Code is a mandatory Field.")]
+	[Display(Name = "Code")]
+	public string Code { get; set; }
+    [Required(ErrorMessage = "The Title is a mandatory Field.")]
+	[Display(Name = "Title")]
+	public string Title { get; set; }
+    [Display(Name = "Unit")]
+	public double Unit { get; set; }
+	private static Expression<Func<Course, CourseDto>> _asCourseDto;
+    public static Expression<Func<Course, CourseDto>> AsCourseDto
+    {
+        get
+        {
+            SetConverters();
+            return _asCourseDto;
+        }
+    }
+    
+    private static Func<Course, CourseDto> _asCourseDtoFunc;
+    public static Func<Course, CourseDto> AsCourseDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asCourseDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<CourseDto, Course>> _asCourse;
+    public static Expression<Func<CourseDto, Course>> AsCourse
+    {
+        get
+        {
+            SetConverters();
+            return _asCourse;
+        }
+    }
+    
+    private static Func<CourseDto, Course> _asCourseFunc;
+    public static Func<CourseDto, Course> AsCourseFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asCourseFunc;
+        }
+    }
+
+	private static Func<Course, CourseDto, Course> _toCourseFunc;
+    public static Func<Course, CourseDto, Course> ToCourseFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toCourseFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<Course, string>> _orderCourse;
+    public static Expression<Func<Course, string>> OrderCourse
+    {
+        get
+        {
+            SetConverters();
+            return _orderCourse;
+        }
+    }
+	*/
+
+	private static Expression<Func<Course, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+			|| w.Code.Contains(searchString) //@string
+			|| w.Title.Contains(searchString) //@string
+			;
+    }
+
+    static IQueryable<Course> _searchQuery;
+    public static IQueryable<Course> Search(IQueryable<Course> query, string searchString)
+    {
+        _searchQuery = query.Where(
+						SearchExpression(searchString)
+					);
+		OnSetSearchQuery(query, searchString);
+		return _searchQuery;
+	}
+
+    static IOrderedQueryable<Course> _orderQuery;
+    public static IOrderedQueryable<Course> OrderBy(IQueryable<Course> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Id);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<CourseDto> _orderQueryDto;
+    public static IOrderedQueryable<CourseDto> OrderBy(IQueryable<CourseDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Id);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+	static string[] _includeNavigations;
+    public static string[] IncludeNavigations()
+    {
+        _includeNavigations = new string[] { 
+		};
+        OnSetIncludeNavigations();
+        return _includeNavigations;
+    }
+
+    static Expression<Func<Course, bool>>[] _filters;
+    public static Expression<Func<Course, bool>>[] Filters(string searchString)
+    {
+        _filters = new Expression<Func<Course, bool>>[]
+					   {
+							SearchExpression(searchString)
+
+					   };
+        OnSetFilters(searchString);
+        return _filters;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asCourseDto = x => new CourseDto
+        {
+			CourseDescription = x.CourseDescription,
+            
+            Id = x.Id,
+			// +simplex
+			Code = x.Code,
+			Title = x.Title,
+			Unit = x.Unit,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+        };
+
+        _asCourse = x => new Course
+        {
+            
+            Id = x.Id,
+			// +simple
+			Code = x.Code,
+			Title = x.Title,
+			Unit = x.Unit,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+             
+        };
+
+        _toCourseFunc = (y,x) => {
+            
+            y.Id = x.Id;
+			// +simple
+			y.Code = x.Code;
+			y.Title = x.Title;
+			y.Unit = x.Unit;
+            
+            y.IsVisible = x.IsVisible;
+            y.InsertUser = x.InsertUser;
+            y.InsertDateTime = x.InsertDateTime;
+            y.UpdateUser = x.UpdateUser;
+            y.UpdateDateTime = x.UpdateDateTime;
+            y.LastActivityUser = x.LastActivityUser;
+            y.LastActivityDateTime = x.LastActivityDateTime;
+            // y.Version = x.Version;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asCourseFunc = _asCourse.Compile();
+        _asCourseDtoFunc = _asCourseDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<Course> query);
+    static partial void OnSetOrderQuery(IQueryable<CourseDto> query);
+    static partial void OnSetSearchQuery(IQueryable<Course> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}
+
+public partial class GradeDto : BaseNameEntityDto
+{
+    public GradeDto()
+    {
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+    [Display(Name = "Begin Mark")]
+	public double BeginMark { get; set; }
+    [Display(Name = "Next Begin Mark")]
+	public double NextBeginMark { get; set; }
+    [Display(Name = "Point")]
+	public double Point { get; set; }
+	private static Expression<Func<Grade, GradeDto>> _asGradeDto;
+    public static Expression<Func<Grade, GradeDto>> AsGradeDto
+    {
+        get
+        {
+            SetConverters();
+            return _asGradeDto;
+        }
+    }
+    
+    private static Func<Grade, GradeDto> _asGradeDtoFunc;
+    public static Func<Grade, GradeDto> AsGradeDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asGradeDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<GradeDto, Grade>> _asGrade;
+    public static Expression<Func<GradeDto, Grade>> AsGrade
+    {
+        get
+        {
+            SetConverters();
+            return _asGrade;
+        }
+    }
+    
+    private static Func<GradeDto, Grade> _asGradeFunc;
+    public static Func<GradeDto, Grade> AsGradeFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asGradeFunc;
+        }
+    }
+
+	private static Func<Grade, GradeDto, Grade> _toGradeFunc;
+    public static Func<Grade, GradeDto, Grade> ToGradeFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toGradeFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<Grade, string>> _orderGrade;
+    public static Expression<Func<Grade, string>> OrderGrade
+    {
+        get
+        {
+            SetConverters();
+            return _orderGrade;
+        }
+    }
+	*/
+
+	private static Expression<Func<Grade, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+			|| w.Name.Contains(searchString) 
+			;
+    }
+
+    static IQueryable<Grade> _searchQuery;
+    public static IQueryable<Grade> Search(IQueryable<Grade> query, string searchString)
+    {
+        _searchQuery = query.Where(
+						SearchExpression(searchString)
+					);
+		OnSetSearchQuery(query, searchString);
+		return _searchQuery;
+	}
+
+    static IOrderedQueryable<Grade> _orderQuery;
+    public static IOrderedQueryable<Grade> OrderBy(IQueryable<Grade> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Name);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<GradeDto> _orderQueryDto;
+    public static IOrderedQueryable<GradeDto> OrderBy(IQueryable<GradeDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Name);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+	static string[] _includeNavigations;
+    public static string[] IncludeNavigations()
+    {
+        _includeNavigations = new string[] { 
+		};
+        OnSetIncludeNavigations();
+        return _includeNavigations;
+    }
+
+    static Expression<Func<Grade, bool>>[] _filters;
+    public static Expression<Func<Grade, bool>>[] Filters(string searchString)
+    {
+        _filters = new Expression<Func<Grade, bool>>[]
+					   {
+							SearchExpression(searchString)
+
+					   };
+        OnSetFilters(searchString);
+        return _filters;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asGradeDto = x => new GradeDto
+        {
+            
+            Id = x.Id,
+            
+            Name = x.Name,
+            // DisplayName = x.DisplayName,
+            // Description = x.Description,
+			// +simplex
+			BeginMark = x.BeginMark,
+			NextBeginMark = x.NextBeginMark,
+			Point = x.Point,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+        };
+
+        _asGrade = x => new Grade
+        {
+            
+            Id = x.Id,
+            
+            Name = x.Name,
+            // DisplayName = x.DisplayName,
+            // Description = x.Description,
+			// +simple
+			BeginMark = x.BeginMark,
+			NextBeginMark = x.NextBeginMark,
+			Point = x.Point,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+             
+        };
+
+        _toGradeFunc = (y,x) => {
+            
+            y.Id = x.Id;
+            
+            y.Name = x.Name;
+            // y.DisplayName = x.DisplayName;
+			// +simple
+			y.BeginMark = x.BeginMark;
+			y.NextBeginMark = x.NextBeginMark;
+			y.Point = x.Point;
+            
+            y.IsVisible = x.IsVisible;
+            y.InsertUser = x.InsertUser;
+            y.InsertDateTime = x.InsertDateTime;
+            y.UpdateUser = x.UpdateUser;
+            y.UpdateDateTime = x.UpdateDateTime;
+            y.LastActivityUser = x.LastActivityUser;
+            y.LastActivityDateTime = x.LastActivityDateTime;
+            // y.Version = x.Version;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asGradeFunc = _asGrade.Compile();
+        _asGradeDtoFunc = _asGradeDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<Grade> query);
+    static partial void OnSetOrderQuery(IQueryable<GradeDto> query);
+    static partial void OnSetSearchQuery(IQueryable<Grade> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}
+
+public partial class SemesterDto : BaseNameEntityDto
+{
+    public SemesterDto()
+    {
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+	private static Expression<Func<Semester, SemesterDto>> _asSemesterDto;
+    public static Expression<Func<Semester, SemesterDto>> AsSemesterDto
+    {
+        get
+        {
+            SetConverters();
+            return _asSemesterDto;
+        }
+    }
+    
+    private static Func<Semester, SemesterDto> _asSemesterDtoFunc;
+    public static Func<Semester, SemesterDto> AsSemesterDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asSemesterDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<SemesterDto, Semester>> _asSemester;
+    public static Expression<Func<SemesterDto, Semester>> AsSemester
+    {
+        get
+        {
+            SetConverters();
+            return _asSemester;
+        }
+    }
+    
+    private static Func<SemesterDto, Semester> _asSemesterFunc;
+    public static Func<SemesterDto, Semester> AsSemesterFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asSemesterFunc;
+        }
+    }
+
+	private static Func<Semester, SemesterDto, Semester> _toSemesterFunc;
+    public static Func<Semester, SemesterDto, Semester> ToSemesterFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toSemesterFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<Semester, string>> _orderSemester;
+    public static Expression<Func<Semester, string>> OrderSemester
+    {
+        get
+        {
+            SetConverters();
+            return _orderSemester;
+        }
+    }
+	*/
+
+	private static Expression<Func<Semester, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+			|| w.Name.Contains(searchString) 
+			;
+    }
+
+    static IQueryable<Semester> _searchQuery;
+    public static IQueryable<Semester> Search(IQueryable<Semester> query, string searchString)
+    {
+        _searchQuery = query.Where(
+						SearchExpression(searchString)
+					);
+		OnSetSearchQuery(query, searchString);
+		return _searchQuery;
+	}
+
+    static IOrderedQueryable<Semester> _orderQuery;
+    public static IOrderedQueryable<Semester> OrderBy(IQueryable<Semester> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Name);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<SemesterDto> _orderQueryDto;
+    public static IOrderedQueryable<SemesterDto> OrderBy(IQueryable<SemesterDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Name);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+	static string[] _includeNavigations;
+    public static string[] IncludeNavigations()
+    {
+        _includeNavigations = new string[] { 
+		};
+        OnSetIncludeNavigations();
+        return _includeNavigations;
+    }
+
+    static Expression<Func<Semester, bool>>[] _filters;
+    public static Expression<Func<Semester, bool>>[] Filters(string searchString)
+    {
+        _filters = new Expression<Func<Semester, bool>>[]
+					   {
+							SearchExpression(searchString)
+
+					   };
+        OnSetFilters(searchString);
+        return _filters;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asSemesterDto = x => new SemesterDto
+        {
+            
+            Id = x.Id,
+            
+            Name = x.Name,
+            // DisplayName = x.DisplayName,
+            // Description = x.Description,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+        };
+
+        _asSemester = x => new Semester
+        {
+            
+            Id = x.Id,
+            
+            Name = x.Name,
+            // DisplayName = x.DisplayName,
+            // Description = x.Description,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+             
+        };
+
+        _toSemesterFunc = (y,x) => {
+            
+            y.Id = x.Id;
+            
+            y.Name = x.Name;
+            // y.DisplayName = x.DisplayName;
+            
+            y.IsVisible = x.IsVisible;
+            y.InsertUser = x.InsertUser;
+            y.InsertDateTime = x.InsertDateTime;
+            y.UpdateUser = x.UpdateUser;
+            y.UpdateDateTime = x.UpdateDateTime;
+            y.LastActivityUser = x.LastActivityUser;
+            y.LastActivityDateTime = x.LastActivityDateTime;
+            // y.Version = x.Version;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asSemesterFunc = _asSemester.Compile();
+        _asSemesterDtoFunc = _asSemesterDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<Semester> query);
+    static partial void OnSetOrderQuery(IQueryable<SemesterDto> query);
+    static partial void OnSetSearchQuery(IQueryable<Semester> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}
+
+public partial class SessionDto : BaseNameEntityDto
+{
+    public SessionDto()
+    {
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+	private static Expression<Func<Session, SessionDto>> _asSessionDto;
+    public static Expression<Func<Session, SessionDto>> AsSessionDto
+    {
+        get
+        {
+            SetConverters();
+            return _asSessionDto;
+        }
+    }
+    
+    private static Func<Session, SessionDto> _asSessionDtoFunc;
+    public static Func<Session, SessionDto> AsSessionDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asSessionDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<SessionDto, Session>> _asSession;
+    public static Expression<Func<SessionDto, Session>> AsSession
+    {
+        get
+        {
+            SetConverters();
+            return _asSession;
+        }
+    }
+    
+    private static Func<SessionDto, Session> _asSessionFunc;
+    public static Func<SessionDto, Session> AsSessionFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asSessionFunc;
+        }
+    }
+
+	private static Func<Session, SessionDto, Session> _toSessionFunc;
+    public static Func<Session, SessionDto, Session> ToSessionFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toSessionFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<Session, string>> _orderSession;
+    public static Expression<Func<Session, string>> OrderSession
+    {
+        get
+        {
+            SetConverters();
+            return _orderSession;
+        }
+    }
+	*/
+
+	private static Expression<Func<Session, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+			|| w.Name.Contains(searchString) 
+			;
+    }
+
+    static IQueryable<Session> _searchQuery;
+    public static IQueryable<Session> Search(IQueryable<Session> query, string searchString)
+    {
+        _searchQuery = query.Where(
+						SearchExpression(searchString)
+					);
+		OnSetSearchQuery(query, searchString);
+		return _searchQuery;
+	}
+
+    static IOrderedQueryable<Session> _orderQuery;
+    public static IOrderedQueryable<Session> OrderBy(IQueryable<Session> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Name);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<SessionDto> _orderQueryDto;
+    public static IOrderedQueryable<SessionDto> OrderBy(IQueryable<SessionDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Name);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+	static string[] _includeNavigations;
+    public static string[] IncludeNavigations()
+    {
+        _includeNavigations = new string[] { 
+		};
+        OnSetIncludeNavigations();
+        return _includeNavigations;
+    }
+
+    static Expression<Func<Session, bool>>[] _filters;
+    public static Expression<Func<Session, bool>>[] Filters(string searchString)
+    {
+        _filters = new Expression<Func<Session, bool>>[]
+					   {
+							SearchExpression(searchString)
+
+					   };
+        OnSetFilters(searchString);
+        return _filters;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asSessionDto = x => new SessionDto
+        {
+            
+            Id = x.Id,
+            
+            Name = x.Name,
+            // DisplayName = x.DisplayName,
+            // Description = x.Description,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+        };
+
+        _asSession = x => new Session
+        {
+            
+            Id = x.Id,
+            
+            Name = x.Name,
+            // DisplayName = x.DisplayName,
+            // Description = x.Description,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+             
+        };
+
+        _toSessionFunc = (y,x) => {
+            
+            y.Id = x.Id;
+            
+            y.Name = x.Name;
+            // y.DisplayName = x.DisplayName;
+            
+            y.IsVisible = x.IsVisible;
+            y.InsertUser = x.InsertUser;
+            y.InsertDateTime = x.InsertDateTime;
+            y.UpdateUser = x.UpdateUser;
+            y.UpdateDateTime = x.UpdateDateTime;
+            y.LastActivityUser = x.LastActivityUser;
+            y.LastActivityDateTime = x.LastActivityDateTime;
+            // y.Version = x.Version;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asSessionFunc = _asSession.Compile();
+        _asSessionDtoFunc = _asSessionDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<Session> query);
+    static partial void OnSetOrderQuery(IQueryable<SessionDto> query);
+    static partial void OnSetSearchQuery(IQueryable<Session> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}
+
+public partial class StudentDto : BaseEntityDto
+{
+	public String StudentDescription { get; private set; }
+
+    public StudentDto()
+    {
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+    [Required(ErrorMessage = "The Matric No is a mandatory Field.")]
+	[Display(Name = "Matric No")]
+	public string MatricNo { get; set; }
+    [Required(ErrorMessage = "The Lastname is a mandatory Field.")]
+	[Display(Name = "Lastname")]
+	public string Lastname { get; set; }
+    [Required(ErrorMessage = "The Firstname is a mandatory Field.")]
+	[Display(Name = "Firstname")]
+	public string Firstname { get; set; }
+    [Display(Name = "Middlename")]
+	public string Middlename { get; set; }
+	private static Expression<Func<Student, StudentDto>> _asStudentDto;
+    public static Expression<Func<Student, StudentDto>> AsStudentDto
+    {
+        get
+        {
+            SetConverters();
+            return _asStudentDto;
+        }
+    }
+    
+    private static Func<Student, StudentDto> _asStudentDtoFunc;
+    public static Func<Student, StudentDto> AsStudentDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asStudentDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<StudentDto, Student>> _asStudent;
+    public static Expression<Func<StudentDto, Student>> AsStudent
+    {
+        get
+        {
+            SetConverters();
+            return _asStudent;
+        }
+    }
+    
+    private static Func<StudentDto, Student> _asStudentFunc;
+    public static Func<StudentDto, Student> AsStudentFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asStudentFunc;
+        }
+    }
+
+	private static Func<Student, StudentDto, Student> _toStudentFunc;
+    public static Func<Student, StudentDto, Student> ToStudentFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toStudentFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<Student, string>> _orderStudent;
+    public static Expression<Func<Student, string>> OrderStudent
+    {
+        get
+        {
+            SetConverters();
+            return _orderStudent;
+        }
+    }
+	*/
+
+	private static Expression<Func<Student, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+			|| w.MatricNo.Contains(searchString) //@string
+			|| w.Lastname.Contains(searchString) //@string
+			|| w.Firstname.Contains(searchString) //@string
+			|| w.Middlename.Contains(searchString) //@string
+			;
+    }
+
+    static IQueryable<Student> _searchQuery;
+    public static IQueryable<Student> Search(IQueryable<Student> query, string searchString)
+    {
+        _searchQuery = query.Where(
+						SearchExpression(searchString)
+					);
+		OnSetSearchQuery(query, searchString);
+		return _searchQuery;
+	}
+
+    static IOrderedQueryable<Student> _orderQuery;
+    public static IOrderedQueryable<Student> OrderBy(IQueryable<Student> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Id);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<StudentDto> _orderQueryDto;
+    public static IOrderedQueryable<StudentDto> OrderBy(IQueryable<StudentDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Id);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+	static string[] _includeNavigations;
+    public static string[] IncludeNavigations()
+    {
+        _includeNavigations = new string[] { 
+		};
+        OnSetIncludeNavigations();
+        return _includeNavigations;
+    }
+
+    static Expression<Func<Student, bool>>[] _filters;
+    public static Expression<Func<Student, bool>>[] Filters(string searchString)
+    {
+        _filters = new Expression<Func<Student, bool>>[]
+					   {
+							SearchExpression(searchString)
+
+					   };
+        OnSetFilters(searchString);
+        return _filters;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asStudentDto = x => new StudentDto
+        {
+			StudentDescription = x.StudentDescription,
+            
+            Id = x.Id,
+			// +simplex
+			MatricNo = x.MatricNo,
+			Lastname = x.Lastname,
+			Firstname = x.Firstname,
+			Middlename = x.Middlename,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+        };
+
+        _asStudent = x => new Student
+        {
+            
+            Id = x.Id,
+			// +simple
+			MatricNo = x.MatricNo,
+			Lastname = x.Lastname,
+			Firstname = x.Firstname,
+			Middlename = x.Middlename,
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+             
+        };
+
+        _toStudentFunc = (y,x) => {
+            
+            y.Id = x.Id;
+			// +simple
+			y.MatricNo = x.MatricNo;
+			y.Lastname = x.Lastname;
+			y.Firstname = x.Firstname;
+			y.Middlename = x.Middlename;
+            
+            y.IsVisible = x.IsVisible;
+            y.InsertUser = x.InsertUser;
+            y.InsertDateTime = x.InsertDateTime;
+            y.UpdateUser = x.UpdateUser;
+            y.UpdateDateTime = x.UpdateDateTime;
+            y.LastActivityUser = x.LastActivityUser;
+            y.LastActivityDateTime = x.LastActivityDateTime;
+            // y.Version = x.Version;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asStudentFunc = _asStudent.Compile();
+        _asStudentDtoFunc = _asStudentDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<Student> query);
+    static partial void OnSetOrderQuery(IQueryable<StudentDto> query);
+    static partial void OnSetSearchQuery(IQueryable<Student> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}
+
+public partial class StudentCourseDto : BaseEntityDto
+{
+	public String StudentCourseDescription { get; private set; }
+
+    public StudentCourseDto()
+    {
+		
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+    [ForeignKey("Session")]
+	[Display(Name = "Session")]
+	public int? SessionId { get; set; }
+    [ForeignKey("Semester")]
+	[Display(Name = "Semester")]
+	public int? SemesterId { get; set; }
+    [ForeignKey("Student")]
+	[Display(Name = "Student")]
+	public int StudentId { get; set; }
+    [ForeignKey("Course")]
+	[Display(Name = "Course")]
+	public int CourseId { get; set; }
+    [Display(Name = "Score")]
+	public double Score { get; set; }
+	// +navigation
+    // +Student
+	[Display(Name = "Student Matric No")]
+	public string StudentMatricNo { get; set; }
+	[Display(Name = "Student Description")]
+	public string StudentDescription { get; set; } //Basic-Nav-Property
+	// -Student
+    // +Course
+	[Display(Name = "Course Code")]
+	public string CourseCode { get; set; }
+	[Display(Name = "Course Description")]
+	public string CourseDescription { get; set; } //Basic-Nav-Property
+	// -Course
+    // +Session
+	[Display(Name = "Session Name")]
+	public string SessionName { get; set; }
+	// -Session
+    // +Semester
+	[Display(Name = "Semester Name")]
+	public string SemesterName { get; set; }
+	// -Semester
+	// -navigation
+	private static Expression<Func<StudentCourse, StudentCourseDto>> _asStudentCourseDto;
+    public static Expression<Func<StudentCourse, StudentCourseDto>> AsStudentCourseDto
+    {
+        get
+        {
+            SetConverters();
+            return _asStudentCourseDto;
+        }
+    }
+    
+    private static Func<StudentCourse, StudentCourseDto> _asStudentCourseDtoFunc;
+    public static Func<StudentCourse, StudentCourseDto> AsStudentCourseDtoFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asStudentCourseDtoFunc;
+        }
+    }
+    
+    private static Expression<Func<StudentCourseDto, StudentCourse>> _asStudentCourse;
+    public static Expression<Func<StudentCourseDto, StudentCourse>> AsStudentCourse
+    {
+        get
+        {
+            SetConverters();
+            return _asStudentCourse;
+        }
+    }
+    
+    private static Func<StudentCourseDto, StudentCourse> _asStudentCourseFunc;
+    public static Func<StudentCourseDto, StudentCourse> AsStudentCourseFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asStudentCourseFunc;
+        }
+    }
+
+	private static Func<StudentCourse, StudentCourseDto, StudentCourse> _toStudentCourseFunc;
+    public static Func<StudentCourse, StudentCourseDto, StudentCourse> ToStudentCourseFunc
+    {
+        get
+        {
+            SetConverters();
+            return _toStudentCourseFunc;
+        }
+    }
+
+	/*
+	private static Expression<Func<StudentCourse, string>> _orderStudentCourse;
+    public static Expression<Func<StudentCourse, string>> OrderStudentCourse
+    {
+        get
+        {
+            SetConverters();
+            return _orderStudentCourse;
+        }
+    }
+	*/
+
+	private static Expression<Func<StudentCourse, bool>> SearchExpression(string searchString)
+    {
+        return 
+				w => w.Id.ToString().Contains(searchString) 
+				|| w.Session.Id.ToString().Contains(searchString) //null
+				|| w.Semester.Id.ToString().Contains(searchString) //null
+				|| w.Student.MatricNo.Contains(searchString) //MatricNo
+				|| w.Course.Code.Contains(searchString) //Code
+			;
+    }
+
+    static IQueryable<StudentCourse> _searchQuery;
+    public static IQueryable<StudentCourse> Search(IQueryable<StudentCourse> query, string searchString)
+    {
+        _searchQuery = query.Where(
+						SearchExpression(searchString)
+					);
+		OnSetSearchQuery(query, searchString);
+		return _searchQuery;
+	}
+
+    static IOrderedQueryable<StudentCourse> _orderQuery;
+    public static IOrderedQueryable<StudentCourse> OrderBy(IQueryable<StudentCourse> query)
+    {
+		_orderQuery = query.OrderBy(o => o.Id);
+		OnSetOrderQuery(query);
+        return _orderQuery;
+    }
+
+    static IOrderedQueryable<StudentCourseDto> _orderQueryDto;
+    public static IOrderedQueryable<StudentCourseDto> OrderBy(IQueryable<StudentCourseDto> query)
+    {
+		_orderQueryDto = query.OrderBy(o => o.Id);
+        OnSetOrderQuery(query);
+        return _orderQueryDto;
+    }
+
+	static string[] _includeNavigations;
+    public static string[] IncludeNavigations()
+    {
+        _includeNavigations = new string[] { 
+	// +navigation
+    // +Student
+			"Student",//String-Nav-Property
+			// -Student
+    // +Course
+			"Course",//String-Nav-Property
+			// -Course
+    // +Session
+			"Session",//String-Nav-Property
+			// -Session
+    // +Semester
+			"Semester",//String-Nav-Property
+			// -Semester
+	// -navigation
+		};
+        OnSetIncludeNavigations();
+        return _includeNavigations;
+    }
+
+    static Expression<Func<StudentCourse, bool>>[] _filters;
+    public static Expression<Func<StudentCourse, bool>>[] Filters(string searchString)
+    {
+        _filters = new Expression<Func<StudentCourse, bool>>[]
+					   {
+							SearchExpression(searchString)
+
+					   };
+        OnSetFilters(searchString);
+        return _filters;
+    }
+
+
+	private static void SetConverters()
+    {
+        _asStudentCourseDto = x => new StudentCourseDto
+        {
+			StudentCourseDescription = x.StudentCourseDescription,
+            
+            Id = x.Id,
+			// +simplex
+			SessionId = x.SessionId,
+			SemesterId = x.SemesterId,
+			StudentId = x.StudentId,
+			CourseId = x.CourseId,
+			Score = x.Score,
+			// +navigation
+			// +Student
+			StudentMatricNo = x.Student == null ? default : x.Student.MatricNo,
+			StudentDescription = x.Student == null ? default : (x.Student.StudentDescription), //Basic-Nav-Property
+			// -Student
+			// +Course
+			CourseCode = x.Course == null ? default : x.Course.Code,
+			CourseDescription = x.Course == null ? default : (x.Course.CourseDescription), //Basic-Nav-Property
+			// -Course
+			// +Session
+			SessionName = x.Session == null ? default : x.Session.Name,
+			// -Session
+			// +Semester
+			SemesterName = x.Semester == null ? default : x.Semester.Name,
+			// -Semester
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+        };
+
+        _asStudentCourse = x => new StudentCourse
+        {
+            
+            Id = x.Id,
+			// +simple
+			SessionId = x.SessionId,
+			SemesterId = x.SemesterId,
+			StudentId = x.StudentId,
+			CourseId = x.CourseId,
+			Score = x.Score,
+			// +navigation
+            
+            IsVisible = x.IsVisible,
+            InsertUser = x.InsertUser,
+            InsertDateTime = x.InsertDateTime,
+            UpdateUser = x.UpdateUser,
+            UpdateDateTime = x.UpdateDateTime,
+            LastActivityUser = x.LastActivityUser,
+            LastActivityDateTime = x.LastActivityDateTime,
+            Version = x.Version
+             
+        };
+
+        _toStudentCourseFunc = (y,x) => {
+            
+            y.Id = x.Id;
+			// +simple
+			y.SessionId = x.SessionId;
+			y.SemesterId = x.SemesterId;
+			y.StudentId = x.StudentId;
+			y.CourseId = x.CourseId;
+			y.Score = x.Score;
+			// +navigation
+			/* y.Student.MatricNo = x.StudentMatricNo; */
+			/* y.Course.Code = x.CourseCode; */
+			/* y.Session.Name = x.SessionName; */
+			/* y.Semester.Name = x.SemesterName; */
+            
+            y.IsVisible = x.IsVisible;
+            y.InsertUser = x.InsertUser;
+            y.InsertDateTime = x.InsertDateTime;
+            y.UpdateUser = x.UpdateUser;
+            y.UpdateDateTime = x.UpdateDateTime;
+            y.LastActivityUser = x.LastActivityUser;
+            y.LastActivityDateTime = x.LastActivityDateTime;
+            // y.Version = x.Version;
+      
+			return y;
+        };
+
+        OnSetConverters();
+
+        _asStudentCourseFunc = _asStudentCourse.Compile();
+        _asStudentCourseDtoFunc = _asStudentCourseDto.Compile();
+    }
+
+    static partial void OnSetConverters();
+    static partial void OnSetOrderQuery(IQueryable<StudentCourse> query);
+    static partial void OnSetOrderQuery(IQueryable<StudentCourseDto> query);
+    static partial void OnSetSearchQuery(IQueryable<StudentCourse> query, string searchString);
+    static partial void OnSetOrders();
+    static partial void OnSetIncludeNavigations();
+    static partial void OnSetFilters(string searchString);
+}

@@ -7,3 +7,639 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq.Expressions;
+using .Entities;
+
+public partial class AppSettingCache : BaseEntityCache
+{
+    public AppSettingCache()
+    {
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+
+    private static Expression<Func<AppSetting, string>> _orderAppSetting;
+    public static Expression<Func<AppSetting, string>> OrderAppSetting
+    {
+        get
+        {
+            SetConverters();
+            return _orderAppSetting;
+        }
+    }
+    
+	private static Expression<Func<AppSetting, AppSettingCache>> _asAppSettingCache;
+    public static Expression<Func<AppSetting, AppSettingCache>> AsAppSettingCache
+    {
+        get
+        {
+            SetConverters();
+            return _asAppSettingCache;
+        }
+    }
+    
+    private static Func<AppSetting, AppSettingCache> _asAppSettingCacheFunc;
+    public static Func<AppSetting, AppSettingCache> AsAppSettingCacheFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asAppSettingCacheFunc;
+        }
+    }
+    
+	private static void SetConverters()
+    {
+        _orderAppSetting = x => x.Id.ToString();
+
+        _asAppSettingCache = x => new AppSettingCache
+        {
+			Id = x.Id,
+            
+            Name = null, //[x.Name],
+			
+        };
+
+        OnSetConverters();
+
+        _asAppSettingCacheFunc = _asAppSettingCache.Compile();
+    }
+
+    static partial void OnSetConverters();
+
+
+	
+}
+
+public partial class BaseEntityCache : BaseCache
+{
+    public BaseEntityCache()
+    {
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+
+    private static Expression<Func<BaseEntity, string>> _orderBaseEntity;
+    public static Expression<Func<BaseEntity, string>> OrderBaseEntity
+    {
+        get
+        {
+            SetConverters();
+            return _orderBaseEntity;
+        }
+    }
+    
+	private static Expression<Func<BaseEntity, BaseEntityCache>> _asBaseEntityCache;
+    public static Expression<Func<BaseEntity, BaseEntityCache>> AsBaseEntityCache
+    {
+        get
+        {
+            SetConverters();
+            return _asBaseEntityCache;
+        }
+    }
+    
+    private static Func<BaseEntity, BaseEntityCache> _asBaseEntityCacheFunc;
+    public static Func<BaseEntity, BaseEntityCache> AsBaseEntityCacheFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asBaseEntityCacheFunc;
+        }
+    }
+    
+	private static void SetConverters()
+    {
+        _orderBaseEntity = x => x.Id.ToString();
+
+        _asBaseEntityCache = x => new BaseEntityCache
+        {
+			Id = x.Id,
+            
+            Name = null, //[x.Name],
+			
+        };
+
+        OnSetConverters();
+
+        _asBaseEntityCacheFunc = _asBaseEntityCache.Compile();
+    }
+
+    static partial void OnSetConverters();
+
+
+	
+}
+
+public partial class BaseNameEntityCache : BaseEntityCache
+{
+    public BaseNameEntityCache()
+    {
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+
+    private static Expression<Func<BaseNameEntity, string>> _orderBaseNameEntity;
+    public static Expression<Func<BaseNameEntity, string>> OrderBaseNameEntity
+    {
+        get
+        {
+            SetConverters();
+            return _orderBaseNameEntity;
+        }
+    }
+    
+	private static Expression<Func<BaseNameEntity, BaseNameEntityCache>> _asBaseNameEntityCache;
+    public static Expression<Func<BaseNameEntity, BaseNameEntityCache>> AsBaseNameEntityCache
+    {
+        get
+        {
+            SetConverters();
+            return _asBaseNameEntityCache;
+        }
+    }
+    
+    private static Func<BaseNameEntity, BaseNameEntityCache> _asBaseNameEntityCacheFunc;
+    public static Func<BaseNameEntity, BaseNameEntityCache> AsBaseNameEntityCacheFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asBaseNameEntityCacheFunc;
+        }
+    }
+    
+	private static void SetConverters()
+    {
+        _orderBaseNameEntity = x => x.Id.ToString();
+
+        _asBaseNameEntityCache = x => new BaseNameEntityCache
+        {
+			Id = x.Id,
+            
+            Name = null, //[x.Name],
+			
+        };
+
+        OnSetConverters();
+
+        _asBaseNameEntityCacheFunc = _asBaseNameEntityCache.Compile();
+    }
+
+    static partial void OnSetConverters();
+
+
+	
+}
+
+public partial class CardCache : BaseEntityCache
+{
+    public CardCache()
+    {
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+
+    private static Expression<Func<Card, string>> _orderCard;
+    public static Expression<Func<Card, string>> OrderCard
+    {
+        get
+        {
+            SetConverters();
+            return _orderCard;
+        }
+    }
+    
+	private static Expression<Func<Card, CardCache>> _asCardCache;
+    public static Expression<Func<Card, CardCache>> AsCardCache
+    {
+        get
+        {
+            SetConverters();
+            return _asCardCache;
+        }
+    }
+    
+    private static Func<Card, CardCache> _asCardCacheFunc;
+    public static Func<Card, CardCache> AsCardCacheFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asCardCacheFunc;
+        }
+    }
+    
+	private static void SetConverters()
+    {
+        _orderCard = x => x.Id.ToString();
+
+        _asCardCache = x => new CardCache
+        {
+			Id = x.Id,
+            
+            Name = null, //[x.Name],
+			
+        };
+
+        OnSetConverters();
+
+        _asCardCacheFunc = _asCardCache.Compile();
+    }
+
+    static partial void OnSetConverters();
+
+
+	
+}
+
+public partial class CourseCache : BaseEntityCache
+{
+    public CourseCache()
+    {
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+
+    private static Expression<Func<Course, string>> _orderCourse;
+    public static Expression<Func<Course, string>> OrderCourse
+    {
+        get
+        {
+            SetConverters();
+            return _orderCourse;
+        }
+    }
+    
+	private static Expression<Func<Course, CourseCache>> _asCourseCache;
+    public static Expression<Func<Course, CourseCache>> AsCourseCache
+    {
+        get
+        {
+            SetConverters();
+            return _asCourseCache;
+        }
+    }
+    
+    private static Func<Course, CourseCache> _asCourseCacheFunc;
+    public static Func<Course, CourseCache> AsCourseCacheFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asCourseCacheFunc;
+        }
+    }
+    
+	private static void SetConverters()
+    {
+        _orderCourse = x => x.Id.ToString();
+
+        _asCourseCache = x => new CourseCache
+        {
+			Id = x.Id,
+            
+            Name = null, //[x.Name],
+			
+        };
+
+        OnSetConverters();
+
+        _asCourseCacheFunc = _asCourseCache.Compile();
+    }
+
+    static partial void OnSetConverters();
+
+
+	
+}
+
+public partial class GradeCache : BaseNameEntityCache
+{
+    public GradeCache()
+    {
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+
+    private static Expression<Func<Grade, string>> _orderGrade;
+    public static Expression<Func<Grade, string>> OrderGrade
+    {
+        get
+        {
+            SetConverters();
+            return _orderGrade;
+        }
+    }
+    
+	private static Expression<Func<Grade, GradeCache>> _asGradeCache;
+    public static Expression<Func<Grade, GradeCache>> AsGradeCache
+    {
+        get
+        {
+            SetConverters();
+            return _asGradeCache;
+        }
+    }
+    
+    private static Func<Grade, GradeCache> _asGradeCacheFunc;
+    public static Func<Grade, GradeCache> AsGradeCacheFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asGradeCacheFunc;
+        }
+    }
+    
+	private static void SetConverters()
+    {
+        _orderGrade = x => x.Name;
+
+        _asGradeCache = x => new GradeCache
+        {
+			Id = x.Id,
+            
+            Name = x.Name,
+			
+        };
+
+        OnSetConverters();
+
+        _asGradeCacheFunc = _asGradeCache.Compile();
+    }
+
+    static partial void OnSetConverters();
+
+
+	
+}
+
+public partial class SemesterCache : BaseNameEntityCache
+{
+    public SemesterCache()
+    {
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+
+    private static Expression<Func<Semester, string>> _orderSemester;
+    public static Expression<Func<Semester, string>> OrderSemester
+    {
+        get
+        {
+            SetConverters();
+            return _orderSemester;
+        }
+    }
+    
+	private static Expression<Func<Semester, SemesterCache>> _asSemesterCache;
+    public static Expression<Func<Semester, SemesterCache>> AsSemesterCache
+    {
+        get
+        {
+            SetConverters();
+            return _asSemesterCache;
+        }
+    }
+    
+    private static Func<Semester, SemesterCache> _asSemesterCacheFunc;
+    public static Func<Semester, SemesterCache> AsSemesterCacheFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asSemesterCacheFunc;
+        }
+    }
+    
+	private static void SetConverters()
+    {
+        _orderSemester = x => x.Name;
+
+        _asSemesterCache = x => new SemesterCache
+        {
+			Id = x.Id,
+            
+            Name = x.Name,
+			
+        };
+
+        OnSetConverters();
+
+        _asSemesterCacheFunc = _asSemesterCache.Compile();
+    }
+
+    static partial void OnSetConverters();
+
+
+	
+}
+
+public partial class SessionCache : BaseNameEntityCache
+{
+    public SessionCache()
+    {
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+
+    private static Expression<Func<Session, string>> _orderSession;
+    public static Expression<Func<Session, string>> OrderSession
+    {
+        get
+        {
+            SetConverters();
+            return _orderSession;
+        }
+    }
+    
+	private static Expression<Func<Session, SessionCache>> _asSessionCache;
+    public static Expression<Func<Session, SessionCache>> AsSessionCache
+    {
+        get
+        {
+            SetConverters();
+            return _asSessionCache;
+        }
+    }
+    
+    private static Func<Session, SessionCache> _asSessionCacheFunc;
+    public static Func<Session, SessionCache> AsSessionCacheFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asSessionCacheFunc;
+        }
+    }
+    
+	private static void SetConverters()
+    {
+        _orderSession = x => x.Name;
+
+        _asSessionCache = x => new SessionCache
+        {
+			Id = x.Id,
+            
+            Name = x.Name,
+			
+        };
+
+        OnSetConverters();
+
+        _asSessionCacheFunc = _asSessionCache.Compile();
+    }
+
+    static partial void OnSetConverters();
+
+
+	
+}
+
+public partial class StudentCache : BaseEntityCache
+{
+    public StudentCache()
+    {
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+
+    private static Expression<Func<Student, string>> _orderStudent;
+    public static Expression<Func<Student, string>> OrderStudent
+    {
+        get
+        {
+            SetConverters();
+            return _orderStudent;
+        }
+    }
+    
+	private static Expression<Func<Student, StudentCache>> _asStudentCache;
+    public static Expression<Func<Student, StudentCache>> AsStudentCache
+    {
+        get
+        {
+            SetConverters();
+            return _asStudentCache;
+        }
+    }
+    
+    private static Func<Student, StudentCache> _asStudentCacheFunc;
+    public static Func<Student, StudentCache> AsStudentCacheFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asStudentCacheFunc;
+        }
+    }
+    
+	private static void SetConverters()
+    {
+        _orderStudent = x => x.Id.ToString();
+
+        _asStudentCache = x => new StudentCache
+        {
+			Id = x.Id,
+            
+            Name = null, //[x.Name],
+			
+        };
+
+        OnSetConverters();
+
+        _asStudentCacheFunc = _asStudentCache.Compile();
+    }
+
+    static partial void OnSetConverters();
+
+
+	
+}
+
+public partial class StudentCourseCache : BaseEntityCache
+{
+    public StudentCourseCache()
+    {
+        OnInitialize();
+    }
+
+    partial void OnInitialize();
+
+
+    private static Expression<Func<StudentCourse, string>> _orderStudentCourse;
+    public static Expression<Func<StudentCourse, string>> OrderStudentCourse
+    {
+        get
+        {
+            SetConverters();
+            return _orderStudentCourse;
+        }
+    }
+    
+	private static Expression<Func<StudentCourse, StudentCourseCache>> _asStudentCourseCache;
+    public static Expression<Func<StudentCourse, StudentCourseCache>> AsStudentCourseCache
+    {
+        get
+        {
+            SetConverters();
+            return _asStudentCourseCache;
+        }
+    }
+    
+    private static Func<StudentCourse, StudentCourseCache> _asStudentCourseCacheFunc;
+    public static Func<StudentCourse, StudentCourseCache> AsStudentCourseCacheFunc
+    {
+        get
+        {
+            SetConverters();
+            return _asStudentCourseCacheFunc;
+        }
+    }
+    
+	private static void SetConverters()
+    {
+        _orderStudentCourse = x => x.Id.ToString();
+
+        _asStudentCourseCache = x => new StudentCourseCache
+        {
+			Id = x.Id,
+            
+            Name = null, //[x.Name],
+			
+        };
+
+        OnSetConverters();
+
+        _asStudentCourseCacheFunc = _asStudentCourseCache.Compile();
+    }
+
+    static partial void OnSetConverters();
+
+
+	
+}
